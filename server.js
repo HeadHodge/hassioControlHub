@@ -63,15 +63,17 @@ request.on('error', (err) => {
 */
 /////////////////////////////////////////////////////
 const os = require('os');
-const WebSocket = require('/root/node_modules/ws');
-const wss = new WebSocket.Server({ port: 8080 });
+const ws = require('/root/node_modules/ws');
+const server = new ws.Server({ port: 8080 });
 
 console.log(`Started Server on ${os.hostname}`);
 
-wss.on('connection', function connection(ws) {
-	ws.on('message', function incoming(message) {
-		console.log('received: %s', message);
-		ws.send('Got It');
+
+
+server.on('connection', function connection(client) {
+	client.on('message', function incoming(message) {
+		console.log(`received: ${message}`);
+		client.send(`Got It`);
 	});
 
 });
