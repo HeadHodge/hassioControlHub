@@ -1,7 +1,8 @@
-//var WebSocketServer = require('/root/node_modules/websocket').server;
-const WebSocket = require('/root/node_modules/ws')
-const http = require('http');
+	
 ///////////////////////////////////////////////////////
+/*
+const http = require('http');
+
 const options = {
   host: '192.168.0.160',
   port: 5050,
@@ -59,13 +60,18 @@ request.end();
 request.on('error', (err) => {
   console.error(`Encountered an error trying to make a request: ${err.message}`);
 });
-
+*/
 /////////////////////////////////////////////////////
-const wss = new WebSocket.Server({ port: 8080 })
+const os = require('os');
+const WebSocket = require('/root/node_modules/ws');
+const wss = new WebSocket.Server({ port: 8080 });
 
-wss.on('connection', ws => {
-  ws.on('message', message => {
-    console.log(`Received message => ${message}`)
-  })
-  ws.send('ho!')
-})
+console.log(`Started Server on ${os.hostname}`);
+
+wss.on('connection', function connection(ws) {
+	ws.on('message', function incoming(message) {
+		console.log('received: %s', message);
+		ws.send('Got It');
+	});
+
+});
