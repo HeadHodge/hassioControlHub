@@ -6,20 +6,72 @@
 import asyncio, evdev, sys, websockets
 from evdev import InputDevice, categorize, ecodes
 
-async def hello():
+controlWords = {
+          1: "Esc",
+          2: "1",
+          3: "2",
+          4: "3",
+          5: "4",
+          6: "5",
+          7: "6",
+          8: "7",
+          9: "8",
+         10: "9",
+         11: "0",
+         28: "Ok",
+        103: "Up",
+        104: "Less",
+        105: "Left",
+        106: "Right",
+        108: "Down",
+        109: "More",
+        113: "Mute",
+        114: "Softer",
+        115: "Louder",
+        116: "On/Off",
+        127: "Compose",
+        158: "Last",
+        163: "Forward",
+        164: "Start/Stop",
+        165: "Backward",
+        172: "Home"
+}
+
+###################
+# Get Control Word
+###################
+def getControlWord(inputChar, inputCode):
+    global controlWords
+    
     try:
+        print('Enter getControlWord', inputCode, controlWords[inputCode])
+        return(controlWords[inputCode])
+        
+    except Exception as e:
+        print(e)
+        return(inputChar)
+
+###################
+# Send Input
+###################
+async def sendInput(inputChar, inputCode):
+
+    try:
+        controlWord = getControlWord(inputChar, inputCode)
+        
         async with websockets.connect("ws://localhost:8080") as websocket:
-            #print(websocket)
-            #name = input("What's your name? ")
+            print('Send Request', controlWord)
+            await websocket.send('{'+f'"symbol": "{controlWord}", "name": "Bob"'+'}')
+            print('Sent')
 
-            await websocket.send('Bob')
-            #print(f"> {name}")
-
+            print('Get Reply')
             greeting = await websocket.recv()
             print(greeting)
+
     except Exception as e:
         print('Oopps')
         print(e)
+
     else:
         print('Done')
         
@@ -31,9 +83,8 @@ async def captureInput(device):
         if event.type != 1 : continue
         inputEvent = categorize(event)
         if inputEvent.keystate != 0 : continue
-        print(device.path, inputEvent.keycode, inputEvent.scancode)
-        #asyncio.get_event_loop().run_until_complete(hello())
-        await hello()
+        print('Captured: ', device.path, inputEvent.keycode, inputEvent.scancode)
+        await sendInput(inputEvent.keycode, inputEvent.scancode)
 
 ###################
 #      MAIN
