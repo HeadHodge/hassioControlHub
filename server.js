@@ -32,7 +32,7 @@ const decideAction = function(controlWord) {
 //##########################################
 console.log(`Enter decideAction with ${controlWord.symbol} in zone ${controlWord.zone}`);
 
-	if(controlWord.symbol == 'Ok') isCommandMode = true;
+	if(controlWord.symbol == 'Set') isCommandMode = true;
 	if(isCommandMode) return createCommand(controlWord);
 };
   

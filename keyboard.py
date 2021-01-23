@@ -34,7 +34,8 @@ controlWords = {
         163: "Forward",
         164: "Start/Stop",
         165: "Backward",
-        172: "Home"
+        172: "Home",
+        191: "Set"
 }
 
 ###################
