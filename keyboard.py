@@ -7,7 +7,7 @@ import asyncio, evdev, sys, websockets
 from evdev import InputDevice, categorize, ecodes
 
 controlWords = {
-          1: "Esc",
+          1: "Exit",
           2: "1",
           3: "2",
           4: "3",
@@ -19,6 +19,7 @@ controlWords = {
          10: "9",
          11: "0",
          28: "Ok",
+         59: "Mute",
         103: "Up",
         104: "Less",
         105: "Left",
@@ -29,13 +30,15 @@ controlWords = {
         114: "Softer",
         115: "Louder",
         116: "On/Off",
-        127: "Compose",
-        158: "Last",
+        127: "Menu",
+        158: "Exit",
         163: "Forward",
         164: "Start/Stop",
         165: "Backward",
         172: "Home",
-        191: "Set"
+        191: "Set",
+        240: "Focus",
+        272: "Enter"
 }
 
 ###################

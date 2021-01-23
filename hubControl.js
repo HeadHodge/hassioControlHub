@@ -2,8 +2,7 @@
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
 const os = require('os');
-const ws = require('/root/node_modules/ws');
-var server = new ws.Server({ port: 8080 });
+const hubInput = require('/scripts/modules/hubInput.js');
 var isCommandMode = false;
 var tasks;
 
@@ -11,10 +10,10 @@ var tasks;
 const performTask = function(controlWord) {
 //##########################################
 console.log(`Enter performTask with ${controlWord.symbol} in zone ${controlWord.zone}`);
-var hubClient = require('/scripts/modules/hubClient.js');
+var hubOutput = require('/scripts/modules/hubOutput.js');
 var tasks = require('/scripts/modules/masterBedroom.js');
 
-	hubClient.sendTask(tasks.wake);
+	hubOutput.sendControlTask(tasks.wake);
 };
 
 //##########################################
@@ -36,11 +35,24 @@ console.log(`Enter decideAction with ${controlWord.symbol} in zone ${controlWord
 	if(isCommandMode) return createCommand(controlWord);
 };
   
+//##########################################
+const onInput = function(controlMsg) {
+//##########################################
+console.log(`onInput: ${controlMsg}`);
+
+	decideAction(JSON.parse(controlMsg));
+};
+		
 ////////////////////////////////////////////
 //                MAIN
 //Open server to listen for control input
 ////////////////////////////////////////////
-console.log(`Started Server on ${os.hostname}`);
+console.log(`Started hubControl on ${os.hostname}`);
+
+	hubInput.listen(onInput);
+/*	
+const ws = require('/root/node_modules/ws');
+var server = new ws.Server({ port: 8080 });
 
 server.on('connection', function connection(client) {
 	client.on('message', function incoming(message) {
@@ -50,3 +62,4 @@ server.on('connection', function connection(client) {
 	});
 
 });
+*/

@@ -14,9 +14,9 @@ const options = {
 };
 
 //##########################################
-const getReply = function(reply) {
+const onReply = function(reply) {
 //##########################################
-console.log(`Enter getReply, statusCode: ${reply.statusCode}`);
+console.log(`Enter onReply, statusCode: ${reply.statusCode}`);
 var buffer = '';
 
 	reply.on('data', function (chunk) {
@@ -29,10 +29,10 @@ var buffer = '';
 };
 
 //##########################################
-const sendTask = function(task) {
+const sendControlTask = function(task) {
 //##########################################
-console.log(`Enter sendTask: ${task}`);
-var request = http.request(options, getReply);	
+console.log(`Enter sendControlTask: ${task}`);
+var request = http.request(options, onReply);	
 
 	request.on('error', function (error) {
 		console.error(`Encountered an error trying to make a request: ${error.message}`);
@@ -47,4 +47,4 @@ var request = http.request(options, getReply);
 //Open connection with Hub and send request
 ////////////////////////////////////////////
 	console.log('hubClient loaded');
-	exports.sendTask = sendTask;
+	exports.sendControlTask = sendControlTask;
