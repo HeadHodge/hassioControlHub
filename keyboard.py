@@ -61,7 +61,7 @@ async def sendInput(inputChar, inputCode):
         
         async with websockets.connect("ws://localhost:8080") as websocket:
             print('Send Request', controlWord)
-            await websocket.send('{'+f'"symbol": "{controlWord}", "name": "Bob"'+'}')
+            await websocket.send('{'+f'"type": "control", "symbol": "{controlWord}", "zone": "masterBedroom"'+'}')
             print('Sent')
 
             print('Get Reply')
@@ -95,10 +95,10 @@ else:
   location = sys.argv[1]
   
 ## Open Control Input Channels
-chan1 = evdev.InputDevice('/dev/input/event3')
-chan2 = evdev.InputDevice('/dev/input/event4')
-chan3 = evdev.InputDevice('/dev/input/event5')
-chan4 = evdev.InputDevice('/dev/input/event6')
+chan1 = evdev.InputDevice('/dev/input/event8')
+chan2 = evdev.InputDevice('/dev/input/event9')
+chan3 = evdev.InputDevice('/dev/input/event10')
+chan4 = evdev.InputDevice('/dev/input/event11')
 
 ## Make Control Input Channels Private
 chan1.grab()
