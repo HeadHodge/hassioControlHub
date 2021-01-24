@@ -9,10 +9,10 @@ var inputCallback;
 const onConnection = function(connection) {
 //##########################################
 try {
-console.log(`Enter onConnection for client input`);
+console.log(`\n\n\n\nEnter onConnection for client input`);
 
 	connection.on('message', function(message) {
-	console.log(`\n\n\n\nreceived: ${message}`);
+	console.log(`received: ${message}`);
 
 		connection.controlInput = JSON.parse(message);
 		if(connection.controlInput.type != 'hubControl') throw `Invalid input type: ${connection.controlInput.type}`;

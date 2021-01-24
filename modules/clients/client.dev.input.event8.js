@@ -1,7 +1,7 @@
 exports.zone = 'masterBedroom';
 exports.focus = 'Up';
 exports.controller = '/scripts/modules/controllers/masterBedroom.entertainment.js';
-exports.controllers = {
+exports.topics = {
 	"Up"  : {
 		"topic"      : 'Entertainment',
 		"controller" : {
