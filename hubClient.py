@@ -27,7 +27,7 @@ controlWords = {
         106: "Right",
         108: "Down",
         109: "More",
-        113: "Mute",
+        113: "Silence/Sound",
         114: "Softer",
         115: "Louder",
         116: "On/Off",

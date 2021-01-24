@@ -3,7 +3,7 @@
 ////////////////////////////////////////////
 const os = require('os');
 const hubInput = require('/scripts/modules/hubInput.js');
-var tasks, clientOptions={}, zoneOptions={}, focusOptions={};
+var tasks, clientOptions={}, focusOptions={};
 
 //##########################################
 const onCommand = function(command) {
@@ -13,7 +13,7 @@ var hubOutput = require('/scripts/modules/hubOutput.js');
 //var tasks = require('/scripts/modules/masterBedroom.js');
 var sequence, task;
 
-	focusOptions = require(`/scripts/modules/focus/masterBedroom.up.js`);
+	focusOptions = require(`/scripts/modules/controllers/masterBedroom.entertainment.js`);
 	sequence = focusOptions.tasks[command];
 	if(!sequence) return console.log(`Abort: Ivalid command: ${command}`);
 	
@@ -40,6 +40,7 @@ clientOptions[client.controlInput.id] = require(`/scripts/modules/clients/${clie
 console.log(`Enter onInput, clientId: ${client.controlInput.id}, clientZone: ${clientOptions[client.controlInput.id].zone}`);
 
 	if(client.controlInput.command == 'Set') client.controlInput.command = 'On';
+	if(client.controlInput.command == 'Silence/Sound') client.controlInput.command = 'Silence';
 	if(client.controlInput.isCommandMode) return createCommand(client.controlInput);
 	onCommand(client.controlInput.command);
 };

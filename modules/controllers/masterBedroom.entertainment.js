@@ -45,7 +45,7 @@ exports.tasks = {
 		{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": false}}
 	],
 			
-	"Mute": [
+	"Silence": [
 		{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": true}}
 	],
 	
