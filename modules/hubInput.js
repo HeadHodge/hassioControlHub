@@ -12,7 +12,7 @@ try {
 console.log(`Enter onConnection for client input`);
 
 	connection.on('message', function(message) {
-	console.log(`received: ${message}`);
+	console.log(`\n\n\n\nreceived: ${message}`);
 
 		connection.controlInput = JSON.parse(message);
 		if(connection.controlInput.type != 'hubControl') throw `Invalid input type: ${connection.controlInput.type}`;

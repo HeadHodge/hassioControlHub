@@ -9,7 +9,7 @@ const options = {
   method: 'POST',
   headers: {
     'Accept': 'application/json',
-    'Content-Type': 'application/json; charset=UTF-8'
+    'Content-Type': 'application/text; charset=UTF-8'
   }
 };
 
@@ -47,5 +47,5 @@ var request = http.request(options, onReply);
 //                MAIN
 //Open connection with Hub and send request
 ////////////////////////////////////////////
-	console.log('hubClient loaded');
+	console.log('hubOutpt loaded');
 	exports.sendControlTask = sendControlTask;

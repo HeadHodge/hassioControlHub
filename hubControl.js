@@ -6,16 +6,19 @@ const hubInput = require('/scripts/modules/hubInput.js');
 var tasks, clientOptions={}, zoneOptions={}, focusOptions={};
 
 //##########################################
-const sendTask = function(command) {
+const onCommand = function(command) {
 //##########################################
-console.log(`Enter sendTask for command: ${command}`);
+console.log(`Enter onCommand for command: ${command}`);
 var hubOutput = require('/scripts/modules/hubOutput.js');
-var tasks = require('/scripts/modules/masterBedroom.js');
-var task;
+//var tasks = require('/scripts/modules/masterBedroom.js');
+var sequence, task;
 
 	focusOptions = require(`/scripts/modules/focus/masterBedroom.up.js`);
+	sequence = focusOptions.tasks[command];
+	if(!sequence) return console.log(`Abort: Ivalid command: ${command}`);
+	
 	task = `{"action": "runSequence", "sequence": ${JSON.stringify(focusOptions.tasks[command])}}`;
-	console.log(`Send Task: ${task}`);
+	//console.log(`Send Task: ${task}`);
 	hubOutput.sendControlTask(task);
 	//$case.postCommand({"action": "runSequence", "sequence": [{"remote/send_command": {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}}, {"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}]});
 };
@@ -36,9 +39,9 @@ const onInput = function(client) {
 clientOptions[client.controlInput.id] = require(`/scripts/modules/clients/${client.controlInput.id}.js`);
 console.log(`Enter onInput, clientId: ${client.controlInput.id}, clientZone: ${clientOptions[client.controlInput.id].zone}`);
 
-	if(client.controlInput.command == 'Set') client.controlInput.isCommandMode = true;
+	if(client.controlInput.command == 'Set') client.controlInput.command = 'On';
 	if(client.controlInput.isCommandMode) return createCommand(client.controlInput);
-	sendTask(client.controlInput.command);
+	onCommand(client.controlInput.command);
 };
 		
 ////////////////////////////////////////////
