@@ -5,7 +5,8 @@
 ############################
 import asyncio, evdev, sys, websockets
 from evdev import InputDevice, categorize, ecodes
-
+  
+zone = 'home'
 controlWords = {
           1: "Exit",
           2: "1",
@@ -65,7 +66,8 @@ async def sendInput(inputChar, inputCode):
         
         async with websockets.connect("ws://localhost:8080") as websocket:
             print('Send Request', controlWord)
-            await websocket.send('{'+f'"type": "control", "symbol": "{controlWord}", "zone": "masterBedroom"'+'}')
+            id = 'client' + chan1.path.replace('/', '.')
+            await websocket.send('{'+f'"type": "hubControl", "symbol": "{controlWord}", "id": "{id}", "zone": "{zone}"'+'}')
             print('Sent')
 
             print('Get Reply')
@@ -93,10 +95,7 @@ async def captureInput(device):
 ###################
 #      MAIN
 ###################
-if len(sys.argv) == 1:
-  location = 'home'
-else:
-  location = sys.argv[1]
+if len(sys.argv) > 1: zone = sys.argv[1]
   
 ## Open Control Input Channels
 chan1 = evdev.InputDevice('/dev/input/event8')
@@ -111,7 +110,7 @@ chan3.grab()
 chan4.grab()
 
 ## Listen for Contrrol Input
-print(location, chan1.name, chan1.info.vendor, chan1.info.product, chan1.info.bustype)
+print(chan1.name, zone, chan1.path, chan1.info, chan1.phys, chan1.info.vendor, chan1.info.product)
 
 for device in chan1, chan2, chan3, chan4:
     asyncio.ensure_future(captureInput(device))

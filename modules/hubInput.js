@@ -6,16 +6,24 @@ var server = null;
 var inputCallback;
 
 //##########################################
-const onConnection = function(client) {
+const onConnection = function(connection) {
 //##########################################
+try {
 console.log(`Enter onConnection for client input`);
 
-	client.on('message', function(message) {
-		console.log(`received: ${message}`);
-		client.send(`Got It`);
-		inputCallback(message);
+	connection.on('message', function(message) {
+	console.log(`received: ${message}`);
+
+		connection.controlWord = JSON.parse(message);
+		if(connection.controlWord.type != 'hubControl') throw `Invalid input type: ${connection.controlWord.type}`;
+		connection.send(`Got It`);
+		inputCallback(connection);
 	});
-};
+}
+catch (error) {
+	console.log(`Invalid Messag: ${error}`);
+	client.send(`Invalid Messag: ${error}`);
+}};
   
 //##########################################
 const listen = function(onInput) {

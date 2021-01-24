@@ -3,13 +3,12 @@
 ////////////////////////////////////////////
 const os = require('os');
 const hubInput = require('/scripts/modules/hubInput.js');
-var isCommandMode = false;
-var tasks;
+var tasks, clientOptions={};
 
 //##########################################
-const performTask = function(controlWord) {
+const performTask = function(inputWord) {
 //##########################################
-console.log(`Enter performTask with ${controlWord.symbol} in zone ${controlWord.zone}`);
+console.log(`Enter performTask with ${inputWord.symbol} in zone ${inputWord.zone}`);
 var hubOutput = require('/scripts/modules/hubOutput.js');
 var tasks = require('/scripts/modules/masterBedroom.js');
 
@@ -17,30 +16,32 @@ var tasks = require('/scripts/modules/masterBedroom.js');
 };
 
 //##########################################
-const createCommand = function(controlWord) {
+const createCommand = function(inputWord) {
 //##########################################
-console.log(`Enter createCommand with ${controlWord.symbol} in zone ${controlWord.zone}`);
+console.log(`Enter createCommand with ${inputWord.symbol} in zone ${inputWord.zone}`);
 
-	controlWord.task = 'wake';
+	inputWord.task = 'wake';
 	isCommandMode = false;	
-	return performTask(controlWord);
+	return performTask(inputWord);
 };
   
 //##########################################
-const decideAction = function(controlWord) {
+const decideAction = function(inputWord) {
 //##########################################
-console.log(`Enter decideAction with ${controlWord.symbol} in zone ${controlWord.zone}`);
+console.log(`Enter decideAction with ${inputWord.symbol} in zone ${inputWord.zone}`);
 
-	if(controlWord.symbol == 'Set') isCommandMode = true;
-	if(isCommandMode) return createCommand(controlWord);
+	if(inputWord.symbol == 'Set') inputWord.isCommandMode = true;
+	if(inputWord.isCommandMode) return createCommand(inputWord);
 };
   
 //##########################################
-const onInput = function(controlMsg) {
+const onInput = function(client) {
 //##########################################
-console.log(`onInput: ${controlMsg}`);
+clientOptions[client.controlWord.id] = require(`/scripts/modules/clients/${client.controlWord.id}.js`);
+console.log(`Enter onInput, clientId: ${client.controlWord.id}, clientZone: ${clientOptions[client.controlWord.id].zone}`);
+clientOptions[client.controlWord.id].zone = 'livingRoom';
 
-	decideAction(JSON.parse(controlMsg));
+	decideAction(client.controlWord);
 };
 		
 ////////////////////////////////////////////
@@ -50,16 +51,3 @@ console.log(`onInput: ${controlMsg}`);
 console.log(`Started hubControl on ${os.hostname}`);
 
 	hubInput.listen(onInput);
-/*	
-const ws = require('/root/node_modules/ws');
-var server = new ws.Server({ port: 8080 });
-
-server.on('connection', function connection(client) {
-	client.on('message', function incoming(message) {
-		console.log(`received: ${message}`);
-		decideAction(JSON.parse(message));
-		client.send(`Got It`);
-	});
-
-});
-*/
