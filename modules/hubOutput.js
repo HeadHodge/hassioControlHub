@@ -47,5 +47,5 @@ var request = http.request(options, onReply);
 //                MAIN
 //Open connection with Hub and send request
 ////////////////////////////////////////////
-	console.log('hubOutpt loaded');
+	console.log('hubOutput loaded');
 	exports.sendControlTask = sendControlTask;

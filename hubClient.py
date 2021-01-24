@@ -20,7 +20,7 @@ controlWords = {
          10: "9",
          11: "0",
          28: "Ok",
-         59: "Mute",
+         59: "Silence/Sound",
         103: "Up",
         104: "Less",
         105: "Left",

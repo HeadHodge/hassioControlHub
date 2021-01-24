@@ -45,6 +45,10 @@ exports.tasks = {
 		{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": false}}
 	],
 			
+	"Sound": [
+		{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": false}}
+	],
+			
 	"Silence": [
 		{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": true}}
 	],
@@ -59,6 +63,11 @@ exports.tasks = {
 	
 	"Forward": [
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 90"}}
+	],
+	
+	"On/Off": [
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "SLEEP"}},
+		{"remote/send_command" : {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}}
 	],
 	
 	"On": [

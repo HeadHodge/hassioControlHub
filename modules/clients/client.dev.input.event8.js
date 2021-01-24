@@ -1,22 +1,21 @@
 exports.zone = 'masterBedroom';
 exports.focus = 'Up';
-exports.controller = '/scripts/modules/controllers/masterBedroom.entertainment.js';
+exports.primaryController = '/scripts/modules/controllers/masterBedroom.entertainment.js';
+exports.popupController = null;
 exports.topics = {
 	"Up"  : {
 		"topic"      : 'Entertainment',
 		"controller" : {
-			"Default"      : "/scripts/modules/controllers/masterBedroom.entertainment.js",
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
+			"Up"      	   : "/scripts/modules/controllers/masterBedroom.entertainment.js",
+			"Softer"       : "/scripts/modules/controllers/masterBedroom.tv.js",
+			"Louder"       : "/scripts/modules/controllers/masterBedroom.stereo.js",
 		}
 	},
 
 	"Down"  : {
 		"topic"      : 'Lights',
 		"controller" : {
-			"Default"      : null,
+			"Down"         : null,
 			"Louder"       : null,
 			"Softer"       : null,
 			"Silence/Sound": null,
@@ -27,7 +26,7 @@ exports.topics = {
 	"Left"  : {
 		"topic"      : 'Covers',
 		"controller" : {
-			"Default"      : null,
+			"Left"         : null,
 			"Louder"       : null,
 			"Softer"       : null,
 			"Silence/Sound": null,
@@ -38,7 +37,7 @@ exports.topics = {
 	"Right"  : {
 		"topic"      : 'Temperature',
 		"controller" : {
-			"Default"      : null,
+			"Right"        : null,
 			"Louder"       : null,
 			"Softer"       : null,
 			"Silence/Sound": null,
