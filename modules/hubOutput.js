@@ -19,12 +19,13 @@ const onReply = function(reply) {
 console.log(`Enter onReply, statusCode: ${reply.statusCode}`);
 var buffer = '';
 
-	reply.on('data', function (chunk) {
+	reply.on('data', function(chunk) {
+		console.log('chunk: ' + chunk);
 		buffer += chunk;
 	});
 
 	reply.on('end', function () {
-		console.log(buffer);
+		//console.log(buffer);
 	});
 };
 

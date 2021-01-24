@@ -3,16 +3,21 @@
 ////////////////////////////////////////////
 const os = require('os');
 const hubInput = require('/scripts/modules/hubInput.js');
-var tasks, clientOptions={};
+var tasks, clientOptions={}, zoneOptions={}, focusOptions={};
 
 //##########################################
-const performTask = function(inputWord) {
+const sendTask = function(command) {
 //##########################################
-console.log(`Enter performTask with ${inputWord.symbol} in zone ${inputWord.zone}`);
+console.log(`Enter sendTask for command: ${command}`);
 var hubOutput = require('/scripts/modules/hubOutput.js');
 var tasks = require('/scripts/modules/masterBedroom.js');
+var task;
 
-	hubOutput.sendControlTask(tasks.wake);
+	focusOptions = require(`/scripts/modules/focus/masterBedroom.up.js`);
+	task = `{"action": "runSequence", "sequence": ${JSON.stringify(focusOptions.tasks[command])}}`;
+	console.log(`Send Task: ${task}`);
+	hubOutput.sendControlTask(task);
+	//$case.postCommand({"action": "runSequence", "sequence": [{"remote/send_command": {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}}, {"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}]});
 };
 
 //##########################################
@@ -22,26 +27,18 @@ console.log(`Enter createCommand with ${inputWord.symbol} in zone ${inputWord.zo
 
 	inputWord.task = 'wake';
 	isCommandMode = false;	
-	return performTask(inputWord);
-};
-  
-//##########################################
-const decideAction = function(inputWord) {
-//##########################################
-console.log(`Enter decideAction with ${inputWord.symbol} in zone ${inputWord.zone}`);
-
-	if(inputWord.symbol == 'Set') inputWord.isCommandMode = true;
-	if(inputWord.isCommandMode) return createCommand(inputWord);
+	return sendTask(inputWord);
 };
   
 //##########################################
 const onInput = function(client) {
 //##########################################
-clientOptions[client.controlWord.id] = require(`/scripts/modules/clients/${client.controlWord.id}.js`);
-console.log(`Enter onInput, clientId: ${client.controlWord.id}, clientZone: ${clientOptions[client.controlWord.id].zone}`);
-clientOptions[client.controlWord.id].zone = 'livingRoom';
+clientOptions[client.controlInput.id] = require(`/scripts/modules/clients/${client.controlInput.id}.js`);
+console.log(`Enter onInput, clientId: ${client.controlInput.id}, clientZone: ${clientOptions[client.controlInput.id].zone}`);
 
-	decideAction(client.controlWord);
+	if(client.controlInput.command == 'Set') client.controlInput.isCommandMode = true;
+	if(client.controlInput.isCommandMode) return createCommand(client.controlInput);
+	sendTask(client.controlInput.command);
 };
 		
 ////////////////////////////////////////////
