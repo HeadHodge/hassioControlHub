@@ -44,15 +44,19 @@ console.log(`Enter onFocusChange with ${clientCommand} in zone ${clientOptions[c
 
 	clientOptions[clientId].isFocusSet = null;
 	
+	if(clientCommand == 'Focus' || clientCommand == 'On/Off' || clientCommand == 'Set') return console.log(`Cancel onFocus`);
+	
+	if(clientCommand == 'Ok') return onCommand(clientId, 'Off');
+	
 	if(!clientOptions[clientId].topics[clientCommand]) {
-		//console.log(clientOptions[clientId].topics[clientOptions[clientId].focus].controller[clientCommand]);
 		clientOptions[clientId].popupController = clientOptions[clientId].topics[clientOptions[clientId].focus].controller[clientCommand];
 		return console.log(`popupController selected: ${clientOptions[clientId].popupController}`);
 	};
 	
-	clientOptions[clientId].primaryController = clientOptions[clientId].topics[clientCommand].controller.clientCommand;
+	clientOptions[clientId].primaryController = clientOptions[clientId].topics[clientCommand].controller[clientCommand];
 	console.log(`primaryController changed to: ${clientOptions[clientId].primaryController}`);
-};
+	return onCommand(clientId, 'Open');
+ };
  
 //##########################################
 const onInput = function(client) {
@@ -63,20 +67,20 @@ var controller = clientOptions[client.controlInput.id].topics[clientOptions[clie
 //var controller = clientOptions[client.controlInput.id].topics[clientOptions[client.controlInput.id].focus].controller.clientOptions[client.controlInput.id].focus;
 console.log(controller);
 console.log(`Enter onInput, clientCommand: ${client.controlInput.command}, clientId: ${client.controlInput.id}, clientZone: ${clientOptions[client.controlInput.id].zone}`);
-
-	if(client.controlInput.command == 'Focus') {clientOptions[client.controlInput.id].isFocusSet = true; return console.log(`Set Focus Flag`);}
-	if(client.controlInput.command == 'Enter') {clientOptions[client.controlInput.id].isFunctionSet = true; return console.log(`Set Function Flag`);}
 	
 	if(clientOptions[client.controlInput.id].isFocusSet) return onFocus(client.controlInput.id, client.controlInput.command);
 	if(clientOptions[client.controlInput.id].isFunctionSet) return onFunction(client.controlInput.id, client.controlInput.command);
 
+	if(client.controlInput.command == 'Focus' || client.controlInput.command == 'On/Off' || client.controlInput.command == 'Set') {clientOptions[client.controlInput.id].isFocusSet = true; return console.log(`Set Focus Flag`);}
+	if(client.controlInput.command == 'Enter') {clientOptions[client.controlInput.id].isFunctionSet = true; return console.log(`Set Function Flag`);}
+/*
 	if(client.controlInput.command == 'On/Off' || client.controlInput.command == 'Set') {
 		if(clientOptions[client.controlInput.id].isOn)
 			{client.controlInput.command = 'Off';clientOptions[client.controlInput.id].isOn=false;}
 		else
 			{client.controlInput.command = 'On';clientOptions[client.controlInput.id].isOn=true;}
 	};
-	
+*/	
 	if(client.controlInput.command == 'Silence/Sound') {
 		if(clientOptions[client.controlInput.id].isSilent)
 			{client.controlInput.command = 'Sound';clientOptions[client.controlInput.id].isSilent=false;}

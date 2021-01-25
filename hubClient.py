@@ -39,7 +39,7 @@ controlWords = {
         172: "Home",
         191: "Set",
         240: "Focus",
-        272: "Enter"
+        272: "Ok"
 }
 
 ###################
@@ -98,10 +98,10 @@ async def captureInput(device):
 if len(sys.argv) > 1: zone = sys.argv[1]
   
 ## Open Control Input Channels
-chan1 = evdev.InputDevice('/dev/input/event8')
-chan2 = evdev.InputDevice('/dev/input/event9')
-chan3 = evdev.InputDevice('/dev/input/event10')
-chan4 = evdev.InputDevice('/dev/input/event11')
+chan1 = evdev.InputDevice('/dev/input/event3')
+chan2 = evdev.InputDevice('/dev/input/event4')
+chan3 = evdev.InputDevice('/dev/input/event5')
+chan4 = evdev.InputDevice('/dev/input/event6')
 
 ## Make Control Input Channels Private
 chan1.grab()
