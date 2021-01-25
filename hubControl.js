@@ -71,8 +71,10 @@ console.log(`Enter onInput, clientCommand: ${client.controlInput.command}, clien
 	if(clientOptions[client.controlInput.id].isFocusSet) return onFocus(client.controlInput.id, client.controlInput.command);
 	if(clientOptions[client.controlInput.id].isFunctionSet) return onFunction(client.controlInput.id, client.controlInput.command);
 
-	if(client.controlInput.command == 'Focus' || client.controlInput.command == 'On/Off' || client.controlInput.command == 'Set') {clientOptions[client.controlInput.id].isFocusSet = true; return console.log(`Set Focus Flag`);}
+	if(client.controlInput.command == 'Focus' || client.controlInput.command == 'On/Off') {clientOptions[client.controlInput.id].isFocusSet = true; return console.log(`Set Focus Flag`);}
 	if(client.controlInput.command == 'Enter') {clientOptions[client.controlInput.id].isFunctionSet = true; return console.log(`Set Function Flag`);}
+	if(client.controlInput.command == 'Set') client.controlInput.command = 'Off';
+
 /*
 	if(client.controlInput.command == 'On/Off' || client.controlInput.command == 'Set') {
 		if(clientOptions[client.controlInput.id].isOn)

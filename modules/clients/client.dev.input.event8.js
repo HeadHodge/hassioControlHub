@@ -9,6 +9,7 @@ exports.topics = {
 			"Up"      	   : "/scripts/modules/controllers/masterBedroom.entertainment.js",
 			"Softer"       : "/scripts/modules/controllers/masterBedroom.tv.js",
 			"Louder"       : "/scripts/modules/controllers/masterBedroom.stereo.js",
+			"Backward"       : "/scripts/modules/controllers/masterBedroom.fireplace.js"
 		}
 	},
 

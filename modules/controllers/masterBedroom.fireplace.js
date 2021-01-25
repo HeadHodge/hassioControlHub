@@ -16,7 +16,7 @@ exports.tasks = {
 	],
 	
 	"Up": [
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "UP"}}
+		{"input_select.select_option": {"entity_id": "input_select.masterbedroom_fireplace_duration", "option": "30 Minutes"}}
 	],
 	
 	"Down": [
@@ -32,7 +32,7 @@ exports.tasks = {
 	],
 	
 	"Ok": [
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "CENTER"}}
+		{"switch/turn_on": {"entity_id": "switch.31485653bcddc23a2807"}} //Turn off Fireplace
 	],
 	
 	"Louder": [
@@ -70,21 +70,8 @@ exports.tasks = {
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}
 	],
 	
-	"Open": [
-		{"remote/send_command": {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}},
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
-	    {"sleep": 3},
-		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}}
-	],
-	
 	"Off": [
-		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "SLEEP"}},
-		{"remote/send_command" : {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}},
-	    {"sleep": 5},
-		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
-		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.18}},
-		{"sonos/set_sleep_timer": {"entity_id": "media_player.master_bedroom", "sleep_time": 3600}}
+		{"switch/turn_off": {"entity_id": "switch.31485653bcddc23a2807"}} //Turn off Fireplace
 	],
 		
 	"On/Off": [
