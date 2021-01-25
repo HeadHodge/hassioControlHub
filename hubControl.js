@@ -4,24 +4,29 @@
 const os = require('os');
 const hubInput = require('/scripts/modules/hubInput.js');
 var tasks, clientOptions={};
-var primaryController={};
+var primaryController={}, popupController={};
 
 //##########################################
 const onCommand = function(clientId, clientCommand) {
 //##########################################
 console.log(`Enter onCommand for clientCommand: ${clientCommand}`);
 var hubOutput = require('/scripts/modules/hubOutput.js');
-var sequence, task;
+var controller, task, module;
 
-	//focusOptions = require(`/scripts/modules/controllers/masterBedroom.entertainment.js`);
-	primaryController = require(clientOptions[clientId].primaryController);
-	sequence = primaryController.tasks[clientCommand];
-	if(!sequence) return console.log(`Abort: Invalid clientCommand: ${clientCommand}`);
+	if(clientOptions[clientId].popupController) {
+		module = clientOptions[clientId].popupController;clientOptions[clientId].popupController = null;
+		popupController = require(module);
+		controller = popupController;
+	} else {
+		primaryController = require(clientOptions[clientId].primaryController);
+		controller = primaryController;
+	};
 	
-	task = `{"action": "runSequence", "sequence": ${JSON.stringify(primaryController.tasks[clientCommand])}}`;
-	//console.log(`Send Task: ${task}`);
+	//sequence = controller.tasks[clientCommand];
+	if(!controller.tasks[clientCommand]) return console.log(`Abort: Invalid clientCommand: ${clientCommand}`);
+	
+	task = `{"action": "runSequence", "sequence": ${JSON.stringify(controller.tasks[clientCommand])}}`;
 	hubOutput.sendControlTask(task);
-	//$case.postCommand({"action": "runSequence", "sequence": [{"remote/send_command": {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}}, {"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}]});
 };
 
 //##########################################
@@ -40,7 +45,7 @@ console.log(`Enter onFocusChange with ${clientCommand} in zone ${clientOptions[c
 	clientOptions[clientId].isFocusSet = null;
 	
 	if(!clientOptions[clientId].topics[clientCommand]) {
-		console.log(clientOptions[clientId].topics[clientOptions[clientId].focus].controller[clientCommand]);
+		//console.log(clientOptions[clientId].topics[clientOptions[clientId].focus].controller[clientCommand]);
 		clientOptions[clientId].popupController = clientOptions[clientId].topics[clientOptions[clientId].focus].controller[clientCommand];
 		return console.log(`popupController selected: ${clientOptions[clientId].popupController}`);
 	};
@@ -51,6 +56,7 @@ console.log(`Enter onFocusChange with ${clientCommand} in zone ${clientOptions[c
  
 //##########################################
 const onInput = function(client) {
+try {
 //##########################################
 clientOptions[client.controlInput.id] = require(`/scripts/modules/clients/${client.controlInput.id}.js`);
 var controller = clientOptions[client.controlInput.id].topics[clientOptions[client.controlInput.id].focus].controller[clientOptions[client.controlInput.id].focus];
@@ -79,7 +85,10 @@ console.log(`Enter onInput, clientCommand: ${client.controlInput.command}, clien
 	};
 	
 	onCommand(client.controlInput.id, client.controlInput.command);
-};
+}
+catch(error) {
+	console.log(`Unexpected Problem: ${error}`);
+}};
 		
 ////////////////////////////////////////////
 //                MAIN
