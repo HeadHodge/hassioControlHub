@@ -40,4 +40,5 @@ console.log(`Enter listen for client commands`);
 //                MAIN
 //Open server to listen for control clients
 ////////////////////////////////////////////
+console.log(`Started hubInput`);
 exports.listen = listen;

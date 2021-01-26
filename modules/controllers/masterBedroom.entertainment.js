@@ -67,24 +67,9 @@ exports.tasks = {
 	
 	"Open": [
 		{"remote/send_command": {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}},
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}
-	],
-	
-	"On": [
-		{"remote/send_command": {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}},
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
 	    {"sleep": 3},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}}
-	],
-	
-	"Off": [
-		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "SLEEP"}},
-		{"remote/send_command" : {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}},
-	    {"sleep": 5},
-		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
-		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.18}},
-		{"sonos/set_sleep_timer": {"entity_id": "media_player.master_bedroom", "sleep_time": 3600}}
 	],
 		
 	"On/Off": [
@@ -93,7 +78,7 @@ exports.tasks = {
 		{"remote/send_command" : {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}},
 	    {"sleep": 5},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
-		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.2}},
+		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.18}},
 		{"sonos/set_sleep_timer": {"entity_id": "media_player.master_bedroom", "sleep_time": 3600}}
 	]
 };
