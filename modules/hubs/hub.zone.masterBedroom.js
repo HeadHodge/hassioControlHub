@@ -1,15 +1,17 @@
-exports.zone = 'masterBedroom';
+//exports.zone = 'masterBedroom';
 exports.focus = 'Up';
-exports.primaryController = '/scripts/modules/controllers/masterBedroom.entertainment.js';
-exports.popupController = null;
+exports.popupController;
+exports.primaryController;
+exports.popupModule = null;
+exports.primaryModule = "/scripts/modules/controllers/masterBedroom.entertainment.js";
 exports.topics = {
 	"Up"  : {
 		"topic"      : 'Entertainment',
 		"controller" : {
-			"Up"      	   : "/scripts/modules/controllers/masterBedroom.entertainment.js",
-			"Softer"       : "/scripts/modules/controllers/masterBedroom.tv.js",
-			"Louder"       : "/scripts/modules/controllers/masterBedroom.stereo.js",
-			"Backward"       : "/scripts/modules/controllers/masterBedroom.fireplace.js"
+			"Up"      	: "/scripts/modules/controllers/masterBedroom.entertainment.js",
+			"Softer"    : "/scripts/modules/controllers/masterBedroom.tv.js",
+			"Louder"    : "/scripts/modules/controllers/masterBedroom.stereo.js",
+			"Backward"	: "/scripts/modules/controllers/masterBedroom.fireplace.js"
 		}
 	},
 
@@ -47,4 +49,10 @@ exports.topics = {
 	},
 };
 
+		
+////////////////////////////////////////////
+//                MAIN
+//             hubControl
+////////////////////////////////////////////
+console.log(`Started hubControl`);
 

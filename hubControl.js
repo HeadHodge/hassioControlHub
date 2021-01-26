@@ -3,97 +3,96 @@
 ////////////////////////////////////////////
 const os = require('os');
 const hubInput = require('/scripts/modules/hubInput.js');
-var tasks, clientOptions={};
+var _hub={};
 var primaryController={}, popupController={};
 
 //##########################################
-const onCommand = function(clientId, clientCommand) {
+const onCommand = function(zone, command) {
 //##########################################
-console.log(`Enter onCommand for clientCommand: ${clientCommand}`);
+console.log(`Enter onCommand for command: ${command}`);
 var hubOutput = require('/scripts/modules/hubOutput.js');
-var controller, task, module;
+var controller, task;
 
-	if(clientOptions[clientId].popupController) {
-		module = clientOptions[clientId].popupController;clientOptions[clientId].popupController = null;
-		popupController = require(module);
-		controller = popupController;
+	if(_hub[zone].popupModule) {
+		//module = _hub[zone].popupModule;
+		//_hub[zone].popupModule = null;
+		popupController = require(_hub[zone].popupModule);
+		controller = popupModule;
 	} else {
-		primaryController = require(clientOptions[clientId].primaryController);
+		primaryController = require(_hub[zone].primaryModule);
 		controller = primaryController;
 	};
 	
-	//sequence = controller.tasks[clientCommand];
-	if(!controller.tasks[clientCommand]) return console.log(`Abort: Invalid clientCommand: ${clientCommand}`);
+	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
-	task = `{"action": "runSequence", "sequence": ${JSON.stringify(controller.tasks[clientCommand])}}`;
+	task = `{"action": "runSequence", "sequence": ${JSON.stringify(controller.tasks[command])}}`;
 	hubOutput.sendControlTask(task);
 };
 
 //##########################################
-const onFunction = function(clientId, clientCommand) {
+const onFunction = function(zone, command) {
 //##########################################
-console.log(`Enter onFunction with ${clientCommand} in zone: ${clientOptions[clientId].zone}`);
+console.log(`Enter onFunction with ${command} in zone: ${_hub[zone].zone}`);
 
-	clientOptions[clientId].isFunctionSet = null;
+	_hub[zone].isFunctionSet = null;
 };
  
 //##########################################
-const onFocus = function(clientId, clientCommand) {
+const onFocus = function(zone, command) {
 //##########################################
-console.log(`Enter onFocusChange with ${clientCommand} in zone ${clientOptions[clientId].zone}`);
+console.log(`Enter onFocusChange with ${command} in zone ${_hub[zone].zone}`);
 
-	clientOptions[clientId].isFocusSet = null;
+	_hub[zone].isFocusSet = null;
 	
-	if(clientCommand == 'Focus' || clientCommand == 'On/Off' || clientCommand == 'Set') return console.log(`Cancel onFocus`);
+	if(command == 'Focus' || command == 'On/Off' || command == 'Set') return console.log(`Cancel onFocus`);
 	
-	if(clientCommand == 'Ok') return onCommand(clientId, 'Off');
+	if(command == 'Ok') return onCommand(zone, 'Off');
 	
-	if(!clientOptions[clientId].topics[clientCommand]) {
-		clientOptions[clientId].popupController = clientOptions[clientId].topics[clientOptions[clientId].focus].controller[clientCommand];
-		return console.log(`popupController selected: ${clientOptions[clientId].popupController}`);
+	if(!_hub[zone].topics[command]) {
+		_hub[zone].popupController = _hub[zone].topics[_hub[zone].focus].controller[command];
+		return console.log(`popupController selected: ${_hub[zone].popupController}`);
 	};
 	
-	clientOptions[clientId].primaryController = clientOptions[clientId].topics[clientCommand].controller[clientCommand];
-	console.log(`primaryController changed to: ${clientOptions[clientId].primaryController}`);
-	return onCommand(clientId, 'Open');
+	_hub[zone].primaryController = _hub[zone].topics[command].controller[command];
+	console.log(`primaryController changed to: ${_hub[zone].primaryController}`);
+	return onCommand(zone, 'Open');
  };
  
 //##########################################
-const onInput = function(client) {
+const onInput = function(hubInput) {
 try {
 //##########################################
-clientOptions[client.controlInput.id] = require(`/scripts/modules/clients/${client.controlInput.id}.js`);
-var controller = clientOptions[client.controlInput.id].topics[clientOptions[client.controlInput.id].focus].controller[clientOptions[client.controlInput.id].focus];
-//var controller = clientOptions[client.controlInput.id].topics[clientOptions[client.controlInput.id].focus].controller.clientOptions[client.controlInput.id].focus;
-console.log(controller);
-console.log(`Enter onInput, clientCommand: ${client.controlInput.command}, clientId: ${client.controlInput.id}, clientZone: ${clientOptions[client.controlInput.id].zone}`);
+console.log(`Enter onInput, command: ${hubInput.command}, zone: ${hubInput.zone}`);
+_hub[hubInput.zone] = require(`/scripts/modules/hubs/hub.zone.${hubInput.zone}.js`);
+//var controller = _hub[hubInput.zone].topics[_hub[hubInput.zone].focus].controller[_hub[hubInput.zone].focus];
 	
-	if(clientOptions[client.controlInput.id].isFocusSet) return onFocus(client.controlInput.id, client.controlInput.command);
-	if(clientOptions[client.controlInput.id].isFunctionSet) return onFunction(client.controlInput.id, client.controlInput.command);
+	if(_hub[hubInput.zone].isFocusSet) return onFocus(hubInput.zone, hubInput.command);
+	if(_hub[hubInput.zone].isFunctionSet) return onFunction(hubInput.zone, hubInput.command);
 
-	if(client.controlInput.command == 'Focus' || client.controlInput.command == 'On/Off') {clientOptions[client.controlInput.id].isFocusSet = true; return console.log(`Set Focus Flag`);}
-	if(client.controlInput.command == 'Enter') {clientOptions[client.controlInput.id].isFunctionSet = true; return console.log(`Set Function Flag`);}
-	if(client.controlInput.command == 'Set') client.controlInput.command = 'Off';
+	if(hubInput.command == 'Focus' || hubInput.command == 'On/Off') {_hub[hubInput.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
+	if(hubInput.command == 'Enter') {_hub[hubInput.zone].isFunctionSet = true; return console.log(`Set Function Flag`);}
+	if(hubInput.command == 'Set') hubInput.command = 'Off';
 
 /*
-	if(client.controlInput.command == 'On/Off' || client.controlInput.command == 'Set') {
-		if(clientOptions[client.controlInput.id].isOn)
-			{client.controlInput.command = 'Off';clientOptions[client.controlInput.id].isOn=false;}
+	if(hubInput.command == 'On/Off' || hubInput.command == 'Set') {
+		if(_hub[hubInput.zone].isOn)
+			{hubInput.command = 'Off';_hub[hubInput.zone].isOn=false;}
 		else
-			{client.controlInput.command = 'On';clientOptions[client.controlInput.id].isOn=true;}
+			{hubInput.command = 'On';_hub[hubInput.zone].isOn=true;}
 	};
 */	
-	if(client.controlInput.command == 'Silence/Sound') {
-		if(clientOptions[client.controlInput.id].isSilent)
-			{client.controlInput.command = 'Sound';clientOptions[client.controlInput.id].isSilent=false;}
+	if(hubInput.command == 'Silence/Sound') {
+		if(_hub[hubInput.zone].isSilent)
+			{hubInput.command = 'Sound';_hub[hubInput.zone].isSilent=false;}
 		else
-			{client.controlInput.command = 'Silence';clientOptions[client.controlInput.id].isSilent=true;}
+			{hubInput.command = 'Silence';_hub[hubInput.zone].isSilent=true;}
 	};
 	
-	onCommand(client.controlInput.id, client.controlInput.command);
+	onCommand(hubInput.zone, hubInput.command);
 }
 catch(error) {
 	console.log(`Unexpected Problem: ${error}`);
+	console.error(error);
 }};
 		
 ////////////////////////////////////////////

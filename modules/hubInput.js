@@ -17,7 +17,7 @@ console.log(`\n\n\n\nEnter onConnection for client input`);
 		connection.controlInput = JSON.parse(message);
 		if(connection.controlInput.type != 'hubControl') throw `Invalid input type: ${connection.controlInput.type}`;
 		connection.send(`Got It`);
-		inputCallback(connection);
+		inputCallback(connection.controlInput);
 	});
 }
 catch (error) {

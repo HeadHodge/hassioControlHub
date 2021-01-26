@@ -72,8 +72,8 @@ async def sendInput(inputChar, inputCode):
             print('Sent')
 
             print('Get Reply')
-            greeting = await websocket.recv()
-            print(greeting)
+            reply = await websocket.recv()
+            print(reply)
 
     except Exception as e:
         print('Oopps')
