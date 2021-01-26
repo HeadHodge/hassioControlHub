@@ -70,7 +70,7 @@ exports.tasks = {
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}
 	],
 	
-	"Open": [
+	"On": [
 		{"remote/send_command": {"entity_id": "remote.rm4_ir_hub_remote", "device": "Vizio", "command": "On/Off"}},
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
 	    {"sleep": 3},

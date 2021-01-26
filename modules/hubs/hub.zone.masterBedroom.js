@@ -1,7 +1,7 @@
 //exports.zone = 'masterBedroom';
 exports.focus = 'Up';
-exports.popupController;
-exports.primaryController;
+exports.popupController = {};
+exports.primaryController = {};
 exports.popupModule = null;
 exports.primaryModule = "/scripts/modules/controllers/masterBedroom.entertainment.js";
 exports.topics = {
