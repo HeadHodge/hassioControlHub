@@ -31,11 +31,17 @@ var controller, task;
 };
 
 //##########################################
-const onFunction = function(zone, command) {
+const onSelectTask = function(zone, command) {
 //##########################################
-console.log(`Enter onFunction with ${command} in zone: ${zone}`);
+console.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
+var hubOutput = require('/scripts/modules/hubOutput.js');
+var task;
 
-	_hub[zone].isFunctionSet = null;
+	_hub[zone].isTaskSet = null;
+	if(!_hub[zone].tasks[_hub[zone].focus][command]) return;
+	task = `{"action": "runSequence", "sequence": ${JSON.stringify(_hub[zone].tasks[_hub[zone].focus][command])}}`;
+	console.log(`Send selected task: ${task}`);
+	hubOutput.sendControlTask(task);
 };
  
 //##########################################
@@ -50,13 +56,19 @@ console.log(`Enter onModuleSelected with ${command} in zone: ${zone}`);
 };
 
 //##########################################
-const onSelectModule = function(zone, command) {
+const onSelectFocus = function(zone, command) {
 //##########################################
-console.log(`Enter onSelectModule with ${command} in zone ${zone}`);
+console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 
 	_hub[zone].isFocusSet = null;
 	
+	if(command == 'Ok') {
+		_hub[zone].isTaskSet = true;
+		return console.log(`taskList selected for ${zone}`);
+	};
+	
 	if(_hub[zone].topics[command] && _hub[zone].topics[command].controller[command]) {
+		_hub[zone].focus = command;
 		_hub[zone].primaryModule = _hub[zone].topics[command].controller[command];
 		_hub[zone].isModuleSelected = true;
 		return console.log(`primaryModule selected : ${_hub[zone].primaryModule}`);
@@ -76,9 +88,9 @@ try {
 console.log(`Enter onInput, command: ${hubInput.command}, zone: ${hubInput.zone}`);
 _hub[hubInput.zone] = require(`/scripts/modules/hubs/hub.zone.${hubInput.zone}.js`);
 	
-	if(_hub[hubInput.zone].isFocusSet) return onSelectModule(hubInput.zone, hubInput.command);
+	if(_hub[hubInput.zone].isTaskSet) return onSelectTask(hubInput.zone, hubInput.command);
+	if(_hub[hubInput.zone].isFocusSet) return onSelectFocus(hubInput.zone, hubInput.command);
 	if(_hub[hubInput.zone].isModuleSelected) return onModuleSelected(hubInput.zone, hubInput.command);
-	//if(_hub[hubInput.zone].isFunctionSet) return onFunction(hubInput.zone, hubInput.command);
 
 	if(hubInput.command == 'Focus') {_hub[hubInput.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
 
