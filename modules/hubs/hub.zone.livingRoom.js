@@ -1,17 +1,16 @@
-//exports.zone = 'masterBedroom';
 exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
 exports.popupModule = null;
-exports.primaryModule = "/scripts/modules/controllers/masterBedroom.entertainment.js";
+exports.primaryModule = "/scripts/modules/controllers/livingRoom.entertainment.js";
 exports.topics = {
 	"Up"  : {
 		"topic"      : 'Entertainment',
 		"controller" : {
-			"Up"      	: "/scripts/modules/controllers/masterBedroom.entertainment.js",
-			"Softer"    : "/scripts/modules/controllers/masterBedroom.tv.js",
-			"Louder"    : "/scripts/modules/controllers/masterBedroom.stereo.js",
-			"Backward"	: "/scripts/modules/controllers/masterBedroom.fireplace.js"
+			"Up"      	: "/scripts/modules/controllers/livingRoom.entertainment.js",
+			"Softer"    : "/scripts/modules/controllers/livingRoom.tv.js",
+			"Louder"    : "/scripts/modules/controllers/livingRoom.stereo.js",
+			"Backward"	: "/scripts/modules/controllers/livingRoom.fireplace.js"
 		}
 	},
 
@@ -91,21 +90,16 @@ exports.tasks = {
 	
 		//Night	
 		"Down"  : [
-			{"input_select/select_option": {"entity_id": "input_select.masterbedroom_fireplace_duration", "option": "90 Minutes"}},
-			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
-			{"sleep": 3},
-			{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
-			{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
-			{"cover/close_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
-			{"cover/close_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
-			{"sleep": 10},
-			{"cover/open_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
-			{"cover/open_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
-			{"sleep": 2},
-			{"cover/stop_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
-			{"cover/stop_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}}
- 		]
+		]
+	},
+		
+	"Left": {
+	},
+		
+	"Right": {
+	},
+		
+	"Down": {
 	}
 };
 		

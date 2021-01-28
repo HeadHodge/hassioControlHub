@@ -96,13 +96,22 @@ async def captureInput(device):
 ###################
 #      MAIN
 ###################
-if len(sys.argv) > 1: zone = sys.argv[1]
-  
+if len(sys.argv) < 3: 
+    print('Terminate hubClient, missing required zone and/or event list argument')
+    sys.exit()
+
+zone = sys.argv[1]
+events = sys.argv[2].split(',')
+
+if len(events) != 4: 
+    print('Terminate hubClient, wrong number of event numbers provided')
+    sys.exit()
+
 ## Open Control Input Channels
-chan1 = evdev.InputDevice('/dev/input/event11')
-chan2 = evdev.InputDevice('/dev/input/event12')
-chan3 = evdev.InputDevice('/dev/input/event13')
-chan4 = evdev.InputDevice('/dev/input/event14')
+chan1 = evdev.InputDevice(f'/dev/input/event{events[0]}')
+chan2 = evdev.InputDevice(f'/dev/input/event{events[1]}')
+chan3 = evdev.InputDevice(f'/dev/input/event{events[2]}')
+chan4 = evdev.InputDevice(f'/dev/input/event{events[3]}')
 
 ## Make Control Input Channels Private
 chan1.grab()
