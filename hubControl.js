@@ -2,7 +2,7 @@
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
 const os = require('os');
-const hubInput = require('/scripts/modules/hubInput.js');
+const hubInput = require('/controlHub/modules/hubInput.js');
 var _hub={};
 //var primaryController={}, popupController={};
 
@@ -10,7 +10,7 @@ var _hub={};
 const onCommand = function(zone, command) {
 //##########################################
 console.log(`Enter onCommand for command: ${command}`);
-var hubOutput = require('/scripts/modules/hubOutput.js');
+var hubOutput = require('/controlHub/modules/hubOutput.js');
 var controller, task;
 
 	if(_hub[zone].popupModule) {
@@ -34,7 +34,7 @@ var controller, task;
 const onSelectTask = function(zone, command) {
 //##########################################
 console.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
-var hubOutput = require('/scripts/modules/hubOutput.js');
+var hubOutput = require('/controlHub/modules/hubOutput.js');
 var task;
 
 	_hub[zone].isTaskSet = null;
@@ -86,7 +86,7 @@ const onInput = function(hubInput) {
 try {
 //##########################################
 console.log(`Enter onInput, command: ${hubInput.command}, zone: ${hubInput.zone}`);
-_hub[hubInput.zone] = require(`/scripts/modules/hubs/hub.zone.${hubInput.zone}.js`);
+_hub[hubInput.zone] = require(`/controlHub/modules/hubs/hub.zone.${hubInput.zone}.js`);
 	
 	if(_hub[hubInput.zone].isTaskSet) return onSelectTask(hubInput.zone, hubInput.command);
 	if(_hub[hubInput.zone].isFocusSet) return onSelectFocus(hubInput.zone, hubInput.command);
