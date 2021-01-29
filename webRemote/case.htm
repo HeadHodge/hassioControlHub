@@ -62,6 +62,7 @@ socket.onerror = function(error) {
 //### postCommand
 //################
 function postCommand(command, doneCallback, failCallback) {
+return alert('postCommand: '+JSON.stringify(command));
 var xhr = new XMLHttpRequest();
 
 	if(!command) return;
@@ -165,7 +166,7 @@ function loadTask(content, command={"action": "default"}) {
 		var control =_control.getAttribute('value');
 		var filePath = './tasks/'+zone+'-'+control+'.js';
 		
-		postCommand({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
+		//postCommand({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
 		break;
 	};
 };
@@ -194,7 +195,8 @@ var map = document.querySelector('Map.container');
 			map[button].addEventListener("click", keyClicked);
 		};
 
-		postCommand({"action": "getFile", "filePath": filePath, "format": "control"}, loadMap);
+		//postCommand({"action": "getFile", "filePath": filePath, "format": "control"}, loadMap);
+		getFile({"filePath": filePath, "format": "control"}, loadMap);
 		break;
 		
 	case 'control':
@@ -242,7 +244,8 @@ var map = document.querySelector('Map.container');
 		Object.keys($map).forEach(function(key) { delete $map[key]; });		
 		
 		//Start Loading Selected Map
-		postCommand({"action": "getFile", "filePath": filePath, "format": "markup"}, loadMap);
+		//postCommand({"action": "getFile", "filePath": filePath, "format": "markup"}, loadMap);
+		getFile({"filePath": filePath, "format": "markup"}, loadMap);
 		break;
 	};
 };
@@ -426,6 +429,7 @@ var key = button.attributes['key'].nodeValue;
 //### monitorPulse
 //################
 function monitorPulse() {
+	return;
 	setTimeout(function(){
 		postCommand({"action": "getPulse"}, function(reply){console.log(reply)});
 		monitorPulse();
@@ -481,7 +485,7 @@ function loadOverlay(content, command={"filePath": "default"}) {
 		start();
 		break;
 	default:
-		getFile({"filePath": "./menus/categories.htm"}, loadOverlay);
+		getFile({"filePath": "./menus/zones.htm"}, loadOverlay);
 		break;
 	};
 };
