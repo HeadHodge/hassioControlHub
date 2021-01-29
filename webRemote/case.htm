@@ -26,25 +26,6 @@ var	_case, _filter, _map, _shortcuts, _zone, _category, _control, _commands, _ov
 var _socket;
 
 //################
-//### loadFile
-//################
-function loadFile(fileName, fileType, callBack) {
-var xhr = new XMLHttpRequest();
-
-	xhr.open('GET', fileName+'.'+fileType);
-	xhr.send();
-	
-	xhr.onload = function() {
-		if (xhr.status != 200) return console.log(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
-		if(typeof callBack != 'undefined') callBack(xhr.response, fileName, fileType);
-	};
-
-	xhr.onerror = function() {
-		notify("getFile Request failed");
-	};
-};
-
-//################
 //### sendCommand
 //################
 function sendCommand(command) {
@@ -106,6 +87,27 @@ var xhr = new XMLHttpRequest();
 };
 
 //################
+//### getFile
+//################
+function getFile(options, callBack) {
+var xhr = new XMLHttpRequest();
+
+	xhr.open('GET', options.filePath);
+	xhr.send();
+	
+	xhr.onload = function() {
+		//if (xhr.status != 200) return console.log(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+		//alert(xhr.response);
+		console.log(`getFile Success ${xhr.status}`);
+		if(callBack) return callBack(xhr.response, options);
+	};
+
+	xhr.onerror = function() {
+		console.log(`getFile ERROR: ${xhr.status}=${xhr.statusText}`); // e.g. 404: Not Found
+	};
+};
+
+//################
 //### removeMap
 //################
 function removeMap() {
@@ -161,7 +163,7 @@ function loadTask(content, command={"action": "default"}) {
 	default:
 		var zone = _zone.getAttribute('value');
 		var control =_control.getAttribute('value');
-		var filePath = '/ipRemote/tasks/'+zone+'-'+control+'.js';
+		var filePath = './tasks/'+zone+'-'+control+'.js';
 		
 		postCommand({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
 		break;
@@ -179,7 +181,7 @@ var map = document.querySelector('Map.container');
 		var zone = _zone.getAttribute('value');
 		var category = _category.getAttribute('value');
 		var control = _control.getAttribute('value');
-		var filePath = '/ipRemote/maps/'+category+'-'+control+'-'+zone+'.js';
+		var filePath = './maps/'+category+'-'+control+'-'+zone+'.js';
 
 		if(content) {
 			map.innerHTML=content;
@@ -196,7 +198,7 @@ var map = document.querySelector('Map.container');
 		break;
 		
 	case 'control':
-		var filePath = '/ipRemote/helpers/'+_category.getAttribute('value') + '-' + _zone.getAttribute('value')+'.js';
+		var filePath = './helpers/'+_category.getAttribute('value') + '-' + _zone.getAttribute('value')+'.js';
 		var	node, script;
 
 		//Remove Current Script
@@ -229,7 +231,7 @@ var map = document.querySelector('Map.container');
 		break;
 		
 	default:
-		var filePath = '/ipRemote/maps/'+_category.getAttribute('value') + '-' + _control.getAttribute('layout')+'.htm';
+		var filePath = './maps/'+_category.getAttribute('value') + '-' + _control.getAttribute('layout')+'.htm';
 
 		_zone.innerHTML = _zone.getAttribute('text');
 		_category.innerHTML = _category.getAttribute('text');
@@ -463,25 +465,23 @@ function loadOverlay(content, command={"filePath": "default"}) {
 	if(content) document.querySelector('body').innerHTML += content;		
 	
 	switch(command.filePath) {
-	case '/ipRemote/menus/zones.htm':
-		postCommand({"action": "getFile", "filePath": "/ipRemote/menus/categories.htm"}, loadOverlay);
+	case './menus/zones.htm':
+		getFile({"filePath": "./menus/categories.htm"}, loadOverlay);
 		break;
-	case '/ipRemote/menus/categories.htm':
-		postCommand({"action": "getFile", "filePath": "/ipRemote/menus/controls.htm"}, loadOverlay);
+	case './menus/categories.htm':
+		getFile({"filePath": "./menus/controls.htm"}, loadOverlay);
 		break;
-	case '/ipRemote/menus/controls.htm':
-		postCommand({"action": "getFile", "filePath": "/ipRemote/menus/tasks.htm"}, loadOverlay);
+	case './menus/controls.htm':
+		getFile({"filePath": "./menus/tasks.htm"}, loadOverlay);
 		break;
-	case '/ipRemote/menus/tasks.htm':
-		postCommand({"action": "getFile", "filePath": "/ipRemote/menus/notes.htm"}, loadOverlay);
+	case './menus/tasks.htm':
+		getFile({"filePath": "./menus/notes.htm"}, loadOverlay);
 		break;
-	case '/ipRemote/menus/notes.htm':
+	case './menus/notes.htm':
 		start();
 		break;
 	default:
-		//document.close();
-
-		postCommand({"action": "getFile", "filePath": "/ipRemote/menus/zones.htm"}, loadOverlay);
+		getFile({"filePath": "./menus/categories.htm"}, loadOverlay);
 		break;
 	};
 };
