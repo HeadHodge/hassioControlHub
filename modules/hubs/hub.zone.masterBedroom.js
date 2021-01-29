@@ -96,6 +96,7 @@ exports.tasks = {
 			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
 			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
 			{"sleep": 3},
+			{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
 			{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
 			{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
 			{"cover/close_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
