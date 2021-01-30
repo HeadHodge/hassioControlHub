@@ -170,80 +170,42 @@ function loadTask(content, command={"action": "default"}) {
 };
 
 //################
-//### loadMap
+//### loadSkin
 //################
-function loadMap(content, command={"format": "default"}) {
-var map = document.querySelector('Map.container');
+function LoadSkin(content, options={"command": "getMarkup"}) {
+var Skin = document.querySelector('Skin.container');
 
-	switch(command.format) {
-	case 'markup':
-		var zone = _zone.getAttribute('value');
-		var category = _category.getAttribute('value');
-		var control = _control.getAttribute('value');
-		var filePath = './maps/'+category+'-'+control+'-'+zone+'.js';
+	switch(options.command) {
+	case 'addMarkup':
+		var keys;
 
 		if(content) {
-			map.innerHTML=content;
-			map.setAttribute('htmfile', command.filePath);
+			Skin.innerHTML=content;
+			Skin.setAttribute('htmfile', options.filePath);
 		};
 
-		map = document.querySelectorAll('[key]');
+		keys = document.querySelectorAll('[key]');
 
-		for(var button = 0; button < map.length; button++) {
-			map[button].addEventListener("click", keyClicked);
+		for(var button = 0; button < keys.length; button++) {
+			keys[button].addEventListener("click", keyClicked);
 		};
 
-		//postCommand({"action": "getFile", "filePath": filePath, "format": "control"}, loadMap);
-		getFile({"filePath": filePath, "format": "control"}, loadMap);
 		break;
-		
-	case 'control':
-		var filePath = './helpers/'+_category.getAttribute('value') + '-' + _zone.getAttribute('value')+'.js';
-		var	node, script;
 
-		//Remove Current Script
-		script = document.head.querySelector('[class="controlScript"]');
-		if(script) script.parentNode.removeChild(script);
-
-		//Add New Script
-		node = document.createElement('script');
-		node.setAttribute('class', 'controlScript');
-		node.setAttribute('type', 'text/javascript');
-		node.innerHTML = content;
-		document.head.appendChild(node);
-		
-		//if($map.start || $map.loadHelper) postCommand({"action": "getFile", "filePath": filePath, "format": "helper"}, loadMap);
-		break;
-		
-	case 'helper':
-		var	node, script;
-		
-		//Remove Current Script
-		script = document.head.querySelector('[class="helperScript"]');
-		if(script) script.parentNode.removeChild(script);
-		
-		//Add New Script
-		node = document.createElement('script');
-		node.setAttribute('class', 'helperScript');
-		node.setAttribute('type', 'text/javascript');
-		node.innerHTML = content;
-		document.head.appendChild(node);
-		break;
-		
 	default:
-		var filePath = './maps/'+_category.getAttribute('value') + '-' + _control.getAttribute('layout')+'.htm';
+		var filePath = './skins/'+_category.getAttribute('value') + '-' + _control.getAttribute('layout')+'.htm';
 
 		_zone.innerHTML = _zone.getAttribute('text');
 		_category.innerHTML = _category.getAttribute('text');
 		_control.innerHTML = _control.getAttribute('text');
 		
 		//Clear Button Node and Botton Object Contents
-		if(map) map.innerHTML = '';
-		Object.keys($map).forEach(function(key) { delete $map[key]; });		
+		if(Skin) Skin.innerHTML = '';
+		//Object.keys($map).forEach(function(key) { delete $map[key]; });		
 		
 		//Start Loading Selected Map
-		//postCommand({"action": "getFile", "filePath": filePath, "format": "markup"}, loadMap);
-		getFile({"filePath": filePath, "format": "markup"}, loadMap);
+		//postCommand({"action": "getFile", "filePath": filePath, "command": "addMarkup"}, LoadSkin);
+		getFile({"filePath": filePath, "command": "addMarkup"}, LoadSkin);
 		break;
 	};
 };
@@ -273,7 +235,7 @@ function recallMap() {
 	
 	_filter.removeAttribute('saved');
 	_filter.setAttribute('recalled', 'true');
-	loadMap();
+	LoadSkin();
 };
 
 //################
@@ -313,7 +275,7 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 			_control.setAttribute('layout', value);
 		
 		_filter.removeAttribute('recalled');
-		loadMap();
+		LoadSkin();
 		break;
 	case 'task':
 		if(value == 'none') return;
@@ -452,7 +414,7 @@ var params = new URLSearchParams(window.location.search);
 	_control = document.querySelector('#Control');
 
 	document.querySelector('commands > [key="["]').addEventListener("click", keyClicked);
-	document.querySelector('commands > [key="`"]').addEventListener("click", keyClicked);
+	//document.querySelector('commands > [key="`"]').addEventListener("click", keyClicked);
 	window.addEventListener("keydown", keyDown);
 	window.addEventListener("keyup", keyUp);
 	
@@ -536,7 +498,7 @@ Case {
 	}
 }  
 
-Filter, Map {
+Filter, Skin {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -561,7 +523,7 @@ Filter, Commands {
 	margin-right:.5vh;
 }
 
-Map {
+Skin {
 	width: 100%;
 	height: 90%;
 	margin: 5% 0;
@@ -755,8 +717,8 @@ Commands .button {
 		</div>
 	</Filter>
 	
-	<Map class="container">
-	</Map>
+	<Skin class="container">
+	</Skin>
 	
 	<Shortcuts class="row shortcuts">
 		<div class="box button red" key="{"></div>
@@ -768,7 +730,7 @@ Commands .button {
 	<Commands class="row commands">
 		<div class="button" key="[">INPUT</div>  
 		<div class="button" key="j">INFO</div>
-		<div class="button" key="`">OFF</div>  
+		<div class="button" key="On/Off">OFF</div>  
 	</Commands>
 </Case>
 
