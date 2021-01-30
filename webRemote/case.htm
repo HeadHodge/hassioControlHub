@@ -172,7 +172,7 @@ function loadTask(content, command={"action": "default"}) {
 //################
 //### loadSkin
 //################
-function LoadSkin(content, options={"command": "getMarkup"}) {
+function loadSkin(content, options={"command": "getMarkup"}) {
 var Skin = document.querySelector('Skin.container');
 
 	switch(options.command) {
@@ -193,10 +193,11 @@ var Skin = document.querySelector('Skin.container');
 		break;
 
 	default:
-		var filePath = './skins/'+_category.getAttribute('value') + '-' + _control.getAttribute('layout')+'.htm';
+		var filePath = './skins/' + _control.getAttribute('layout')+'.htm';
+		//var filePath = './skins/'+_category.getAttribute('value') + '-' + _control.getAttribute('layout')+'.htm';
 
 		_zone.innerHTML = _zone.getAttribute('text');
-		_category.innerHTML = _category.getAttribute('text');
+		//_category.innerHTML = _category.getAttribute('text');
 		_control.innerHTML = _control.getAttribute('text');
 		
 		//Clear Button Node and Botton Object Contents
@@ -204,8 +205,8 @@ var Skin = document.querySelector('Skin.container');
 		//Object.keys($map).forEach(function(key) { delete $map[key]; });		
 		
 		//Start Loading Selected Map
-		//postCommand({"action": "getFile", "filePath": filePath, "command": "addMarkup"}, LoadSkin);
-		getFile({"filePath": filePath, "command": "addMarkup"}, LoadSkin);
+		//postCommand({"action": "getFile", "filePath": filePath, "command": "addMarkup"}, loadSkin);
+		getFile({"filePath": filePath, "command": "addMarkup"}, loadSkin);
 		break;
 	};
 };
@@ -235,7 +236,7 @@ function recallMap() {
 	
 	_filter.removeAttribute('saved');
 	_filter.setAttribute('recalled', 'true');
-	LoadSkin();
+	loadSkin();
 };
 
 //################
@@ -251,8 +252,15 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 	case 'zone':
 		_zone.setAttribute('value', value);
 		_zone.setAttribute('text', text);
-		openMenu('category', 'Categories[zone="'+value+'"]');
+		//openMenu('category', 'Categories[zone="'+value+'"]');
+
+		if(value == 'task')
+			openMenu('task', 'Tasks[zone="'+_zone.getAttribute('value')+'"][category="media"]');
+		else
+			openMenu('control', 'Controls[zone="'+_zone.getAttribute('value')+'"][category="media"]');
+
 		break;
+/*
 	case 'category':
 		_category.setAttribute('value', value);
 		_category.setAttribute('text', text);
@@ -263,6 +271,7 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 			openMenu('control', 'Controls[zone="'+_zone.getAttribute('value')+'"][category="'+value+'"]');
 
 		break;
+*/
 	case 'control':
 		if(value == 'none') return;
 
@@ -275,7 +284,8 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 			_control.setAttribute('layout', value);
 		
 		_filter.removeAttribute('recalled');
-		LoadSkin();
+		
+		loadSkin();
 		break;
 	case 'task':
 		if(value == 'none') return;
@@ -385,6 +395,7 @@ var key = button.attributes['key'].nodeValue;
 	keyPressed(key);
 };
 
+/*
 //################
 //### monitorPulse
 //################
@@ -395,6 +406,7 @@ function monitorPulse() {
 		monitorPulse();
 	}, 60000);
 };
+*/
 
 //################
 //### start
@@ -419,7 +431,7 @@ var params = new URLSearchParams(window.location.search);
 	window.addEventListener("keyup", keyUp);
 	
 	//Start Pulse Monitor
-	monitorPulse();
+	//monitorPulse();
 };
 
 //################
@@ -498,7 +510,7 @@ Case {
 	}
 }  
 
-Filter, Skin {
+Skin, Filter {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -511,7 +523,7 @@ Filter, Commands {
 
 #Zone, #Category, #Control {
 	font-size: 1.8vh;
-	width:33%;
+	width:50%;
 	margin-left: .5vh;
 	padding-top: .2vh;
 	text-align: center;
@@ -706,13 +718,11 @@ Commands .button {
 	<Filter class="container">
 		<div class="row headings">
 			<div>ZONE</div>
-			<div>CATEGORY</div>
 			<div>CONTROL</div>
 		</div>
 		
 		<div class="row filter">
 			<Code id="Zone">0. None</Code>
-			<Code id="Category">0. None</Code>
 			<Code id="Control">0. None</Code>
 		</div>
 	</Filter>
@@ -729,7 +739,6 @@ Commands .button {
    
 	<Commands class="row commands">
 		<div class="button" key="[">INPUT</div>  
-		<div class="button" key="j">INFO</div>
 		<div class="button" key="On/Off">OFF</div>  
 	</Commands>
 </Case>
