@@ -6,7 +6,7 @@
 <script class='ipRemote caseScript' type="text/javascript" ipremote="/local/ipRemote/home.htm">
 //##############################################
 //### Use javascript's XMLHttpRequest Object
-//### To Trigger HomeAssistant Events+'-'+controlValue
+//### To Trigger HomeAssistant Events+'-'+skinValue
 //### Via the RESTful Integration API
 //##############################################
 
@@ -22,7 +22,7 @@ ipRemote = {
 //### Global Variables
 //################
 var _isKeyDown, _wasMapRecalled;
-var	_case, _filter, _map, _shortcuts, _zone, _category, _control, _commands, _overlay, _menu;
+var	_case, _filter, _map, _shortcuts, _zone, _category, _skin, _commands, _overlay, _menu;
 var _socket;
 
 //################
@@ -56,6 +56,7 @@ function sendCommand(command) {
 	};
 };
 
+/*
 //################
 //### postCommand
 //################
@@ -84,6 +85,7 @@ var xhr = new XMLHttpRequest();
 	xhr.setRequestHeader("Content-Type", "text/plain");
 	xhr.send(JSON.stringify(command));
 };
+*/
 
 //################
 //### getFile
@@ -106,16 +108,17 @@ var xhr = new XMLHttpRequest();
 	};
 };
 
+/*
 //################
 //### removeMap
 //################
 function removeMap() {
 	document.querySelector('#Zone').setAttribute('value', 'none');
 	document.querySelector('#Category').setAttribute('value', 'none');
-	document.querySelector('#Control').setAttribute('value', 'none');
+	document.querySelector('#Skin').setAttribute('value', 'none');
 	document.querySelector('#Zone').innerHTML = '0. None';
 	document.querySelector('#Category').innerHTML = '0. None';
-	document.querySelector('#Control').innerHTML = '0. None';
+	document.querySelector('#Skin').innerHTML = '0. None';
 
 	_map.innerHTML = '';
 	_filter.setAttribute('saved', 'false');
@@ -130,13 +133,14 @@ function saveMap(command=undefined) {
 	_zone.setAttribute('pin-text', _zone.getAttribute('text'));
 	_category.setAttribute('pin-value', _category.getAttribute('value'));
 	_category.setAttribute('pin-text', _category.getAttribute('text'));
-	_control.setAttribute('pin-value', _control.getAttribute('value'));
-	_control.setAttribute('pin-text', _control.getAttribute('text'));
-	_control.setAttribute('pin-layout', _control.getAttribute('layout'));
+	_skin.setAttribute('pin-value', _skin.getAttribute('value'));
+	_skin.setAttribute('pin-text', _skin.getAttribute('text'));
+	_skin.setAttribute('pin-layout', _skin.getAttribute('layout'));
 
 	_filter.setAttribute('saved', 'true');
 	if(command)	postCommand(command);
 };
+*/
 
 //################
 //### loadTask
@@ -161,8 +165,8 @@ function loadTask(content, command={"action": "default"}) {
 		break;
 	default:
 		var zone = _zone.getAttribute('value');
-		var control =_control.getAttribute('value');
-		var filePath = './tasks/'+zone+'-'+control+'.js';
+		var skin =_skin.getAttribute('value');
+		var filePath = './tasks/'+zone+'-'+skin+'.js';
 		
 		//postCommand({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
 		break;
@@ -193,12 +197,12 @@ var Skin = document.querySelector('Skin.container');
 		break;
 
 	default:
-		var filePath = './skins/' + _control.getAttribute('layout')+'.htm';
-		//var filePath = './skins/'+_category.getAttribute('value') + '-' + _control.getAttribute('layout')+'.htm';
+		var filePath = './skins/' + _skin.getAttribute('layout')+'.htm';
+		//var filePath = './skins/'+_category.getAttribute('value') + '-' + _skin.getAttribute('layout')+'.htm';
 
 		_zone.innerHTML = _zone.getAttribute('text');
 		//_category.innerHTML = _category.getAttribute('text');
-		_control.innerHTML = _control.getAttribute('text');
+		_skin.innerHTML = _skin.getAttribute('text');
 		
 		//Clear Button Node and Botton Object Contents
 		if(Skin) Skin.innerHTML = '';
@@ -223,16 +227,16 @@ function recallMap() {
 	if(
 		_zone.getAttribute('pin-value') == _zone.getAttribute('value') &&
 		_category.getAttribute('pin-value') == _category.getAttribute('value') &&
-		_control.getAttribute('pin-value') == _control.getAttribute('value')
+		_skin.getAttribute('pin-value') == _skin.getAttribute('value')
 	) return;
 
 	_zone.setAttribute('value', _zone.getAttribute('pin-value'));
 	_zone.setAttribute('text', _zone.getAttribute('pin-text'));
 	_category.setAttribute('value', _category.getAttribute('pin-value'));
 	_category.setAttribute('text', _category.getAttribute('pin-text'));
-	_control.setAttribute('value', _control.getAttribute('pin-value'));
-	_control.setAttribute('text', _control.getAttribute('pin-text'));
-	_control.setAttribute('layout', _control.getAttribute('pin-layout'));
+	_skin.setAttribute('value', _skin.getAttribute('pin-value'));
+	_skin.setAttribute('text', _skin.getAttribute('pin-text'));
+	_skin.setAttribute('layout', _skin.getAttribute('pin-layout'));
 	
 	_filter.removeAttribute('saved');
 	_filter.setAttribute('recalled', 'true');
@@ -244,7 +248,7 @@ function recallMap() {
 //################
 function closeMenu(charCode) {
 var option = document.querySelector('Overlay[open] Option[key="'+charCode+'"]');
-var name = option.getAttribute('name'), value = option.getAttribute('value'), layout = option.getAttribute('layout'), text = option.innerHTML;
+var name = option.getAttribute('name'), value = option.getAttribute('value'), layout = option.getAttribute('layout'), text = option.getAttribute('value'); //, text = option.innerHTML;
 
 	_overlay.removeAttribute("open");
 
@@ -257,7 +261,7 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 		if(value == 'task')
 			openMenu('task', 'Tasks[zone="'+_zone.getAttribute('value')+'"][category="media"]');
 		else
-			openMenu('control', 'Controls[zone="'+_zone.getAttribute('value')+'"][category="media"]');
+			openMenu('skin', 'Skins[zone="'+_zone.getAttribute('value')+'"][category="media"]');
 
 		break;
 /*
@@ -268,20 +272,20 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 		if(value == 'task')
 			openMenu('task', 'Tasks[zone="'+_zone.getAttribute('value')+'"][category="'+value+'"]');
 		else
-			openMenu('control', 'Controls[zone="'+_zone.getAttribute('value')+'"][category="'+value+'"]');
+			openMenu('skin', 'Skins[zone="'+_zone.getAttribute('value')+'"][category="'+value+'"]');
 
 		break;
 */
-	case 'control':
+	case 'skin':
 		if(value == 'none') return;
 
-		_control.setAttribute('value', value);
-		_control.setAttribute('text', text);
+		_skin.setAttribute('value', value);
+		_skin.setAttribute('text', text);
 
 		if(layout)
-			_control.setAttribute('layout', layout);
+			_skin.setAttribute('layout', layout);
 		else
-			_control.setAttribute('layout', value);
+			_skin.setAttribute('layout', value);
 		
 		_filter.removeAttribute('recalled');
 		
@@ -290,8 +294,8 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 	case 'task':
 		if(value == 'none') return;
 		
-		_control.setAttribute('value', value);
-		_control.setAttribute('text', text);
+		_skin.setAttribute('value', value);
+		_skin.setAttribute('text', text);
 
 		loadTask();
 		break;
@@ -302,22 +306,23 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 //### openMenu
 //################
 function openMenu(optionName='zone', optionCategory='Zones') {
+console.log(`Enter openMenu,  optionName: ${optionName}, optionCategory: ${optionCategory}`);
 var options=document.querySelector(optionCategory);
 var buttons;
 
-//Reset Selections
+	//Reset Selections
 	if(optionName == 'zone') {
 		_menu.removeAttribute('zoneValue');
 		_menu.removeAttribute('zoneOption');
-		_menu.removeAttribute('categoryValue');
-		_menu.removeAttribute('categoryOption');
-		_menu.removeAttribute('controlValue');
-		_menu.removeAttribute('controlOption');
+		//_menu.removeAttribute('categoryValue');
+		//_menu.removeAttribute('categoryOption');
+		_menu.removeAttribute('skinValue');
+		_menu.removeAttribute('skinOption');
 		_menu.removeAttribute('taskValue');
 		_menu.removeAttribute('taskOption');
 	};
 	
-//Add Options
+	//Add Options
 	if(!options) {
 		options=document.querySelector('Notes[nooptions]');
 		options.querySelector('option.text').innerHTML = '*** ERROR: '+optionName.toUpperCase()+' OPTIONS MISSING ***';
@@ -423,7 +428,7 @@ var params = new URLSearchParams(window.location.search);
 	_menu = document.querySelector('Menu');
 	_zone = document.querySelector('#Zone');
 	_category = document.querySelector('#Category');
-	_control = document.querySelector('#Control');
+	_skin = document.querySelector('#Skin');
 
 	document.querySelector('commands > [key="["]').addEventListener("click", keyClicked);
 	//document.querySelector('commands > [key="`"]').addEventListener("click", keyClicked);
@@ -445,9 +450,9 @@ function loadOverlay(content, command={"filePath": "default"}) {
 		getFile({"filePath": "./menus/categories.htm"}, loadOverlay);
 		break;
 	case './menus/categories.htm':
-		getFile({"filePath": "./menus/controls.htm"}, loadOverlay);
+		getFile({"filePath": "./menus/skins.htm"}, loadOverlay);
 		break;
-	case './menus/controls.htm':
+	case './menus/skins.htm':
 		getFile({"filePath": "./menus/tasks.htm"}, loadOverlay);
 		break;
 	case './menus/tasks.htm':
@@ -467,14 +472,15 @@ function loadOverlay(content, command={"filePath": "default"}) {
 //################
 //debugger;
 	//Make Variables Public
+	/*
 	$case.saveMap = saveMap;
 	$case.recallMap = recallMap;
 	$case.removeMap = removeMap;
 	$case.postCommand = postCommand;
 	$case.keyPressed = keyPressed;
-	
+	*/
 	window.addEventListener("load", function(){loadOverlay()}, false);
-//alert('hi psi');
+
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	
 })(ipRemote.case, ipRemote.map);
 </script>
@@ -521,7 +527,7 @@ Filter, Commands {
 	margin-left: -.2%;
 }
 
-#Zone, #Category, #Control {
+#Zone, #Category, #Skin {
 	font-size: 1.8vh;
 	width:50%;
 	margin-left: .5vh;
@@ -531,7 +537,7 @@ Filter, Commands {
 	background: LightBlue;
 }
 
-#Control {
+#Skin {
 	margin-right:.5vh;
 }
 
@@ -616,10 +622,11 @@ Option.text {
 }
 
 Option.button {
+	font-family: courier;
 	margin: 3vh 0 0 3vh; 
 }
 
-Zones, Categories, Controls, Tasks, Notes {
+Zones, Categories, Skins, Tasks, Notes {
 	display: none;
 }
 
@@ -718,12 +725,12 @@ Commands .button {
 	<Filter class="container">
 		<div class="row headings">
 			<div>ZONE</div>
-			<div>CONTROL</div>
+			<div>SKIN</div>
 		</div>
 		
 		<div class="row filter">
-			<Code id="Zone">0. None</Code>
-			<Code id="Control">0. None</Code>
+			<Code id="Zone"></Code>
+			<Code id="Skin"></Code>
 		</div>
 	</Filter>
 	
