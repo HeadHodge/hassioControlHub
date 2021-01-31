@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>ipRemote</title>
+<title>webRemote</title>
   
-<script class='ipRemote caseScript' type="text/javascript" ipremote="/local/ipRemote/home.htm">
+<script class='webRemote caseScript' type="text/javascript" webRemote="/local/webRemote/home.htm">
 //##############################################
 //### Use javascript's XMLHttpRequest Object
 //### To Trigger HomeAssistant Events+'-'+skinValue
@@ -11,12 +11,12 @@
 //##############################################
 
 /////////////////////////// BEGIN PRIVATE NAMESPACE //////////////////////	
-ipRemote = {
+webRemote = {
 	case: {},
 	map: {}
 }; //Create Namespace;
 
-(function($case, $map){ //invoke anonymous self executing function
+webRemote = (function($case, $map){ //invoke anonymous self executing function
 
 //################
 //### Global Variables
@@ -56,37 +56,6 @@ function sendCommand(command) {
 	};
 };
 
-/*
-//################
-//### postCommand
-//################
-function postCommand(command, doneCallback, failCallback) {
-return alert('postCommand: '+JSON.stringify(command));
-var xhr = new XMLHttpRequest();
-
-	if(!command) return;
-
-	xhr.onload = function() {
-		if (xhr.status != 200) {
-			if(failCallback) return failCallback(command, xhr.status, xhr.statusText);
-			console.log(`postCommand Failed: ${xhr.status}=${xhr.statusText}\nCommand:` + JSON.stringify(command)); // e.g. 404: Not Found
-			return;
-		};
-		
-		if(doneCallback) return doneCallback(JSON.parse(this.responseText), command);
-		console.log(`postCommand Success ${xhr.status}`);
-	};
-
-	xhr.onerror = function() {
-		console.log(`postCommand ERROR: ${xhr.status}=${xhr.statusText}, Command:\n` + JSON.stringify(command)); // e.g. 404: Not Found
-	};
-
-	xhr.open("POST", "http://192.168.0.160:5050/api/appdaemon/ipRemoteCommand");
-	xhr.setRequestHeader("Content-Type", "text/plain");
-	xhr.send(JSON.stringify(command));
-};
-*/
-
 //################
 //### getFile
 //################
@@ -97,8 +66,6 @@ var xhr = new XMLHttpRequest();
 	xhr.send();
 	
 	xhr.onload = function() {
-		//if (xhr.status != 200) return console.log(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
-		//alert(xhr.response);
 		console.log(`getFile Success ${xhr.status}`);
 		if(callBack) return callBack(xhr.response, options);
 	};
@@ -107,40 +74,6 @@ var xhr = new XMLHttpRequest();
 		console.log(`getFile ERROR: ${xhr.status}=${xhr.statusText}`); // e.g. 404: Not Found
 	};
 };
-
-/*
-//################
-//### removeMap
-//################
-function removeMap() {
-	document.querySelector('#Zone').setAttribute('value', 'none');
-	document.querySelector('#Category').setAttribute('value', 'none');
-	document.querySelector('#Skin').setAttribute('value', 'none');
-	document.querySelector('#Zone').innerHTML = '0. None';
-	document.querySelector('#Category').innerHTML = '0. None';
-	document.querySelector('#Skin').innerHTML = '0. None';
-
-	_map.innerHTML = '';
-	_filter.setAttribute('saved', 'false');
-	_shortcuts.removeAttribute('display');
-};
-
-//################
-//### saveMap
-//################
-function saveMap(command=undefined) {
-	_zone.setAttribute('pin-value', _zone.getAttribute('value'));
-	_zone.setAttribute('pin-text', _zone.getAttribute('text'));
-	_category.setAttribute('pin-value', _category.getAttribute('value'));
-	_category.setAttribute('pin-text', _category.getAttribute('text'));
-	_skin.setAttribute('pin-value', _skin.getAttribute('value'));
-	_skin.setAttribute('pin-text', _skin.getAttribute('text'));
-	_skin.setAttribute('pin-layout', _skin.getAttribute('layout'));
-
-	_filter.setAttribute('saved', 'true');
-	if(command)	postCommand(command);
-};
-*/
 
 //################
 //### loadTask
@@ -168,7 +101,7 @@ function loadTask(content, command={"action": "default"}) {
 		var skin =_skin.getAttribute('value');
 		var filePath = './tasks/'+zone+'-'+skin+'.js';
 		
-		//postCommand({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
+		//getFile({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
 		break;
 	};
 };
@@ -198,52 +131,14 @@ var Skin = document.querySelector('Skin.container');
 
 	default:
 		var filePath = './skins/' + _skin.getAttribute('layout')+'.htm';
-		//var filePath = './skins/'+_category.getAttribute('value') + '-' + _skin.getAttribute('layout')+'.htm';
 
 		_zone.innerHTML = _zone.getAttribute('text');
-		//_category.innerHTML = _category.getAttribute('text');
 		_skin.innerHTML = _skin.getAttribute('text');
-		
-		//Clear Button Node and Botton Object Contents
-		if(Skin) Skin.innerHTML = '';
-		//Object.keys($map).forEach(function(key) { delete $map[key]; });		
-		
-		//Start Loading Selected Map
-		//postCommand({"action": "getFile", "filePath": filePath, "command": "addMarkup"}, loadSkin);
+		Skin.innerHTML = '';
 		getFile({"filePath": filePath, "command": "addMarkup"}, loadSkin);
 		break;
 	};
 };
-
-/*
-//################
-//### recallMap
-//################
-function recallMap() {
-	_overlay.removeAttribute("open");
-
-	if(!_filter.getAttribute('saved')) return;
-	
-	//Abort if map already loaded
-	if(
-		_zone.getAttribute('pin-value') == _zone.getAttribute('value') &&
-		_category.getAttribute('pin-value') == _category.getAttribute('value') &&
-		_skin.getAttribute('pin-value') == _skin.getAttribute('value')
-	) return;
-
-	_zone.setAttribute('value', _zone.getAttribute('pin-value'));
-	_zone.setAttribute('text', _zone.getAttribute('pin-text'));
-	_category.setAttribute('value', _category.getAttribute('pin-value'));
-	_category.setAttribute('text', _category.getAttribute('pin-text'));
-	_skin.setAttribute('value', _skin.getAttribute('pin-value'));
-	_skin.setAttribute('text', _skin.getAttribute('pin-text'));
-	_skin.setAttribute('layout', _skin.getAttribute('pin-layout'));
-	
-	_filter.removeAttribute('saved');
-	_filter.setAttribute('recalled', 'true');
-	loadSkin();
-};
-*/
 
 //################
 //### closeMenu
@@ -266,18 +161,6 @@ var name = option.getAttribute('name'), value = option.getAttribute('value'), la
 			openMenu('skin', 'Skins[zone="'+_zone.getAttribute('value')+'"][category="media"]');
 
 		break;
-/*
-	case 'category':
-		_category.setAttribute('value', value);
-		_category.setAttribute('text', text);
-
-		if(value == 'task')
-			openMenu('task', 'Tasks[zone="'+_zone.getAttribute('value')+'"][category="'+value+'"]');
-		else
-			openMenu('skin', 'Skins[zone="'+_zone.getAttribute('value')+'"][category="'+value+'"]');
-
-		break;
-*/
 	case 'skin':
 		if(value == 'none') return;
 
@@ -402,19 +285,6 @@ var key = button.attributes['key'].nodeValue;
 	keyPressed(key);
 };
 
-/*
-//################
-//### monitorPulse
-//################
-function monitorPulse() {
-	return;
-	setTimeout(function(){
-		postCommand({"action": "getPulse"}, function(reply){console.log(reply)});
-		monitorPulse();
-	}, 60000);
-};
-*/
-
 //################
 //### start
 //################
@@ -433,12 +303,8 @@ var params = new URLSearchParams(window.location.search);
 	_skin = document.querySelector('#Skin');
 
 	document.querySelector('commands > [key="["]').addEventListener("click", keyClicked);
-	//document.querySelector('commands > [key="`"]').addEventListener("click", keyClicked);
 	window.addEventListener("keydown", keyDown);
 	window.addEventListener("keyup", keyUp);
-	
-	//Start Pulse Monitor
-	//monitorPulse();
 };
 
 //################
@@ -473,21 +339,14 @@ function loadOverlay(content, command={"filePath": "default"}) {
 //###   MAIN   ###
 //################
 //debugger;
-	//Make Variables Public
-	/*
-	$case.saveMap = saveMap;
-	$case.recallMap = recallMap;
-	$case.removeMap = removeMap;
-	$case.postCommand = postCommand;
-	$case.keyPressed = keyPressed;
-	*/
+
 	window.addEventListener("load", function(){loadOverlay()}, false);
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	
-})(ipRemote.case, ipRemote.map);
+})(webRemote.case, webRemote.map);
 </script>
 
-<style class='ipRemote caseStyle'>
+<style class='webRemote caseStyle'>
 body {
 	user-select: none;
 	background: Gray;
@@ -587,11 +446,10 @@ Menu {
 	position: absolute;
 	width: 30%;
 	height: 70%;
-	font-size: 10vh;
 	color: white;
 	background: LightCoral;
   	font-weight: bold;
-	font-size: 3.5vh;
+	font-size: 2.5vh;
 
 	border: solid;
 	border-color: Yellow;
@@ -722,7 +580,7 @@ Commands .button {
 </style>
 </head>
 
-<body id="ipRemote">
+<body id="webRemote">
 <Case>
 	<Filter class="container">
 		<div class="row headings">
@@ -731,8 +589,8 @@ Commands .button {
 		</div>
 		
 		<div class="row filter">
-			<Code id="Zone"></Code>
-			<Code id="Skin"></Code>
+			<Code id="Zone">masterBedroom</Code>
+			<Code id="Skin">Streaming</Code>
 		</div>
 	</Filter>
 	
