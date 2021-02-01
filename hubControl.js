@@ -43,18 +43,7 @@ var task;
 	console.log(`Send selected task: ${task}`);
 	hubOutput.sendControlTask(task);
 };
-/*
-//##########################################
-const onModuleSelected = function(zone, command) {
-//##########################################
-console.log(`Enter onModuleSelected with ${command} in zone: ${zone}`);
 
-	_hub[zone].isModuleSelected = null;
-	if(command == 'On/Off' || command == 'Set') command = 'Open';
-	console.log(`Send command: ${command}`);
-	return onCommand(zone, command);
-};
-*/
 //##########################################
 const onSelectFocus = function(zone, command) {
 //##########################################
@@ -76,7 +65,6 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 	
 	if(_hub[zone].topics[_hub[zone].focus] && _hub[zone].topics[_hub[zone].focus].controller[command]) {
 		_hub[zone].popupModule = _hub[zone].topics[_hub[zone].focus].controller[command];
-		//_hub[zone].isControllerSelected = true;
 		return console.log(`popupModule selected: ${_hub[zone].popupModule}`);
 	};
  };
@@ -88,9 +76,10 @@ try {
 console.log(`Enter onInput, command: ${hubInput.command}, zone: ${hubInput.zone}`);
 _hub[hubInput.zone] = require(`/controlHub/modules/hubs/hub.zone.${hubInput.zone}.js`);
 	
-	if(_hub[hubInput.zone].isTaskSet) return onSelectTask(hubInput.zone, hubInput.command);
-	if(_hub[hubInput.zone].isFocusSet) return onSelectFocus(hubInput.zone, hubInput.command);
 	if(_hub[hubInput.zone].isControllerSelected) {_hub[hubInput.zone].isControllerSelected = null; if(hubInput.command == 'On/Off' || hubInput.command == 'Set') hubInput.command = 'Open';};
+	if(_hub[hubInput.zone].isFocusSet) if(hubInput.command == 'On/Off' || hubInput.command == 'Set'){hubInput.command = 'Open'; _hub[hubInput.zone].isFocusSet = null;};
+	if(_hub[hubInput.zone].isFocusSet) return onSelectFocus(hubInput.zone, hubInput.command);
+	if(_hub[hubInput.zone].isTaskSet) return onSelectTask(hubInput.zone, hubInput.command);
 		
 	if(hubInput.command == 'Focus') {_hub[hubInput.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
 
