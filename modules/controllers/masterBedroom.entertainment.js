@@ -1,8 +1,4 @@
-exports.name = 'MasterBedroom Entertainment Tasks';
-exports.zone = 'masterBedroom';
-exports.focus = 'Up';
-
-events = {
+adbEvents = {
 	"Home"		: "sendevent /dev/input/event4 4 4 786979 && sendevent /dev/input/event4 1 172 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786979 && sendevent /dev/input/event4 1 172 0 && sendevent /dev/input/event4 0 0 0",
 	"Menu"		: "sendevent /dev/input/event4 4 4 786496 && sendevent /dev/input/event4 1 139 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786496 && sendevent /dev/input/event4 1 139 0 && sendevent /dev/input/event4 0 0 0",
 	"Exit"		: "sendevent /dev/input/event4 4 4 458993 && sendevent /dev/input/event4 1 158 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458993 && sendevent /dev/input/event4 1 158 0 && sendevent /dev/input/event4 0 0 0",
@@ -16,45 +12,48 @@ events = {
 	"Forward"	: "sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 0 && sendevent /dev/input/event4 0 0 0"
 };
 
+exports.name = 'MasterBedroom Entertainment Tasks';
+exports.zone = 'masterBedroom';
+exports.focus = 'Up';
 exports.tasks = {
 	"Home": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "HOME"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Home"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}}
 	],
 	
 	"Menu": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "MENU"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Menu"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Menu"]}}
 	],
 		
 	"Exit": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "BACK"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Exit"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Exit"]}}
 	],
 	
 	"Up": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "UP"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Up"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Up"]}}
 	],
 	
 	"Down": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "DOWN"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Down"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Down"]}}
 	],
 	
 	"Left": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "LEFT"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Left"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Left"]}}
 	],
 	
 	"Right": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "RIGHT"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Right"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Right"]}}
 	],
 	
 	"Ok": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "CENTER"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Ok"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Ok"]}}
 	],
 	
 	"Louder": [
@@ -77,17 +76,17 @@ exports.tasks = {
 	
 	"Backward": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 89"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Backward"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Backward"]}}
 	],
 	
 	"Start/Stop": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent 85"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Start/Stop"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Start/Stop"]}}
 	],
 	
 	"Forward": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 90"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": events["Forward"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Forward"]}}
 	],
 	
 	"Open": [
