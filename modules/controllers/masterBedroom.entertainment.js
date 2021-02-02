@@ -81,7 +81,7 @@ exports.tasks = {
 	
 	"Stop/Start": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent 85"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Start/Stop"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Stop/Start"]}}
 	],
 	
 	"Forward": [

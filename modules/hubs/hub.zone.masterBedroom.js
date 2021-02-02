@@ -1,52 +1,16 @@
-//exports.zone = 'masterBedroom';
 exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
 exports.popupModule = null;
 exports.primaryModule = "/controlHub/modules/controllers/masterBedroom.entertainment.js";
-exports.topics = {
-	"Up"  : {
-		"topic"      : 'Entertainment',
-		"controller" : {
-			"Up"      	: "/controlHub/modules/controllers/masterBedroom.entertainment.js",
-			"Softer"    : "/controlHub/modules/controllers/masterBedroom.tv.js",
-			"Louder"    : "/controlHub/modules/controllers/masterBedroom.stereo.js",
-			"Backward"	: "/controlHub/modules/controllers/masterBedroom.fireplace.js"
-		}
-	},
-
-	"Down"  : {
-		"topic"      : 'Lights',
-		"controller" : {
-			"Down"         : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-	
-	"Left"  : {
-		"topic"      : 'Covers',
-		"controller" : {
-			"Left"         : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-
-	"Right"  : {
-		"topic"      : 'Temperature',
-		"controller" : {
-			"Right"        : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
+exports.controllers = {
+	"Focus" 		: "/controlHub/modules/controllers/masterBedroom.entertainment.js",
+	"Softer" 		: "/controlHub/modules/controllers/masterBedroom.video.js",
+	"Silence/Sound"	: "/controlHub/modules/controllers/masterBedroom.sound.js",
+	"Louder" 		: "/controlHub/modules/controllers/masterBedroom.entertainment.js",
+	"Backward"		: "/controlHub/modules/controllers/masterBedroom.fireplace.js",
+	"Stop/Start"	: "/controlHub/modules/controllers/masterBedroom.covers.js",
+	"Forward"		: "/controlHub/modules/controllers/masterBedroom.entertainment.js"
 };
 
 exports.tasks = {
@@ -110,7 +74,53 @@ exports.tasks = {
  		]
 	}
 };
-		
+
+/*
+exports.topics = {
+	"Up"  : {
+		"topic"      : 'Entertainment',
+		"controller" : {
+			"Up"      	: "/controlHub/modules/controllers/masterBedroom.entertainment.js",
+			"Softer"    : "/controlHub/modules/controllers/masterBedroom.tv.js",
+			"Louder"    : "/controlHub/modules/controllers/masterBedroom.stereo.js",
+			"Backward"	: "/controlHub/modules/controllers/masterBedroom.fireplace.js"
+		}
+	},
+
+	"Down"  : {
+		"topic"      : 'Lights',
+		"controller" : {
+			"Down"         : null,
+			"Louder"       : null,
+			"Softer"       : null,
+			"Silence/Sound": null,
+			"Louder"       : null
+		}
+	},
+	
+	"Left"  : {
+		"topic"      : 'Covers',
+		"controller" : {
+			"Left"         : null,
+			"Louder"       : null,
+			"Softer"       : null,
+			"Silence/Sound": null,
+			"Louder"       : null
+		}
+	},
+
+	"Right"  : {
+		"topic"      : 'Temperature',
+		"controller" : {
+			"Right"        : null,
+			"Louder"       : null,
+			"Softer"       : null,
+			"Silence/Sound": null,
+			"Louder"       : null
+		}
+	},
+};
+*/		
 ////////////////////////////////////////////
 //                MAIN
 //             hubControl
