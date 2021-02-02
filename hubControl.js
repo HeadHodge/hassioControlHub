@@ -6,9 +6,9 @@ const hubInput = require('/controlHub/hubInput.js');
 var _zones={};
 
 //##########################################
-const onCommand = function(zone, command) {
+const onOutput = function(zone, command) {
 //##########################################
-console.log(`Enter onCommand for command: ${command}`);
+console.log(`Enter onOutput for command: ${command}`);
 var hubOutput = require('/controlHub/hubOutput.js');
 var controller, task;
 
@@ -55,19 +55,6 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 		return console.log(`taskList selected for ${zone}`);
 	};
 	
-/*	
-	if(_zones[zone].topics[command] && _zones[zone].topics[command].controller[command]) {
-		_zones[zone].focus = command;
-		_zones[zone].primaryModule = _zones[zone].topics[command].controller[command];
-		_zones[zone].isControllerSelected = true;
-		return console.log(`primaryModule selected : ${_zones[zone].primaryModule}`);
-	};
-	
-	if(_zones[zone].topics[_zones[zone].focus] && _zones[zone].topics[_zones[zone].focus].controller[command]) {
-		_zones[zone].popupModule = _zones[zone].topics[_zones[zone].focus].controller[command];
-		return console.log(`popupModule selected: ${_zones[zone].popupModule}`);
-	};
-*/	
 	switch(command) {
 	case 'Focus':
 		_zones[zone].primaryModule = _zones[zone].controllers['Focus'];
@@ -98,29 +85,60 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 };
  
 //##########################################
-const onInput = function(hubInput) {
+const onCommand = function(input) {
 try {
 //##########################################
-console.log(`Enter onInput, command: ${hubInput.command}, zone: ${hubInput.zone}`);
-_zones[hubInput.zone] = require(`/controlHub/zones/zone.${hubInput.zone}.js`);
+console.log(`Enter onCommand, command: ${input.command}, zone: ${input.zone}`);
+_zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
 	
-	if(_zones[hubInput.zone].isControllerSelected) {_zones[hubInput.zone].isControllerSelected = null; if(hubInput.command == 'Off/On' || hubInput.command == 'Set') hubInput.command = 'Open';};
-	if(_zones[hubInput.zone].isFocusSet) if(hubInput.command == 'Off/On' || hubInput.command == 'Set'){hubInput.command = 'Open'; _zones[hubInput.zone].isFocusSet = null;};
-	if(_zones[hubInput.zone].isFocusSet) return onSelectFocus(hubInput.zone, hubInput.command);
-	if(_zones[hubInput.zone].isTaskSet) return onSelectTask(hubInput.zone, hubInput.command);
+	if(_zones[input.zone].isControllerSelected) {_zones[input.zone].isControllerSelected = null; if(input.command == 'Off/On' || input.command == 'Set') input.command = 'Open';};
+	if(_zones[input.zone].isFocusSet) if(input.command == 'Off/On' || input.command == 'Set'){input.command = 'Open'; _zones[input.zone].isFocusSet = null;};
+	if(_zones[input.zone].isFocusSet) return onSelectFocus(input.zone, input.command);
+	if(_zones[input.zone].isTaskSet) return onSelectTask(input.zone, input.command);
 		
-	if(hubInput.command == 'Focus') {_zones[hubInput.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
+	if(input.command == 'Focus') {_zones[input.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
 
-	if(hubInput.command == 'Set') hubInput.command = 'Off/On';
+	if(input.command == 'Set') input.command = 'Off/On';
 
-	if(hubInput.command == 'Silence/Sound') {
-		if(_zones[hubInput.zone].isSilent)
-			{hubInput.command = 'Sound';_zones[hubInput.zone].isSilent=false;}
+	if(input.command == 'Silence/Sound') {
+		if(_zones[input.zone].isSilent)
+			{input.command = 'Sound';_zones[input.zone].isSilent=false;}
 		else
-			{hubInput.command = 'Silence';_zones[hubInput.zone].isSilent=true;}
+			{input.command = 'Silence';_zones[input.zone].isSilent=true;}
 	};
 	
-	onCommand(hubInput.zone, hubInput.command);
+	onOutput(input.zone, input.command);
+}
+catch(error) {
+	console.log(`Unexpected Problem: ${error}`);
+	console.error(error);
+}};
+ 
+//##########################################
+const onFileName = function(client) {
+try {
+//##########################################
+console.log(`Enter onFileName, fileName: ${client.input.fileName}`);
+
+	client.send(`Really Got It`);
+	
+}
+catch(error) {
+	console.log(`Unexpected Problem: ${error}`);
+	console.error(error);
+}};
+ 
+//##########################################
+const onInput = function(client) {
+try {
+//##########################################
+console.log(`Enter onInput, inputType: ${client.input.type}`);
+
+	client.send(`Really Got It`);
+	if(client.input.type == 'command') return onCommand(client.input);
+	if(client.input.type == 'fileName') return onFileName(client);
+	
+	client.send(`Abort: Invalid Input Recieved`);
 }
 catch(error) {
 	console.log(`Unexpected Problem: ${error}`);
@@ -133,4 +151,4 @@ catch(error) {
 ////////////////////////////////////////////
 console.log(`Started hubControl on ${os.hostname}`);
 
-	hubInput.listen(onInput);
+	hubInput.getInput(onInput);

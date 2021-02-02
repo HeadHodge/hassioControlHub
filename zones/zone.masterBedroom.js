@@ -2,7 +2,7 @@ exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
 exports.popupModule = null;
-exports.primaryModule = "/controlHub/modules/controllers/controller.masterBedroom.entertainment.js";
+exports.primaryModule = "/controlHub/controllers/controller.masterBedroom.entertainment.js";
 exports.controllers = {
 	"Focus" 		: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
 	"Softer" 		: "/controlHub/controllers/controller.masterBedroom.video.js",

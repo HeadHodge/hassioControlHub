@@ -34,7 +34,7 @@ function sendCommand(command) {
 
 	socket.onopen = function(e) {
 		console.log("Sending to server "+_zone.getAttribute('value'));
-		socket.send(`{"type": "hubControl", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
+		socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
 	};
 
 	socket.onmessage = function(event) {
@@ -59,6 +59,38 @@ function sendCommand(command) {
 //################
 //### getFile
 //################
+function getFile(fileName, callBack) {
+
+	if(!_socket) socket = new WebSocket("ws://192.168.0.164:8080");
+
+	socket.onopen = function(e) {
+		socket.send(`{"type": "fileName", "fileName": "${fileName}"}`);
+		console.log(`fileName: ${fileName} sent`);
+	};
+
+	socket.onmessage = function(event) {
+		console.log(`[message] Data received from server: ${event.data}`);
+	};
+
+	socket.onclose = function(event) {
+		if (event.wasClean) {
+			console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+		} else {
+			// e.g. server process killed or network down
+			// event.code is usually 1006 in this case
+			console.log('[close] Connection died');
+		}
+	};
+
+	socket.onerror = function(error) {
+		console.log(`[error] ${error.message}`);
+	};
+};
+
+/*
+//################
+//### getFile
+//################
 function getFile(options, callBack) {
 var xhr = new XMLHttpRequest();
 
@@ -74,6 +106,7 @@ var xhr = new XMLHttpRequest();
 		console.log(`getFile ERROR: ${xhr.status}=${xhr.statusText}`); // e.g. 404: Not Found
 	};
 };
+*/
 
 //################
 //### loadTask
@@ -331,7 +364,7 @@ function loadOverlay(content, command={"filePath": "default"}) {
 		start();
 		break;
 	default:
-		getFile({"filePath": "./skin/case.htm"}, loadOverlay);
+		getFile("./skin/case.htm", loadOverlay);
 		break;
 	};
 };
