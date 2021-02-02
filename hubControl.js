@@ -4,7 +4,6 @@
 const os = require('os');
 const hubInput = require('/controlHub/modules/hubInput.js');
 var _hub={};
-//var primaryController={}, popupController={};
 
 //##########################################
 const onCommand = function(zone, command) {
@@ -56,6 +55,7 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 		return console.log(`taskList selected for ${zone}`);
 	};
 	
+/*	
 	if(_hub[zone].topics[command] && _hub[zone].topics[command].controller[command]) {
 		_hub[zone].focus = command;
 		_hub[zone].primaryModule = _hub[zone].topics[command].controller[command];
@@ -67,7 +67,35 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 		_hub[zone].popupModule = _hub[zone].topics[_hub[zone].focus].controller[command];
 		return console.log(`popupModule selected: ${_hub[zone].popupModule}`);
 	};
- };
+*/	
+	switch(command) {
+	case 'Focus':
+		_hub[zone].primaryModule = _hub[zone].controllers['Focus'];
+		break;
+	case 'Louder':
+		_hub[zone].primaryModule = _hub[zone].controllers['Louder'];
+		break;
+	case 'Softer':
+		_hub[zone].primaryModule = _hub[zone].controllers['Softer'];
+		break;
+	case 'Silence/Sound':
+		primaryModule = _hub[zone].controllers['Silence/Sound'];
+		break;
+	case 'Backward':
+		_hub[zone].primaryModule = _hub[zone].controllers['Backward'];
+		break;
+	case 'Stop/Start':
+		_hub[zone].primaryModule = _hub[zone].controllers['Stop/Start'];
+		break;
+	case 'Forward':
+		_hub[zone].primaryModule = _hub[zone].controllers['Forward'];
+		break;
+	default:
+		return;
+	}
+
+	return console.log(`defaultController selected: ${_hub[zone].primaryModule}`);
+};
  
 //##########################################
 const onInput = function(hubInput) {
@@ -76,14 +104,14 @@ try {
 console.log(`Enter onInput, command: ${hubInput.command}, zone: ${hubInput.zone}`);
 _hub[hubInput.zone] = require(`/controlHub/modules/hubs/hub.zone.${hubInput.zone}.js`);
 	
-	if(_hub[hubInput.zone].isControllerSelected) {_hub[hubInput.zone].isControllerSelected = null; if(hubInput.command == 'On/Off' || hubInput.command == 'Set') hubInput.command = 'Open';};
-	if(_hub[hubInput.zone].isFocusSet) if(hubInput.command == 'On/Off' || hubInput.command == 'Set'){hubInput.command = 'Open'; _hub[hubInput.zone].isFocusSet = null;};
+	if(_hub[hubInput.zone].isControllerSelected) {_hub[hubInput.zone].isControllerSelected = null; if(hubInput.command == 'Off/On' || hubInput.command == 'Set') hubInput.command = 'Open';};
+	if(_hub[hubInput.zone].isFocusSet) if(hubInput.command == 'Off/On' || hubInput.command == 'Set'){hubInput.command = 'Open'; _hub[hubInput.zone].isFocusSet = null;};
 	if(_hub[hubInput.zone].isFocusSet) return onSelectFocus(hubInput.zone, hubInput.command);
 	if(_hub[hubInput.zone].isTaskSet) return onSelectTask(hubInput.zone, hubInput.command);
 		
 	if(hubInput.command == 'Focus') {_hub[hubInput.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
 
-	if(hubInput.command == 'Set') hubInput.command = 'On/Off';
+	if(hubInput.command == 'Set') hubInput.command = 'Off/On';
 
 	if(hubInput.command == 'Silence/Sound') {
 		if(_hub[hubInput.zone].isSilent)

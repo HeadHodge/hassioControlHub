@@ -7,7 +7,7 @@ adbEvents = {
 	"Left"		: "sendevent /dev/input/event4 4 4 458832 && sendevent /dev/input/event4 1 105 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458832 && sendevent /dev/input/event4 1 105 0 && sendevent /dev/input/event4 0 0 0",
 	"Right"		: "sendevent /dev/input/event4 4 4 458831 && sendevent /dev/input/event4 1 106 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458831 && sendevent /dev/input/event4 1 106 0 && sendevent /dev/input/event4 0 0 0",
 	"Ok"		: "sendevent /dev/input/event4 4 4 458840 && sendevent /dev/input/event4 1 96 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458840 && sendevent /dev/input/event4 1 96 0 && sendevent /dev/input/event4 0 0 0",
-	"Start/Stop": "sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 0 && sendevent /dev/input/event4 0 0 0",
+	"Stop/Start": "sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 0 && sendevent /dev/input/event4 0 0 0",
 	"Backward"	: "sendevent /dev/input/event4 4 4 786612 && sendevent /dev/input/event4 1 168 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786612 && sendevent /dev/input/event4 1 168 0 && sendevent /dev/input/event4 0 0 0",
 	"Forward"	: "sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 0 && sendevent /dev/input/event4 0 0 0"
 };
@@ -79,7 +79,7 @@ exports.tasks = {
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Backward"]}}
 	],
 	
-	"Start/Stop": [
+	"Stop/Start": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent 85"}}
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Start/Stop"]}}
 	],
@@ -100,7 +100,7 @@ exports.tasks = {
 		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.45}}
 	],
 		
-	"On/Off": [
+	"Off/On": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "SLEEP"}},
 	    //{"sleep": 3},
 		{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},

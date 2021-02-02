@@ -7,7 +7,7 @@ adbEvents = {
 	"Left"		: "sendevent /dev/input/event2 4 4 458832 && sendevent /dev/input/event2 1 105 1 && sendevent /dev/input/event2 0 0 0 && sendevent /dev/input/event2 4 4 458832 && sendevent /dev/input/event2 1 105 0 && sendevent /dev/input/event2 0 0 0",
 	"Right"		: "sendevent /dev/input/event2 4 4 458831 && sendevent /dev/input/event2 1 106 1 && sendevent /dev/input/event2 0 0 0 && sendevent /dev/input/event2 4 4 458831 && sendevent /dev/input/event2 1 106 0 && sendevent /dev/input/event2 0 0 0",
 	"Ok"		: "sendevent /dev/input/event2 4 4 458840 && sendevent /dev/input/event2 1 96 1 && sendevent /dev/input/event2 0 0 0 && sendevent /dev/input/event2 4 4 458840 && sendevent /dev/input/event2 1 96 0 && sendevent /dev/input/event2 0 0 0",
-	"Start/Stop": "sendevent /dev/input/event2 4 4 786637 && sendevent /dev/input/event2 1 164 1 && sendevent /dev/input/event2 0 0 0 && sendevent /dev/input/event2 4 4 786637 && sendevent /dev/input/event2 1 164 0 && sendevent /dev/input/event2 0 0 0",
+	"Stop/Start": "sendevent /dev/input/event2 4 4 786637 && sendevent /dev/input/event2 1 164 1 && sendevent /dev/input/event2 0 0 0 && sendevent /dev/input/event2 4 4 786637 && sendevent /dev/input/event2 1 164 0 && sendevent /dev/input/event2 0 0 0",
 	"Backward"	: "sendevent /dev/input/event2 4 4 786612 && sendevent /dev/input/event2 1 168 1 && sendevent /dev/input/event2 0 0 0 && sendevent /dev/input/event2 4 4 786612 && sendevent /dev/input/event2 1 168 0 && sendevent /dev/input/event2 0 0 0",
 	"Forward"	: "sendevent /dev/input/event2 4 4 786611 && sendevent /dev/input/event2 1 208 1 && sendevent /dev/input/event2 0 0 0 && sendevent /dev/input/event2 4 4 786611 && sendevent /dev/input/event2 1 208 0 && sendevent /dev/input/event2 0 0 0"
 };
@@ -77,9 +77,9 @@ exports.tasks = {
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Backward"]}}
 	],
 	
-	"Start/Stop": [
+	"Stop/Start": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent 85"}}
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Start/Stop"]}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Stop/Start"]}}
 	],
 	
 	"Forward": [
@@ -91,7 +91,7 @@ exports.tasks = {
 		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}
 	],
 	
-	"On/Off": [
+	"Off/On": [
 		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}
 	]
 };
