@@ -2,15 +2,15 @@ exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
 exports.popupModule = null;
-exports.primaryModule = "/controlHub/modules/controllers/livingRoom.entertainment.js";
+exports.primaryModule = "/controlHub/modules/controllers/controller.livingRoom.entertainment.js";
 exports.controllers = {
-	"Focus" 		: "/controlHub/modules/controllers/livingRoom.entertainment.js",
-	"Softer" 		: "/controlHub/modules/controllers/livingRoom.video.js",
-	"Silence/Sound"	: "/controlHub/modules/controllers/livingRoom.sound.js",
-	"Louder" 		: "/controlHub/modules/controllers/livingRoom.entertainment.js",
-	"Backward"		: "/controlHub/modules/controllers/livingRoom.fireplace.js",
-	"Stop/Start"	: "/controlHub/modules/controllers/livingRoom.covers.js",
-	"Forward"		: "/controlHub/modules/controllers/livingRoom.entertainment.js"
+	"Focus" 		: "/controlHub/modules/controllers/controller.livingRoom.entertainment.js",
+	"Softer" 		: "/controlHub/modules/controllers/controller.livingRoom.video.js",
+	"Silence/Sound"	: "/controlHub/modules/controllers/controller.livingRoom.sound.js",
+	"Louder" 		: "/controlHub/modules/controllers/controller.livingRoom.entertainment.js",
+	"Backward"		: "/controlHub/modules/controllers/controller.livingRoom.fireplace.js",
+	"Stop/Start"	: "/controlHub/modules/controllers/controller.livingRoom.covers.js",
+	"Forward"		: "/controlHub/modules/controllers/controller.livingRoom.entertainment.js"
 };
 
 exports.tasks = {

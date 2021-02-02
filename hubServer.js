@@ -4,13 +4,13 @@ var host, path;
 
 http.createServer(function (req, res) {
 
-	if(req.url == '/webRemote') 
-		{host = __dirname + req.url; path = host+'/homePage.htm';}
-	else if(req.url == '/webRemote/') 
-		{host = __dirname; path = host+'/webRemote/homePage.htm';}
+	if(req.url == '/html') 
+		{host = __dirname ; path = host+'/homePage.htm';}
+	else if(req.url == '/html/') 
+		{host = __dirname; path = host+'/html/homePage.htm';}
 	else
 		path = host + req.url;	
-	
+		
 	fs.readFile(path, function (err,data) {
 		if (err) {
 			res.writeHead(404);

@@ -2,15 +2,15 @@ exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
 exports.popupModule = null;
-exports.primaryModule = "/controlHub/modules/controllers/masterBedroom.entertainment.js";
+exports.primaryModule = "/controlHub/modules/controllers/controller.masterBedroom.entertainment.js";
 exports.controllers = {
-	"Focus" 		: "/controlHub/modules/controllers/masterBedroom.entertainment.js",
-	"Softer" 		: "/controlHub/modules/controllers/masterBedroom.video.js",
-	"Silence/Sound"	: "/controlHub/modules/controllers/masterBedroom.sound.js",
-	"Louder" 		: "/controlHub/modules/controllers/masterBedroom.entertainment.js",
-	"Backward"		: "/controlHub/modules/controllers/masterBedroom.fireplace.js",
-	"Stop/Start"	: "/controlHub/modules/controllers/masterBedroom.covers.js",
-	"Forward"		: "/controlHub/modules/controllers/masterBedroom.entertainment.js"
+	"Focus" 		: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
+	"Softer" 		: "/controlHub/controllers/controller.masterBedroom.video.js",
+	"Silence/Sound"	: "/controlHub/controllers/controller.masterBedroom.sound.js",
+	"Louder" 		: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
+	"Backward"		: "/controlHub/controllers/controller.masterBedroom.fireplace.js",
+	"Stop/Start"	: "/controlHub/controllers/controller.masterBedroom.covers.js",
+	"Forward"		: "/controlHub/controllers/controller.masterBedroom.entertainment.js"
 };
 
 exports.tasks = {
