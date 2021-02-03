@@ -23,13 +23,53 @@ webRemote = (function($case, $map){ //invoke anonymous self executing function
 //################
 var _isKeyDown, _wasMapRecalled;
 var	_case, _filter, _map, _shortcuts, _zone, _category, _skin, _commands, _overlay, _menu;
-var _socket;
+var _socket, _isConnected;
+
+//################
+//### openConnection
+//################
+function openConnection(onOpen) {
+console.log("Enter openConnection");
+
+	if(_isConnected) return;
+	
+	_socket = new WebSocket("ws://192.168.0.164:8080");
+	
+	_socket.onopen = function(event) {
+		console.log("Socket Open");
+		_isConnected = true;
+		if(onOpen) onOpen();
+	};
+	
+	_socket.onclose = function(event) {
+		console.log("Socket Closed");
+		_socket = null;
+		_isConnected = null;
+	};
+
+	_socket.onerror = function(error) {
+		console.log(`Socket Error: ${error.message}`);
+		_socket.close();
+		_socket = null;
+		_isConnected = null;
+	};
+};
 
 //################
 //### sendCommand
 //################
 function sendCommand(command) {
+console.log(`Enter sendCommand, command: ${command}`);
+//var _socket;
 
+	if(!_isConnected) return;
+	
+	_socket.onmessage = function(event) {
+		console.log(`[message] Data received from server: ${event.data}`);
+	};
+	
+	_socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
+/*
 	_socket = new WebSocket("ws://192.168.0.164:8080");
 
 	_socket.onopen = function(e) {
@@ -54,6 +94,7 @@ function sendCommand(command) {
 	_socket.onerror = function(error) {
 		console.log(`[error] ${error.message}`);
 	};
+*/
 };
 
 //################
@@ -61,8 +102,18 @@ function sendCommand(command) {
 //################
 function getFile(fileName, callBack) {
 console.log(`Enter getFile, fileName: ${fileName}`);
-var _socket;
+//var _socket;
 
+	if(!_isConnected) return;
+	
+	_socket.onmessage = function(event) {
+		console.log(`Reply received from server`);
+		callBack(event.data, fileName);
+	};
+
+	_socket.send(`{"type": "fileName", "fileName": "${fileName}"}`);
+	
+/*
 	_socket = new WebSocket("ws://192.168.0.164:8080");
 
 	_socket.onopen = function(e) {
@@ -88,6 +139,7 @@ var _socket;
 	_socket.onerror = function(error) {
 		console.log(`[error] ${error.message}`);
 	};
+*/
 };
 
 /*
@@ -383,8 +435,7 @@ console.log(`Enter loadOverlay, filePath: ${filePath}`);
 //debugger;
 
 	window.addEventListener("load", function(){
-		loadOverlay()
-		//loadCase()
+		openConnection(loadOverlay);
 	});
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	
