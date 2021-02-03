@@ -30,18 +30,18 @@ var _socket;
 //################
 function sendCommand(command) {
 
-	if(!_socket) socket = new WebSocket("ws://192.168.0.164:8080");
+	_socket = new WebSocket("ws://192.168.0.164:8080");
 
-	socket.onopen = function(e) {
+	_socket.onopen = function(e) {
 		console.log("Sending to server "+_zone.getAttribute('value'));
-		socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
+		_socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
 	};
 
-	socket.onmessage = function(event) {
+	_socket.onmessage = function(event) {
 		console.log(`[message] Data received from server: ${event.data}`);
 	};
 
-	socket.onclose = function(event) {
+	_socket.onclose = function(event) {
 		if (event.wasClean) {
 			console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
 		} else {
@@ -51,7 +51,7 @@ function sendCommand(command) {
 		}
 	};
 
-	socket.onerror = function(error) {
+	_socket.onerror = function(error) {
 		console.log(`[error] ${error.message}`);
 	};
 };
@@ -60,19 +60,22 @@ function sendCommand(command) {
 //### getFile
 //################
 function getFile(fileName, callBack) {
+console.log(`Enter getFile, fileName: ${fileName}`);
+var _socket;
 
-	if(!_socket) socket = new WebSocket("ws://192.168.0.164:8080");
+	_socket = new WebSocket("ws://192.168.0.164:8080");
 
-	socket.onopen = function(e) {
-		socket.send(`{"type": "fileName", "fileName": "${fileName}"}`);
-		console.log(`fileName: ${fileName} sent`);
+	_socket.onopen = function(e) {
+		_socket.send(`{"type": "fileName", "fileName": "${fileName}"}`);
 	};
 
-	socket.onmessage = function(event) {
-		console.log(`[message] Data received from server: ${event.data}`);
+	_socket.onmessage = function(event) {
+		console.log(`Reply received from server`);
+		_socket.close();
+		callBack(event.data, fileName);
 	};
 
-	socket.onclose = function(event) {
+	_socket.onclose = function(event) {
 		if (event.wasClean) {
 			console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
 		} else {
@@ -82,7 +85,7 @@ function getFile(fileName, callBack) {
 		}
 	};
 
-	socket.onerror = function(error) {
+	_socket.onerror = function(error) {
 		console.log(`[error] ${error.message}`);
 	};
 };
@@ -132,7 +135,7 @@ function loadTask(content, command={"action": "default"}) {
 	default:
 		var zone = _zone.getAttribute('value');
 		var skin =_skin.getAttribute('value');
-		var filePath = './tasks/'+zone+'-'+skin+'.js';
+		var filePath = '/html/tasks/'+zone+'-'+skin+'.js';
 		
 		//getFile({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
 		break;
@@ -142,16 +145,17 @@ function loadTask(content, command={"action": "default"}) {
 //################
 //### loadSkin
 //################
-function loadSkin(content, options={"command": "getMarkup"}) {
+function loadSkin(content, filePath) {
+console.log(`Enter loadSkin, filePath: ${filePath}`);
 var Skin = document.querySelector('Skin.container');
 
-	switch(options.command) {
-	case 'addMarkup':
+	switch(filePath) {
+	case '/html/skin/' + _skin.getAttribute('value')+'.htm':
 		var keys;
 
 		if(content) {
+			Skin.setAttribute('htmfile', filePath);
 			Skin.innerHTML=content;
-			Skin.setAttribute('htmfile', options.filePath);
 		};
 
 		keys = document.querySelectorAll('[key]');
@@ -163,12 +167,14 @@ var Skin = document.querySelector('Skin.container');
 		break;
 
 	default:
-		var filePath = './skin/' + _skin.getAttribute('value')+'.htm';
+		if(filePath) return;
+		
+		var filePath = '/html/skin/' + _skin.getAttribute('value')+'.htm';
 
 		_zone.innerHTML = _zone.getAttribute('text');
 		_skin.innerHTML = _skin.getAttribute('text');
 		Skin.innerHTML = '';
-		getFile({"filePath": filePath, "command": "addMarkup"}, loadSkin);
+		getFile(filePath, loadSkin);
 		break;
 	};
 };
@@ -342,29 +348,31 @@ var params = new URLSearchParams(window.location.search);
 //################
 //### loadOverlay
 //################
-function loadOverlay(content, command={"filePath": "default"}) {
+function loadOverlay(content, filePath) {
+console.log(`Enter loadOverlay, filePath: ${filePath}`);
+
 	if(content) document.querySelector('body').innerHTML += content;		
 	
-	switch(command.filePath) {
-	case './skin/case.htm':
-		getFile({"filePath": "./menus/zones.htm"}, loadOverlay);
-	case './menus/zones.htm':
-		getFile({"filePath": "./menus/categories.htm"}, loadOverlay);
+	switch(filePath) {
+	case '/html/skin/case.htm':
+		getFile("/html/menus/zones.htm", loadOverlay);
+	case '/html/menus/zones.htm':
+		getFile("/html/menus/categories.htm", loadOverlay);
 		break;
-	case './menus/categories.htm':
-		getFile({"filePath": "./menus/skins.htm"}, loadOverlay);
+	case '/html/menus/categories.htm':
+		getFile("/html/menus/skins.htm", loadOverlay);
 		break;
-	case './menus/skins.htm':
-		getFile({"filePath": "./menus/tasks.htm"}, loadOverlay);
+	case '/html/menus/skins.htm':
+		getFile("/html/menus/tasks.htm", loadOverlay);
 		break;
-	case './menus/tasks.htm':
-		getFile({"filePath": "./menus/notes.htm"}, loadOverlay);
+	case '/html/menus/tasks.htm':
+		getFile("/html/menus/notes.htm", loadOverlay);
 		break;
-	case './menus/notes.htm':
+	case '/html/menus/notes.htm':
 		start();
 		break;
 	default:
-		getFile("./skin/case.htm", loadOverlay);
+		if(!filePath) getFile("/html/skin/case.htm", loadOverlay);
 		break;
 	};
 };

@@ -118,9 +118,16 @@ catch(error) {
 const onFileName = function(client) {
 try {
 //##########################################
-console.log(`Enter onFileName, fileName: ${client.input.fileName}`);
+console.log(`Enter onFileName, fileName: ${client.input.fileName}, filePath: ${__dirname + client.input.fileName}`);
+var fs = require('fs');
 
-	client.send(`Really Got It`);
+	fs.readFile(__dirname + client.input.fileName, 'utf8', function(error, content) {
+		if(error) return; //client.send(`${error.name}: ${error.message}`);
+		client.send(content);
+	});
+
+//const blob = new Blob([`Really Got It`], {type : 'application/text'});
+//	client.send(blob);
 	
 }
 catch(error) {
@@ -134,8 +141,7 @@ try {
 //##########################################
 console.log(`Enter onInput, inputType: ${client.input.type}`);
 
-	client.send(`Really Got It`);
-	if(client.input.type == 'command') return onCommand(client.input);
+	if(client.input.type == 'command') {client.send('Got It');onCommand(client.input);return;};
 	if(client.input.type == 'fileName') return onFileName(client);
 	
 	client.send(`Abort: Invalid Input Recieved`);

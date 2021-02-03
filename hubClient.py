@@ -65,7 +65,7 @@ async def sendInput(inputChar, inputCode):
     try:
         controlWord = getControlWord(inputChar, inputCode)
         
-        async with websockets.connect("ws://localhost:8080") as websocket:
+        async with websockets.connect("ws://192.168.0.164:8080") as websocket:
             print('Send Request', controlWord)
             id = 'client' + chan1.path.replace('/', '.')
             await websocket.send('{'+f'"type": "command", "command": "{controlWord}", "id": "{id}", "zone": "{zone}"'+'}')

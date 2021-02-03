@@ -2,7 +2,7 @@ exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
 exports.popupModule = null;
-exports.primaryModule = "/controlHub/modules/controllers/controller.livingRoom.entertainment.js";
+exports.primaryModule = "/controlHub/controllers/controller.livingRoom.entertainment.js";
 exports.controllers = {
 	"Focus" 		: "/controlHub/controllers/controller.livingRoom.entertainment.js",
 	"Softer" 		: "/controlHub/controllers/controller.livingRoom.video.js",
@@ -95,3 +95,4 @@ exports.topics = {
 ////////////////////////////////////////////
 console.log(`Started hubControl`);
 
+	exports.primaryModule = exports.controllers['Focus'];
