@@ -94,6 +94,7 @@ def onMessage(ws, message):
 ###################
 def onError(ws, error):
     print(f"Enter onError: ", error)
+    sys.exit(1)
 
 ###################
 # onClose

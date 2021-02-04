@@ -102,7 +102,7 @@ _zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
 
 	if(input.command == 'Silence/Sound') {
 		if(_zones[input.zone].isSilent)
-			{input.command = 'Sound';_zones[input.zone].isSilent=false;}
+			{input.command = 'Sound';_zones[input.zone].isSilent=null;}
 		else
 			{input.command = 'Silence';_zones[input.zone].isSilent=true;}
 	};

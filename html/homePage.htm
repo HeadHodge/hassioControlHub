@@ -49,9 +49,10 @@ console.log("Enter openConnection");
 
 	_socket.onerror = function(error) {
 		console.log(`****Server Error: ${error.message}****`);
-		_socket.close();
-		_socket = null;
-		_isConnected = null;
+		openConnection(onOpen);
+		//_socket.close();
+		//_socket = null;
+		//_isConnected = null;
 	};
 };
 
@@ -321,33 +322,33 @@ var params = new URLSearchParams(window.location.search);
 };
 
 //################
-//### loadOverlay
+//### loadCase
 //################
-function loadOverlay(content, filePath) {
-console.log(`Enter loadOverlay, filePath: ${filePath}`);
+function loadCase(content, filePath) {
+console.log(`Enter loadCase, filePath: ${filePath}`);
 
 	if(content) document.querySelector('body').innerHTML += content;		
 	
 	switch(filePath) {
 	case '/html/skin/case.htm':
-		getFile("/html/menus/zones.htm", loadOverlay);
+		getFile("/html/menus/zones.htm", loadCase);
 	case '/html/menus/zones.htm':
-		getFile("/html/menus/categories.htm", loadOverlay);
+		getFile("/html/menus/categories.htm", loadCase);
 		break;
 	case '/html/menus/categories.htm':
-		getFile("/html/menus/skins.htm", loadOverlay);
+		getFile("/html/menus/skins.htm", loadCase);
 		break;
 	case '/html/menus/skins.htm':
-		getFile("/html/menus/tasks.htm", loadOverlay);
+		getFile("/html/menus/tasks.htm", loadCase);
 		break;
 	case '/html/menus/tasks.htm':
-		getFile("/html/menus/notes.htm", loadOverlay);
+		getFile("/html/menus/notes.htm", loadCase);
 		break;
 	case '/html/menus/notes.htm':
 		start();
 		break;
 	default:
-		if(!filePath) getFile("/html/skin/case.htm", loadOverlay);
+		if(!filePath) getFile("/html/skin/case.htm", loadCase);
 		break;
 	};
 };
@@ -358,7 +359,7 @@ console.log(`Enter loadOverlay, filePath: ${filePath}`);
 //debugger;
 
 	window.addEventListener("load", function(){
-		openConnection(loadOverlay);
+		openConnection(loadCase);
 	});
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	
