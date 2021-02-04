@@ -1,10 +1,11 @@
 exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
-exports.popupModule = null;
-exports.primaryModule = "/controlHub/controllers/controller.livingRoom.entertainment.js";
+exports.popupModule;
+exports.primaryModule;
+
 exports.controllers = {
-	"Focus" 		: "/controlHub/controllers/controller.livingRoom.entertainment.js",
+	"Home" 			: "/controlHub/controllers/controller.livingRoom.entertainment.js",
 	"Softer" 		: "/controlHub/controllers/controller.livingRoom.video.js",
 	"Silence/Sound"	: "/controlHub/controllers/controller.livingRoom.sound.js",
 	"Louder" 		: "/controlHub/controllers/controller.livingRoom.entertainment.js",
@@ -43,56 +44,10 @@ exports.tasks = {
 	}
 };
 
-/*
-exports.topics = {
-	"Up"  : {
-		"topic"      : 'Entertainment',
-		"controller" : {
-			"Up"      	: "/controlHub/modules/controllers/livingRoom.entertainment.js",
-			"Softer"    : "/controlHub/modules/controllers/livingRoom.tv.js",
-			"Louder"    : "/controlHub/modules/controllers/livingRoom.stereo.js",
-			"Backward"	: "/controlHub/modules/controllers/livingRoom.fireplace.js"
-		}
-	},
-
-	"Down"  : {
-		"topic"      : 'Lights',
-		"controller" : {
-			"Down"         : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-	
-	"Left"  : {
-		"topic"      : 'Covers',
-		"controller" : {
-			"Left"         : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-
-	"Right"  : {
-		"topic"      : 'Temperature',
-		"controller" : {
-			"Right"        : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-};
-*/		
 ////////////////////////////////////////////
 //                MAIN
 //             hubControl
 ////////////////////////////////////////////
 console.log(`Started hubControl`);
 
-	exports.primaryModule = exports.controllers['Focus'];
+	exports.primaryModule = exports.controllers['Home'];

@@ -1,10 +1,11 @@
 exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
-exports.popupModule = null;
-exports.primaryModule = "/controlHub/controllers/controller.masterBedroom.entertainment.js";
+exports.popupModule;
+exports.primaryModule;
+
 exports.controllers = {
-	"Up" 			: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
+	"Home" 			: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
 	"Softer" 		: "/controlHub/controllers/controller.masterBedroom.video.js",
 	"Silence/Sound"	: "/controlHub/controllers/controller.masterBedroom.sound.js",
 	"Louder" 		: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
@@ -75,55 +76,10 @@ exports.tasks = {
 	}
 };
 
-/*
-exports.topics = {
-	"Up"  : {
-		"topic"      : 'Entertainment',
-		"controller" : {
-			"Up"      	: "/controlHub/modules/controllers/masterBedroom.entertainment.js",
-			"Softer"    : "/controlHub/modules/controllers/masterBedroom.tv.js",
-			"Louder"    : "/controlHub/modules/controllers/masterBedroom.stereo.js",
-			"Backward"	: "/controlHub/modules/controllers/masterBedroom.fireplace.js"
-		}
-	},
-
-	"Down"  : {
-		"topic"      : 'Lights',
-		"controller" : {
-			"Down"         : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-	
-	"Left"  : {
-		"topic"      : 'Covers',
-		"controller" : {
-			"Left"         : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-
-	"Right"  : {
-		"topic"      : 'Temperature',
-		"controller" : {
-			"Right"        : null,
-			"Louder"       : null,
-			"Softer"       : null,
-			"Silence/Sound": null,
-			"Louder"       : null
-		}
-	},
-};
-*/		
 ////////////////////////////////////////////
 //                MAIN
 //             hubControl
 ////////////////////////////////////////////
 console.log(`Started hubControl`);
 
+	exports.primaryModule = exports.controllers['Home'];

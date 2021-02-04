@@ -6,9 +6,17 @@ const hubInput = require('/controlHub/hubInput.js');
 var _zones={};
 
 //##########################################
+const debug = {
+//##########################################
+	log: function(content) {
+		//console.log(content);
+	}
+};
+
+//##########################################
 const onOutput = function(zone, command) {
 //##########################################
-console.log(`Enter onOutput for command: ${command}`);
+debug.log(`Enter onOutput for command: ${command}`);
 var hubOutput = require('/controlHub/hubOutput.js');
 var controller, task;
 
@@ -32,7 +40,7 @@ var controller, task;
 //##########################################
 const onSelectTask = function(zone, command) {
 //##########################################
-console.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
+debug.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
 var hubOutput = require('/controlHub/hubOutput.js');
 var task;
 
@@ -46,7 +54,7 @@ var task;
 //##########################################
 const onSelectFocus = function(zone, command) {
 //##########################################
-console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
+debug.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 
 	_zones[zone].isFocusSet = null;
 	
@@ -56,8 +64,8 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 	};
 	
 	switch(command) {
-	case 'Up':
-		_zones[zone].primaryModule = _zones[zone].controllers['Up'];
+	case 'Home':
+		_zones[zone].primaryModule = _zones[zone].controllers['Home'];
 		break;
 	case 'Louder':
 		_zones[zone].primaryModule = _zones[zone].controllers['Louder'];
@@ -88,7 +96,7 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 const onCommand = function(input) {
 try {
 //##########################################
-console.log(`Enter onCommand, command: ${input.command}, zone: ${input.zone}`);
+debug.log(`Enter onCommand, command: ${input.command}, zone: ${input.zone}`);
 _zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
 
 	if(input.command == 'Set') input.command = 'Off/On';
@@ -118,7 +126,7 @@ catch(error) {
 const onFileName = function(client) {
 try {
 //##########################################
-console.log(`Enter onFileName, fileName: ${client.input.fileName}, filePath: ${__dirname + client.input.fileName}`);
+debug.log(`Enter onFileName, fileName: ${client.input.fileName}, filePath: ${__dirname + client.input.fileName}`);
 var fs = require('fs');
 
 	fs.readFile(__dirname + client.input.fileName, 'utf8', function(error, content) {
@@ -135,7 +143,7 @@ catch(error) {
 const onInput = function(client) {
 try {
 //##########################################
-console.log(`Enter onInput, inputType: ${client.input.type}`);
+debug.log(`Enter onInput, inputType: ${client.input.type}`);
 
 	if(client.input.type == 'command') {client.send('Got It');onCommand(client.input);return;};
 	if(client.input.type == 'fileName') return onFileName(client);

@@ -50,8 +50,8 @@ console.log("Enter openConnection");
 
 	_socket.onerror = function(error) {
 		console.log(`****Server Error: ${error.message}****`);
-		_isConnected = null;
-		openConnection();
+		//_isConnected = null;
+		//openConnection();
 		//_socket.close();
 		//_socket = null;
 	};
