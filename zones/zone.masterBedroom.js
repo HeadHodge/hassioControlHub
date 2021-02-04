@@ -4,7 +4,7 @@ exports.primaryController = {};
 exports.popupModule = null;
 exports.primaryModule = "/controlHub/controllers/controller.masterBedroom.entertainment.js";
 exports.controllers = {
-	"Focus" 		: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
+	"Up" 			: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
 	"Softer" 		: "/controlHub/controllers/controller.masterBedroom.video.js",
 	"Silence/Sound"	: "/controlHub/controllers/controller.masterBedroom.sound.js",
 	"Louder" 		: "/controlHub/controllers/controller.masterBedroom.entertainment.js",

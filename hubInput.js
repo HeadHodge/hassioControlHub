@@ -3,21 +3,19 @@
 ////////////////////////////////////////////
 const ws = require('/root/node_modules/ws');
 var server = null;
-var onInput;
+var callBack;
 
 //##########################################
-const onConnection = function(connection) {
+const onInput = function(connection, input, callBack) {
 //##########################################
 try {
-console.log(`\n\n\n\nEnter onConnection waiting for client input`);
+	console.log(`==================================================================================================`);
+	console.log(`= Enter onInput with client input: ${input}`);
+	console.log(`==================================================================================================`);
 
-	connection.on('message', function(input) {
-	console.log(`received client input: ${input}`);
-
-		connection.input = JSON.parse(input);
-		if(onInput) return onInput(connection);
-		//throw `Invalid input type: ${connection.controlInput.type}`;
-	});
+	connection.input = JSON.parse(input);
+	if(callBack) return callBack(connection);
+	//throw `Invalid input type: ${connection.controlInput.type}`;
 }
 catch (error) {
 	console.log(`Invalid Messag: ${error}`);
@@ -27,12 +25,21 @@ catch (error) {
 //##########################################
 const listen = function(callBack) {
 //##########################################
-console.log(`Enter listen for client commands`);
+console.log(`Enter listen for client connections`);
 
-	onInput = callBack;
+	//callBack = callBack;
 	if(server) return console.log('hubServer already running;');
 	server = new ws.Server({ port: 8080 });
-	server.on('connection', onConnection);
+	
+	server.on('connection', function(connection){
+		console.log(`=============================================`);
+		console.log(`= Client Connected, waiting for input`);
+		console.log(`=============================================`);
+		
+		connection.on('message', function(message){
+			onInput(connection, message, callBack);
+		});
+	});
 };
 
 ////////////////////////////////////////////

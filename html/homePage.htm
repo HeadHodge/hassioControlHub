@@ -28,7 +28,7 @@ var _socket, _isConnected;
 //################
 //### openConnection
 //################
-function openConnection(onOpen) {
+function openConnection(onConnected) {
 console.log("Enter openConnection");
 
 	if(_isConnected) return;
@@ -38,21 +38,22 @@ console.log("Enter openConnection");
 	_socket.onopen = function(event) {
 		console.log("****Server Connected****");
 		_isConnected = true;
-		if(onOpen) onOpen();
+		if(onConnected) onConnected();
 	};
 	
 	_socket.onclose = function(event) {
 		console.log("****Server Closed****");
 		_socket = null;
 		_isConnected = null;
+		openConnection();
 	};
 
 	_socket.onerror = function(error) {
 		console.log(`****Server Error: ${error.message}****`);
-		openConnection(onOpen);
+		_isConnected = null;
+		openConnection();
 		//_socket.close();
 		//_socket = null;
-		//_isConnected = null;
 	};
 };
 

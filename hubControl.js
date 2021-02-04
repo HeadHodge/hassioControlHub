@@ -56,8 +56,8 @@ console.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 	};
 	
 	switch(command) {
-	case 'Focus':
-		_zones[zone].primaryModule = _zones[zone].controllers['Focus'];
+	case 'Up':
+		_zones[zone].primaryModule = _zones[zone].controllers['Up'];
 		break;
 	case 'Louder':
 		_zones[zone].primaryModule = _zones[zone].controllers['Louder'];
@@ -90,15 +90,15 @@ try {
 //##########################################
 console.log(`Enter onCommand, command: ${input.command}, zone: ${input.zone}`);
 _zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
+
+	if(input.command == 'Set') input.command = 'Off/On';
 	
-	if(_zones[input.zone].isControllerSelected) {_zones[input.zone].isControllerSelected = null; if(input.command == 'Off/On' || input.command == 'Set') input.command = 'Open';};
-	if(_zones[input.zone].isFocusSet) if(input.command == 'Off/On' || input.command == 'Set'){input.command = 'Open'; _zones[input.zone].isFocusSet = null;};
+	//if(_zones[input.zone].isControllerSelected) {_zones[input.zone].isControllerSelected = null; if(input.command == 'Off/On') input.command = 'Open';};
+	if(_zones[input.zone].isFocusSet && input.command == 'Off/On'){input.command = 'Open'; _zones[input.zone].isFocusSet = null;};
 	if(_zones[input.zone].isFocusSet) return onSelectFocus(input.zone, input.command);
 	if(_zones[input.zone].isTaskSet) return onSelectTask(input.zone, input.command);
 		
 	if(input.command == 'Focus') {_zones[input.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
-
-	if(input.command == 'Set') input.command = 'Off/On';
 
 	if(input.command == 'Silence/Sound') {
 		if(_zones[input.zone].isSilent)
@@ -125,10 +125,6 @@ var fs = require('fs');
 		if(error) return; //client.send(`${error.name}: ${error.message}`);
 		client.send(content);
 	});
-
-//const blob = new Blob([`Really Got It`], {type : 'application/text'});
-//	client.send(blob);
-	
 }
 catch(error) {
 	console.log(`Unexpected Problem: ${error}`);

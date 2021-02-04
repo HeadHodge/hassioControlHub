@@ -9,7 +9,8 @@ adbEvents = {
 	"Ok"		: "sendevent /dev/input/event4 4 4 458840 && sendevent /dev/input/event4 1 96 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458840 && sendevent /dev/input/event4 1 96 0 && sendevent /dev/input/event4 0 0 0",
 	"Stop/Start": "sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 0 && sendevent /dev/input/event4 0 0 0",
 	"Backward"	: "sendevent /dev/input/event4 4 4 786612 && sendevent /dev/input/event4 1 168 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786612 && sendevent /dev/input/event4 1 168 0 && sendevent /dev/input/event4 0 0 0",
-	"Forward"	: "sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 0 && sendevent /dev/input/event4 0 0 0"
+	"Forward"	: "sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 0 && sendevent /dev/input/event4 0 0 0",
+	"Off/On"	: "sendevent /dev/input/event4 4 4 458854 && sendevent /dev/input/event4 1 116 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458854 && sendevent /dev/input/event4 1 116 0 && sendevent /dev/input/event4 0 0 0"
 };
 
 exports.name = 'MasterBedroom Entertainment Tasks';
@@ -91,8 +92,9 @@ exports.tasks = {
 	
 	"Open": [
 		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-	    {"sleep": 3},
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}},
+	    //{"sleep": 3},
+		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Off/On"]}},
 	    {"sleep": 3},
 		{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
 		{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
@@ -101,8 +103,9 @@ exports.tasks = {
 	],
 		
 	"Off/On": [
-		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "SLEEP"}},
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}},
 	    //{"sleep": 3},
+		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Off/On"]}},
 		{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
 	    {"sleep": 3},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
