@@ -3,15 +3,9 @@
 ////////////////////////////////////////////
 const os = require('os');
 const hubInput = require('/controlHub/hubInput.js');
+const debug = require('/controlHub/hubDebug.js').debug;
 var _zones={};
 
-//##########################################
-const debug = {
-//##########################################
-	log: function(content) {
-		//console.log(content);
-	}
-};
 
 //##########################################
 const onOutput = function(zone, command) {
@@ -33,8 +27,8 @@ var controller, task;
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
 	task = `{"action": "runSequence", "sequence": ${JSON.stringify(controller.tasks[command])}}`;
-	console.log(`For command: ${command}, Send task: ${task}`);
-	hubOutput.sendControlTask(task);
+	debug.log(`For command: ${command}, Send task: ${task}`);
+	hubOutput.sendTasks(task);
 };
 
 //##########################################
@@ -159,6 +153,6 @@ catch(error) {
 //                MAIN
 //Open server to listen for control input
 ////////////////////////////////////////////
-console.log(`Started hubControl on ${os.hostname}`);
+debug.log(`Started hubControl on ${os.hostname}`);
 
 	hubInput.getInput(onInput);

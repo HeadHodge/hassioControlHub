@@ -2,6 +2,7 @@
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
 const ws = require('/root/node_modules/ws');
+const debug = require('/controlHub/hubDebug.js').debug;
 var server = null;
 var callBack;
 
@@ -9,8 +10,9 @@ var callBack;
 const onInput = function(connection, input, callBack) {
 //##########################################
 try {
+	console.log(`.`);
 	console.log(`==================================================================================================`);
-	console.log(`= Enter onInput with client input: ${input}`);
+	console.log(`= Enter onInput with client input:\n= ${input}`);
 	console.log(`==================================================================================================`);
 
 	connection.input = JSON.parse(input);
@@ -25,7 +27,7 @@ catch (error) {
 //##########################################
 const listen = function(callBack) {
 //##########################################
-console.log(`Enter listen for client connections`);
+debug.log(`Enter listen for client connections`);
 
 	//callBack = callBack;
 	if(server) return console.log('hubServer already running;');
@@ -46,5 +48,6 @@ console.log(`Enter listen for client connections`);
 //                MAIN
 //Open server to listen for control clients
 ////////////////////////////////////////////
-console.log(`Started hubInput`);
-exports.getInput = listen;
+debug.log(`Started hubInput`);
+	
+	exports.getInput = listen;

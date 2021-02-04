@@ -2,6 +2,8 @@
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
 const http = require('http');
+const debug = require('/controlHub/hubDebug.js').debug;
+
 const options = {
   host: '192.168.0.160',
   port: 5050,
@@ -16,12 +18,12 @@ const options = {
 //##########################################
 const onReply = function(reply) {
 //##########################################
-console.log(`Enter onReply, statusCode: ${reply.statusCode}`);
+debug.log(`Enter onReply, statusCode: ${reply.statusCode}`);
 var buffer = '';
 
-	reply.on('data', function(chunk) {
-		console.log('chunk: ' + chunk);
-		buffer += chunk;
+	reply.on('data', function(reply) {
+		console.log('Task server reply: ' + reply);
+		buffer += reply;
 	});
 
 	reply.on('end', function () {
@@ -30,15 +32,16 @@ var buffer = '';
 };
 
 //##########################################
-const sendControlTask = function(task) {
+const sendTasks = function(task) {
 //##########################################
-console.log(`Enter sendControlTask: ${task}`);
+debug.log(`Enter sendTasks`);
 var request = http.request(options, onReply);	
 
 	request.on('error', function (error) {
 		console.error(`Encountered an error trying to make a request: ${error.message}`);
 	});
 
+	console.log(`sendTasks to task server:\n${task}\n.`);
 	request.write(task);
 	request.end();
 };
@@ -47,5 +50,5 @@ var request = http.request(options, onReply);
 //                MAIN
 //Open connection with Hub and send request
 ////////////////////////////////////////////
-	console.log('hubOutput loaded');
-	exports.sendControlTask = sendControlTask;
+	debug.log('Started hubOutput');
+	exports.sendTasks = sendTasks;

@@ -27,4 +27,4 @@ exports.tasks = {
 ////////////////////////////////////////////
 //                MAIN
 ////////////////////////////////////////////
-	console.log('masterBedroom.fireplace.js loaded');
+	console.log('Loaded masterBedroom.fireplace.js');

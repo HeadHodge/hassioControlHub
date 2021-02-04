@@ -1,3 +1,5 @@
+const debug = require('/controlHub/hubDebug.js').debug;
+
 adbEvents = {
 	"Home"		: "sendevent /dev/input/event4 4 4 786979 && sendevent /dev/input/event4 1 172 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786979 && sendevent /dev/input/event4 1 172 0 && sendevent /dev/input/event4 0 0 0",
 	"Menu"		: "sendevent /dev/input/event4 4 4 786496 && sendevent /dev/input/event4 1 139 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786496 && sendevent /dev/input/event4 1 139 0 && sendevent /dev/input/event4 0 0 0",
@@ -118,4 +120,4 @@ exports.tasks = {
 ////////////////////////////////////////////
 //                MAIN
 ////////////////////////////////////////////
-	console.log('masterBedroom.entertainment.js loaded');
+	debug.log('Loaded masterBedroom.entertainment.js');

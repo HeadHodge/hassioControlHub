@@ -1,3 +1,5 @@
+const debug = require('/controlHub/hubDebug.js').debug;
+
 exports.focus = 'Up';
 exports.popupController = {};
 exports.primaryController = {};
@@ -48,6 +50,6 @@ exports.tasks = {
 //                MAIN
 //             hubControl
 ////////////////////////////////////////////
-console.log(`Started hubControl`);
+debug.log(`Loaded zone.livingRoom.js`);
 
 	exports.primaryModule = exports.controllers['Home'];
