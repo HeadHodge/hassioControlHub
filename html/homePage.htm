@@ -36,19 +36,19 @@ console.log("Enter openConnection");
 	_socket = new WebSocket("ws://192.168.0.164:8080");
 	
 	_socket.onopen = function(event) {
-		console.log("Socket Open");
+		console.log("****Server Connected****");
 		_isConnected = true;
 		if(onOpen) onOpen();
 	};
 	
 	_socket.onclose = function(event) {
-		console.log("Socket Closed");
+		console.log("****Server Closed****");
 		_socket = null;
 		_isConnected = null;
 	};
 
 	_socket.onerror = function(error) {
-		console.log(`Socket Error: ${error.message}`);
+		console.log(`****Server Error: ${error.message}****`);
 		_socket.close();
 		_socket = null;
 		_isConnected = null;
@@ -60,7 +60,6 @@ console.log("Enter openConnection");
 //################
 function sendCommand(command) {
 console.log(`Enter sendCommand, command: ${command}`);
-//var _socket;
 
 	if(!_isConnected) return;
 	
@@ -69,32 +68,6 @@ console.log(`Enter sendCommand, command: ${command}`);
 	};
 	
 	_socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
-/*
-	_socket = new WebSocket("ws://192.168.0.164:8080");
-
-	_socket.onopen = function(e) {
-		console.log("Sending to server "+_zone.getAttribute('value'));
-		_socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
-	};
-
-	_socket.onmessage = function(event) {
-		console.log(`[message] Data received from server: ${event.data}`);
-	};
-
-	_socket.onclose = function(event) {
-		if (event.wasClean) {
-			console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-		} else {
-			// e.g. server process killed or network down
-			// event.code is usually 1006 in this case
-			console.log('[close] Connection died');
-		}
-	};
-
-	_socket.onerror = function(error) {
-		console.log(`[error] ${error.message}`);
-	};
-*/
 };
 
 //################
@@ -102,7 +75,6 @@ console.log(`Enter sendCommand, command: ${command}`);
 //################
 function getFile(fileName, callBack) {
 console.log(`Enter getFile, fileName: ${fileName}`);
-//var _socket;
 
 	if(!_isConnected) return;
 	
@@ -112,56 +84,7 @@ console.log(`Enter getFile, fileName: ${fileName}`);
 	};
 
 	_socket.send(`{"type": "fileName", "fileName": "${fileName}"}`);
-	
-/*
-	_socket = new WebSocket("ws://192.168.0.164:8080");
-
-	_socket.onopen = function(e) {
-		_socket.send(`{"type": "fileName", "fileName": "${fileName}"}`);
-	};
-
-	_socket.onmessage = function(event) {
-		console.log(`Reply received from server`);
-		_socket.close();
-		callBack(event.data, fileName);
-	};
-
-	_socket.onclose = function(event) {
-		if (event.wasClean) {
-			console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-		} else {
-			// e.g. server process killed or network down
-			// event.code is usually 1006 in this case
-			console.log('[close] Connection died');
-		}
-	};
-
-	_socket.onerror = function(error) {
-		console.log(`[error] ${error.message}`);
-	};
-*/
 };
-
-/*
-//################
-//### getFile
-//################
-function getFile(options, callBack) {
-var xhr = new XMLHttpRequest();
-
-	xhr.open('GET', options.filePath);
-	xhr.send();
-	
-	xhr.onload = function() {
-		console.log(`getFile Success ${xhr.status}`);
-		if(callBack) return callBack(xhr.response, options);
-	};
-
-	xhr.onerror = function() {
-		console.log(`getFile ERROR: ${xhr.status}=${xhr.statusText}`); // e.g. 404: Not Found
-	};
-};
-*/
 
 //################
 //### loadTask

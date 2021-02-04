@@ -3,11 +3,17 @@
 # Capture Control Input
 #
 ############################
-import asyncio, evdev, sys, websockets
+import asyncio, evdev, sys, websocket, websockets
+import _thread as thread
 from evdev import InputDevice, categorize, ecodes
-  
-zone = 'home'
-controlWords = {
+
+if len(sys.argv) < 3: 
+    print('Terminate hubClient, missing required zone and/or event list argument')
+    sys.exit()
+    
+zone = sys.argv[1]
+channels = sys.argv[2].split(',')
+commands = {
           1: "Exit",
           2: "1",
           3: "2",
@@ -44,86 +50,76 @@ controlWords = {
 }
 
 ###################
-# Get Control Word
+# getCommand
 ###################
-def getControlWord(inputChar, inputCode):
-    global controlWords
-    
+def getCommand(inputChar, inputCode):
+    #global commands
     try:
-        print('Enter getControlWord', inputCode, controlWords[inputCode])
-        return(controlWords[inputCode])
+        print('Enter getCommand', inputCode, commands[inputCode])
+        return(commands[inputCode])
         
     except Exception as e:
         print(e)
         return(inputChar)
-
+   
 ###################
-# Send Input
+# captureInput
 ###################
-async def sendInput(inputChar, inputCode):
+def captureInput(ws, channelNum):
+    print("Enter captureInput on channel:"+channelNum)
+    
+    channel = evdev.InputDevice(f'/dev/input/event{channelNum}')
+    channel.grab()
 
-    try:
-        controlWord = getControlWord(inputChar, inputCode)
-        
-        async with websockets.connect("ws://192.168.0.164:8080") as websocket:
-            print('Send Request', controlWord)
-            id = 'client' + chan1.path.replace('/', '.')
-            await websocket.send('{'+f'"type": "command", "command": "{controlWord}", "id": "{id}", "zone": "{zone}"'+'}')
-            print('Sent')
-
-            print('Get Reply')
-            reply = await websocket.recv()
-            print(reply)
-
-    except Exception as e:
-        print('Oopps')
-        print(e)
-
-    else:
-        print('Done')
-        
-###################
-# Capture Input
-###################
-async def captureInput(device):
-    async for event in device.async_read_loop():
+    for event in channel.async_read_loop():
         if event.type != 1 : continue
         inputEvent = categorize(event)
         if inputEvent.keystate != 0 : continue
-        print('Captured: ', device.path, inputEvent.keycode, inputEvent.scancode)
-        await sendInput(inputEvent.keycode, inputEvent.scancode)
 
+        command = getCommand(inputEvent.keycode, inputEvent.scancode)
+        #ws.send('{"type": "command", "command": "Ok", "zone": "masterBedroom"}')
+        print(f'Send command from channel: {channelNum}, command: {command}, zone: {zone}')
+        ws.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
+   
+    return
+
+###################
+# onMessage
+###################
+def onMessage(ws, message):
+    print("Enter onMessage: ", message)
+
+###################
+# onError
+###################
+def onError(ws, error):
+    print(f"Enter onError: ", error)
+
+###################
+# onClose
+###################
+def onClose(ws):
+    print("Enter onClose")
+         
+###################
+# onOpen
+###################
+def onOpen(ws):
+    print("Enter on_open")
+
+    for channel in channels:
+        thread.start_new_thread(captureInput, (ws, channel, ))
+    
 ###################
 #      MAIN
 ###################
-if len(sys.argv) < 3: 
-    print('Terminate hubClient, missing required zone and/or event list argument')
-    sys.exit()
+    
+websocket.enableTrace(True)
 
-zone = sys.argv[1]
-events = sys.argv[2].split(',')
+_ws = websocket.WebSocketApp("ws://192.168.0.164:8080",
+    on_message = onMessage,
+    on_error = onError,
+    on_close = onClose,
+    on_open = onOpen) 
 
-if len(events) != 4: 
-    print('Terminate hubClient, wrong number of event numbers provided')
-    sys.exit()
-
-## Open Control Input Channels
-chan1 = evdev.InputDevice(f'/dev/input/event{events[0]}')
-chan2 = evdev.InputDevice(f'/dev/input/event{events[1]}')
-chan3 = evdev.InputDevice(f'/dev/input/event{events[2]}')
-chan4 = evdev.InputDevice(f'/dev/input/event{events[3]}')
-
-## Make Control Input Channels Private
-chan1.grab()
-chan2.grab()
-chan3.grab()
-chan4.grab()
-
-## Listen for Contrrol Input
-print(chan1.name, zone, chan1.path, chan1.info, chan1.phys, chan1.info.vendor, chan1.info.product)
-
-for device in chan1, chan2, chan3, chan4:
-    asyncio.ensure_future(captureInput(device))
-
-loop = asyncio.get_event_loop()
-loop.run_forever()
+_ws.run_forever()

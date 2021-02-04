@@ -6,26 +6,6 @@ var server = null;
 var onInput;
 
 //##########################################
-const sendReply = function(reply) {
-//##########################################
-try {
-console.log(`\n\n\n\nEnter sendReply: ${reply}`);
-
-	connection.on('message', function(message) {
-	console.log(`received: ${message}`);
-
-		connection.controlInput = JSON.parse(message);
-		connection.send(`Got It`);
-		if(connection.controlInput.type == 'command') return commandCallback(connection.controlInput);
-		if(connection.controlInput.type == 'fileName') return fileNameCallback(connection.controlInput);
-		throw `Invalid input type: ${connection.controlInput.type}`;
-	});
-}
-catch (error) {
-	console.log(`Invalid Messag: ${error}`);
-	connection.send(`Invalid Messag: ${error}`);
-}};
-//##########################################
 const onConnection = function(connection) {
 //##########################################
 try {
@@ -35,8 +15,6 @@ console.log(`\n\n\n\nEnter onConnection waiting for client input`);
 	console.log(`received client input: ${input}`);
 
 		connection.input = JSON.parse(input);
-		//connection.send(`Got It`);
-		//if(connection.controlInput.type == 'command') return commandCallback(connection);
 		if(onInput) return onInput(connection);
 		//throw `Invalid input type: ${connection.controlInput.type}`;
 	});
