@@ -10,10 +10,9 @@ var callBack;
 const onInput = function(connection, input, callBack) {
 //##########################################
 try {
-	console.log(`.`);
+	console.log(`\x20\n\x20`);
 	console.log(`==================================================================================================`);
-	console.log(`= Enter onInput with client input:\n= ${input}`);
-	console.log(`==================================================================================================`);
+	console.log(`Enter onInput with client input:\n${input}`);
 
 	connection.input = JSON.parse(input);
 	if(callBack) return callBack(connection);

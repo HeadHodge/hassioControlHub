@@ -23,6 +23,7 @@ var buffer = '';
 
 	reply.on('data', function(reply) {
 		console.log('Task server reply: ' + reply);
+		console.log(`==================================================================================================`);
 		buffer += reply;
 	});
 
@@ -41,7 +42,7 @@ var request = http.request(options, onReply);
 		console.error(`Encountered an error trying to make a request: ${error.message}`);
 	});
 
-	console.log(`sendTasks to task server:\n${task}\n.`);
+	console.log(`\x20\n${task}\n\x20`);
 	request.write(task);
 	request.end();
 };
