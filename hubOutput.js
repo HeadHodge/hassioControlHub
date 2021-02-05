@@ -51,5 +51,6 @@ var request = http.request(options, onReply);
 //                MAIN
 //Open connection with Hub and send request
 ////////////////////////////////////////////
-	debug.log('Started hubOutput');
+console.log('Loaded hubOutput.js');
+
 	exports.sendTasks = sendTasks;

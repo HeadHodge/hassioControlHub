@@ -1,3 +1,5 @@
+const debug = require('/controlHub/hubDebug.js').debug;
+
 exports.name = 'MasterBedroom Entertainment Tasks';
 exports.zone = 'masterBedroom';
 exports.focus = 'Up';
@@ -27,4 +29,4 @@ exports.tasks = {
 ////////////////////////////////////////////
 //                MAIN
 ////////////////////////////////////////////
-	console.log('Loaded masterBedroom.fireplace.js');
+console.log('Loaded controller.masterBedroom.fireplace.js');

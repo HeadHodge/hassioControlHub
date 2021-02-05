@@ -29,4 +29,4 @@ exports.tasks = {
 ////////////////////////////////////////////
 //                MAIN
 ////////////////////////////////////////////
-	debug.log('Loaded masterBedroom.fireplace.js');
+console.log('Loaded controller.livingRoom.fireplace.js');

@@ -50,6 +50,6 @@ exports.tasks = {
 //                MAIN
 //             hubControl
 ////////////////////////////////////////////
-debug.log(`Loaded zone.livingRoom.js`);
+console.log(`Loaded zone.livingRoom.js`);
 
 	exports.primaryModule = exports.controllers['Home'];

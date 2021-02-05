@@ -1,10 +1,33 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
+const fs = require('fs');
+const http = require('http');
 const ws = require('/root/node_modules/ws');
 const debug = require('/controlHub/hubDebug.js').debug;
+
 var server = null;
-var callBack;
+var basePath = __dirname + '/html';
+
+//##########################################
+const listenHTTP = function(request, reply) {
+//##########################################
+console.log(`Enter listenHTTP`);
+try {
+	fs.readFile(basePath+request.url, function(error, data) {
+		if(error) {
+			throw error;
+		};
+		
+		reply.writeHead(200);
+		reply.end(data);
+	});
+}
+catch (error) {
+	console.log(`Abort listenHTTP: ${error}`);
+	reply.writeHead(404);
+	reply.end(JSON.stringify(error));
+}};
 
 //##########################################
 const onInput = function(connection, input, callBack) {
@@ -24,11 +47,10 @@ catch (error) {
 }};
   
 //##########################################
-const listen = function(callBack) {
+const listenWS = function(callBack) {
 //##########################################
-debug.log(`Enter listen for client connections`);
+debug.log(`Enter listenWS for client connections`);
 
-	//callBack = callBack;
 	if(server) return console.log('hubServer already running;');
 	server = new ws.Server({ port: 8080 });
 	
@@ -47,6 +69,8 @@ debug.log(`Enter listen for client connections`);
 //                MAIN
 //Open server to listen for control clients
 ////////////////////////////////////////////
-debug.log(`Started hubInput`);
+console.log(`Loaded hubInput.js`);
+var httpServer = http.createServer(listenHTTP);
 	
-	exports.getInput = listen;
+	exports.getInput = listenWS;
+	httpServer.listen(80);

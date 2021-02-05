@@ -93,31 +93,34 @@ exports.tasks = {
 	],
 	
 	"Open": [
+	//Turn on TV
 		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}},
-	    //{"sleep": 3},
-		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Off/On"]}},
-	    {"sleep": 3},
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Power"]}},
+	    {"sleep": 2},
 		{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
+
+	//Turn on Sound
+		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
 		{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
 		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.45}}
 	],
 		
 	"Off/On": [
+	//Turn off TV
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}},
-	    //{"sleep": 3},
-		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Off/On"]}},
 		{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-	    {"sleep": 3},
+	    {"sleep": 2},
+
+	//Turn on Sleep Timer with Music
+		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
 		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.18}},
-		{"sonos/set_sleep_timer": {"entity_id": "media_player.master_bedroom", "sleep_time": 3600}},
-		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}}
+		{"sonos/set_sleep_timer": {"entity_id": "media_player.master_bedroom", "sleep_time": 3600}}
 	]
 };
 
 ////////////////////////////////////////////
 //                MAIN
 ////////////////////////////////////////////
-	debug.log('Loaded masterBedroom.entertainment.js');
+console.log('Loaded controller.masterBedroom.entertainment.js');

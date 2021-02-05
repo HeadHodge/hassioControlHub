@@ -3,9 +3,9 @@
 ////////////////////////////////////////////
 const os = require('os');
 const hubInput = require('/controlHub/hubInput.js');
+//const hubServer = require('/controlHub/hubServer.js');
 const debug = require('/controlHub/hubDebug.js').debug;
 var _zones={};
-
 
 //##########################################
 const onOutput = function(zone, command) {
@@ -42,7 +42,7 @@ var task;
 	if(!_zones[zone].tasks[_zones[zone].focus][command]) return;
 	task = `{"action": "runSequence", "sequence": ${JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command])}}`;
 	console.log(`Send selected task: ${task}`);
-	hubOutput.sendControlTask(task);
+	hubOutput.sendTasks(task);
 };
 
 //##########################################

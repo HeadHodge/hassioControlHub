@@ -101,4 +101,4 @@ exports.tasks = {
 ////////////////////////////////////////////
 //                MAIN
 ////////////////////////////////////////////
-	debug.log('Loaded masterBedroom.entertainment.js');
+console.log('Loaded controller.livingRoom.entertainment.js');

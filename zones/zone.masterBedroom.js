@@ -37,7 +37,7 @@ exports.tasks = {
 		//Morning	
 		"Up"  : [
 			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
+			//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
 			{"sleep": 3},
 			{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
 			{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
@@ -50,22 +50,31 @@ exports.tasks = {
 		//Daytime	
 		"Right"  : [
 			{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "SLEEP"}},
+			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "HOME"}},
 			{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-			{"sleep": 5},
+			{"sleep": 3},
 			{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
 			{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.25}}
 		],
 	
-		//Night	
+	//Night	
 		"Down"  : [
-			{"input_select/select_option": {"entity_id": "input_select.masterbedroom_fireplace_duration", "option": "90 Minutes"}},
+		//Turn TV On
 			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
-			{"sleep": 3},
+			//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
+			{"sleep": 2},
 			{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
+
+		//Turn Sound On
+			{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
 			{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
 			{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
+			{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.45}},
+
+		//Turn Fireplace On
+			{"input_select/select_option": {"entity_id": "input_select.masterbedroom_fireplace_duration", "option": "90 Minutes"}},
+
+		//Close Shades
 			{"cover/close_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
 			{"cover/close_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
 			{"sleep": 10},
@@ -82,6 +91,6 @@ exports.tasks = {
 //                MAIN
 //             hubControl
 ////////////////////////////////////////////
-debug.log(`Started zone.masterBedroom.js`);
+console.log(`Loaded zone.masterBedroom.js`);
 
 	exports.primaryModule = exports.controllers['Home'];
