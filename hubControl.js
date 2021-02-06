@@ -2,16 +2,16 @@
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
 const os = require('os');
-const hubInput = require('/controlHub/hubInput.js');
+const hubInput = require('/controlHub/core/hubInput.js');
 //const hubServer = require('/controlHub/hubServer.js');
-const debug = require('/controlHub/hubDebug.js').debug;
+const debug = require('/controlHub/core/hubDebug.js').debug;
 var _zones={};
 
 //##########################################
 const onOutput = function(zone, command) {
 //##########################################
 debug.log(`Enter onOutput for command: ${command}`);
-var hubOutput = require('/controlHub/hubOutput.js');
+var hubOutput = require('/controlHub/core/hubOutput.js');
 var controller, task;
 
 	if(_zones[zone].popupModule) {
@@ -35,7 +35,7 @@ var controller, task;
 const onSelectTask = function(zone, command) {
 //##########################################
 debug.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
-var hubOutput = require('/controlHub/hubOutput.js');
+var hubOutput = require('/controlHub/core/hubOutput.js');
 var task;
 
 	_zones[zone].isTaskSet = null;

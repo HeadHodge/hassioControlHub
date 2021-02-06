@@ -3,7 +3,7 @@
 # Capture Control Input
 #
 ############################
-import asyncio, evdev, sys, websocket, websockets
+import asyncio, evdev, sys, websocket, websockets, time
 import _thread as thread
 from evdev import InputDevice, categorize, ecodes
 
@@ -49,11 +49,13 @@ commands = {
         273: "Exit"
 }
 
+lastCode = 0
+lastTime = time.time()
+
 ###################
 # getCommand
 ###################
 def getCommand(inputChar, inputCode):
-    #global commands
     try:
         print('Enter getCommand', inputCode, commands[inputCode])
         return(commands[inputCode])
@@ -70,17 +72,22 @@ def captureInput(ws, channelNum):
     
     channel = evdev.InputDevice(f'/dev/input/event{channelNum}')
     channel.grab()
-
+    
     for event in channel.async_read_loop():
+        global lastCode
+        global lastTime
+        
         if event.type != 1 : continue
         inputEvent = categorize(event)
-        if inputEvent.keystate != 0 : continue
-
+        print(f'keyState: {inputEvent.keystate}')
+        if(inputEvent.keystate != 0): continue
+        if(inputEvent.scancode == lastCode and time.time() - lastTime < 1.5): continue
+        lastCode = inputEvent.scancode
+        lastTime = time.time()
+        
         command = getCommand(inputEvent.keycode, inputEvent.scancode)
-        #ws.send('{"type": "command", "command": "Ok", "zone": "masterBedroom"}')
         print(f'Send command from channel: {channelNum}, command: {command}, zone: {zone}')
         ws.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
-   
     return
 
 ###################

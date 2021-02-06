@@ -7,7 +7,8 @@ const ws = require('/root/node_modules/ws');
 const debug = require('/controlHub/hubDebug.js').debug;
 
 var server = null;
-var basePath = __dirname + '/html';
+var basePath = '/controlHub/html';
+//var basePath = __dirname + '/html';
 
 //##########################################
 const listenHTTP = function(request, reply) {
@@ -16,17 +17,18 @@ console.log(`Enter listenHTTP`);
 try {
 	fs.readFile(basePath+request.url, function(error, data) {
 		if(error) {
-			throw error;
+			console.log(error);
+			reply.writeHead(404);
+			reply.end(JSON.stringify(error));
 		};
 		
 		reply.writeHead(200);
 		reply.end(data);
 	});
-}
-catch (error) {
+} catch (error) {
 	console.log(`Abort listenHTTP: ${error}`);
-	reply.writeHead(404);
-	reply.end(JSON.stringify(error));
+} finally {
+	return;
 }};
 
 //##########################################
