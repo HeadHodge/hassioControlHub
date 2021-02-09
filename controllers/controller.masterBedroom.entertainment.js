@@ -1,4 +1,4 @@
-const debug = require('/controlHub/hubDebug.js').debug;
+const debug = require('/controlHub/core/debugLog.js').debug;
 const eventNum = 4;
 
 adbEvents = {

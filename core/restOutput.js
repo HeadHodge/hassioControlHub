@@ -2,7 +2,7 @@
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
 const http = require('http');
-const debug = require('/controlHub/hubDebug.js').debug;
+const debug = require('/controlHub/core/debugLog.js').debug;
 
 const options = {
   host: '192.168.0.160',

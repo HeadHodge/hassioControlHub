@@ -1,3 +1,4 @@
+const debug = require('/controlHub/core/debugLog.js').debug;
 exports.name = 'MasterBedroom Entertainment Tasks';
 exports.zone = 'masterBedroom';
 exports.focus = 'Up';

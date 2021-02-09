@@ -1,4 +1,4 @@
-const debug = require('/controlHub/hubDebug.js').debug;
+const debug = require('/controlHub/core/debugLog.js').debug;
 
 exports.name = 'MasterBedroom Entertainment Tasks';
 exports.zone = 'masterBedroom';

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
-const debug = require('/controlHub/hubDebug.js').debug;
+const debug = require('/controlHub/core/debugLog.js').debug;
 const mqtt = require('/root/node_modules/mqtt')
 const brokerUrl = 'mqtt://192.168.0.160:1883'; //test broker: 'mqtt://test.mosquitto.org'
 const brokerOptions = {
@@ -26,12 +26,18 @@ console.log(`Enter connectBroker`);
  
 	broker.on('message', function(topic, message) {
 		console.log(`Enter broker replied, topic: ${topic}, message: ${message}`);
-		console.log(message.toString())
-		//client.end()
+		console.log(message.toString());
 	});
 
 	broker.on("error", function(error) {
-		console.log(`Enter broker error: ${error.toString()}`);
+		console.log(`Enter broker failed: ${error.toString()}`);
+		if(broker) broker.end();
+		broker = null;
+	});	
+
+	broker.on("close", function() {
+		console.log(`Enter broker closed`);
+		broker = null;
 	});	
 };
 

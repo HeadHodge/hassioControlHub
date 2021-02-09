@@ -1,10 +1,10 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
+const debug = require('/controlHub/core/debugLog.js').debug;
 const fs = require('fs');
 const http = require('http');
 const ws = require('/root/node_modules/ws');
-const debug = require('/controlHub/hubDebug.js').debug;
 
 var server = null;
 var basePath = '/controlHub/html';
