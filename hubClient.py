@@ -81,7 +81,7 @@ def captureInput(ws, channelNum):
         inputEvent = categorize(event)
         print(f'keyState: {inputEvent.keystate}')
         if(inputEvent.keystate != 0): continue
-        if(inputEvent.scancode == lastCode and time.time() - lastTime < 1.5): continue
+        if(inputEvent.scancode == lastCode and time.time() - lastTime < 0.75): continue
         lastCode = inputEvent.scancode
         lastTime = time.time()
         

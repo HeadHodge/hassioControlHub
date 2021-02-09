@@ -33,9 +33,9 @@ var buffer = '';
 };
 
 //##########################################
-const sendTasks = function(task) {
+const sendTask = function(task) {
 //##########################################
-debug.log(`Enter sendTasks`);
+debug.log(`Enter sendTask`);
 var request = http.request(options, onReply);	
 
 	request.on('error', function (error) {
@@ -53,4 +53,4 @@ var request = http.request(options, onReply);
 ////////////////////////////////////////////
 console.log('Loaded hubOutput.js');
 
-	exports.sendTasks = sendTasks;
+	exports.sendTask = sendTask;

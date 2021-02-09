@@ -1,17 +1,18 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
-const os = require('os');
-const hubInput = require('/controlHub/core/hubInput.js');
-//const hubServer = require('/controlHub/hubServer.js');
 const debug = require('/controlHub/core/hubDebug.js').debug;
+const os = require('os');
+const hubInput = require('/controlHub/core/wsInput.js');
+
 var _zones={};
 
 //##########################################
 const onOutput = function(zone, command) {
 //##########################################
-debug.log(`Enter onOutput for command: ${command}`);
-var hubOutput = require('/controlHub/core/hubOutput.js');
+console.log(`Enter onOutput for command: ${command}`);
+var hubOutput = require('/controlHub/core/restOutput.js');
+var mqttOutput = require('/controlHub/core/mqttOutput.js');
 var controller, task;
 
 	if(_zones[zone].popupModule) {
@@ -28,21 +29,22 @@ var controller, task;
 	
 	task = `{"action": "runSequence", "sequence": ${JSON.stringify(controller.tasks[command])}}`;
 	debug.log(`For command: ${command}, Send task: ${task}`);
-	hubOutput.sendTasks(task);
+	//hubOutput.sendTask(task);
+	mqttOutput.sendTask(task);
 };
 
 //##########################################
 const onSelectTask = function(zone, command) {
 //##########################################
 debug.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
-var hubOutput = require('/controlHub/core/hubOutput.js');
+var hubOutput = require('/controlHub/core/restOutput.js');
 var task;
 
 	_zones[zone].isTaskSet = null;
 	if(!_zones[zone].tasks[_zones[zone].focus][command]) return;
 	task = `{"action": "runSequence", "sequence": ${JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command])}}`;
 	console.log(`Send selected task: ${task}`);
-	hubOutput.sendTasks(task);
+	hubOutput.sendTask(task);
 };
 
 //##########################################

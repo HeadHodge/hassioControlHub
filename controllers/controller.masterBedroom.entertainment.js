@@ -1,18 +1,19 @@
 const debug = require('/controlHub/hubDebug.js').debug;
+const eventNum = 4;
 
 adbEvents = {
-	"Home"		: "sendevent /dev/input/event4 4 4 786979 && sendevent /dev/input/event4 1 172 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786979 && sendevent /dev/input/event4 1 172 0 && sendevent /dev/input/event4 0 0 0",
-	"Menu"		: "sendevent /dev/input/event4 4 4 786496 && sendevent /dev/input/event4 1 139 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786496 && sendevent /dev/input/event4 1 139 0 && sendevent /dev/input/event4 0 0 0",
-	"Exit"		: "sendevent /dev/input/event4 4 4 458993 && sendevent /dev/input/event4 1 158 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458993 && sendevent /dev/input/event4 1 158 0 && sendevent /dev/input/event4 0 0 0",
-	"Up"		: "sendevent /dev/input/event4 4 4 458834 && sendevent /dev/input/event4 1 103 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458834 && sendevent /dev/input/event4 1 103 0 && sendevent /dev/input/event4 0 0 0",
-	"Down"		: "sendevent /dev/input/event4 4 4 458833 && sendevent /dev/input/event4 1 108 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458833 && sendevent /dev/input/event4 1 108 0 && sendevent /dev/input/event4 0 0 0",
-	"Left"		: "sendevent /dev/input/event4 4 4 458832 && sendevent /dev/input/event4 1 105 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458832 && sendevent /dev/input/event4 1 105 0 && sendevent /dev/input/event4 0 0 0",
-	"Right"		: "sendevent /dev/input/event4 4 4 458831 && sendevent /dev/input/event4 1 106 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458831 && sendevent /dev/input/event4 1 106 0 && sendevent /dev/input/event4 0 0 0",
-	"Ok"		: "sendevent /dev/input/event4 4 4 458840 && sendevent /dev/input/event4 1 96 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458840 && sendevent /dev/input/event4 1 96 0 && sendevent /dev/input/event4 0 0 0",
-	"Stop/Start": "sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786637 && sendevent /dev/input/event4 1 164 0 && sendevent /dev/input/event4 0 0 0",
-	"Backward"	: "sendevent /dev/input/event4 4 4 786612 && sendevent /dev/input/event4 1 168 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786612 && sendevent /dev/input/event4 1 168 0 && sendevent /dev/input/event4 0 0 0",
-	"Forward"	: "sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 786611 && sendevent /dev/input/event4 1 208 0 && sendevent /dev/input/event4 0 0 0",
-	"Off/On"	: "sendevent /dev/input/event4 4 4 458854 && sendevent /dev/input/event4 1 116 1 && sendevent /dev/input/event4 0 0 0 && sendevent /dev/input/event4 4 4 458854 && sendevent /dev/input/event4 1 116 0 && sendevent /dev/input/event4 0 0 0"
+	"Home"		: `sendevent /dev/input/event${eventNum} 4 4 786979 && sendevent /dev/input/event${eventNum} 1 172 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 786979 && sendevent /dev/input/event${eventNum} 1 172 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Menu"		: `sendevent /dev/input/event${eventNum} 4 4 786496 && sendevent /dev/input/event${eventNum} 1 139 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 786496 && sendevent /dev/input/event${eventNum} 1 139 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Exit"		: `sendevent /dev/input/event${eventNum} 4 4 458993 && sendevent /dev/input/event${eventNum} 1 158 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458993 && sendevent /dev/input/event${eventNum} 1 158 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Up"		: `sendevent /dev/input/event${eventNum} 4 4 458834 && sendevent /dev/input/event${eventNum} 1 103 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458834 && sendevent /dev/input/event${eventNum} 1 103 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Down"		: `sendevent /dev/input/event${eventNum} 4 4 458833 && sendevent /dev/input/event${eventNum} 1 108 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458833 && sendevent /dev/input/event${eventNum} 1 108 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Left"		: `sendevent /dev/input/event${eventNum} 4 4 458832 && sendevent /dev/input/event${eventNum} 1 105 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458832 && sendevent /dev/input/event${eventNum} 1 105 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Right"		: `sendevent /dev/input/event${eventNum} 4 4 458831 && sendevent /dev/input/event${eventNum} 1 106 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458831 && sendevent /dev/input/event${eventNum} 1 106 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Ok"		: `sendevent /dev/input/event${eventNum} 4 4 458840 && sendevent /dev/input/event${eventNum} 1 96 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458840 && sendevent /dev/input/event${eventNum} 1 96 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Stop/Start": `sendevent /dev/input/event${eventNum} 4 4 786637 && sendevent /dev/input/event${eventNum} 1 164 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 786637 && sendevent /dev/input/event${eventNum} 1 164 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Backward"	: `sendevent /dev/input/event${eventNum} 4 4 786612 && sendevent /dev/input/event${eventNum} 1 168 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 786612 && sendevent /dev/input/event${eventNum} 1 168 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Forward"	: `sendevent /dev/input/event${eventNum} 4 4 786611 && sendevent /dev/input/event${eventNum} 1 208 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 786611 && sendevent /dev/input/event${eventNum} 1 208 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
+	"Off/On"	: `sendevent /dev/input/event${eventNum} 4 4 458854 && sendevent /dev/input/event${eventNum} 1 116 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458854 && sendevent /dev/input/event${eventNum} 1 116 0 && sendevent /dev/input/event${eventNum} 0 0 0`
 };
 
 exports.name = 'MasterBedroom Entertainment Tasks';
@@ -95,8 +96,8 @@ exports.tasks = {
 	"Open": [
 	//Turn on TV
 		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-	    {"sleep": 2},
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
+	    {"sleep": 2},
 		{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
 
 	//Turn on Sound
