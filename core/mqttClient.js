@@ -9,7 +9,7 @@ const brokerOptions = {
 	password:"pepper"
 };
 
-var broker = null;
+var broker = null, onInput = null;
 
 //##########################################
 const connectBroker = function(task) {
@@ -21,12 +21,12 @@ console.log(`Enter connectBroker`);
 
 	broker.on('connect', function() {
 		console.log(`Enter broker connected`);
-		if(task) sendTask(task);
 	});
  
 	broker.on('message', function(topic, message) {
-		console.log(`Enter broker replied, topic: ${topic}, message: ${message}`);
-		console.log(message.toString());
+		console.log(`Enter broker message received, topic: ${topic}, message: ${message}`);
+		//onInput(message);
+		onInput(JSON.parse(message));
 	});
 
 	broker.on("error", function(error) {
@@ -47,13 +47,24 @@ const sendTask = function(task) {
 console.log(`Enter sendTask`);
 
 	if(!broker) connectBroker(task);
-	broker.publish('taskInput', task);
+	broker.publish('controlInput', task);
+};
+
+//##########################################
+const captureInput = function(callBack=null) {
+//##########################################
+console.log(`Enter captureInput`);
+
+	onInput = callBack;
+	if(!broker) connectBroker();
+	broker.subscribe('remoteInput', 0);
 };
 
 ////////////////////////////////////////////
 //                MAIN
 //Open connection with Hub and send request
 ////////////////////////////////////////////
-console.log('Loaded mqttOutput.js');
+console.log('Loaded mqttClient.js');
 
+	exports.captureInput = captureInput;
 	exports.sendTask = sendTask;

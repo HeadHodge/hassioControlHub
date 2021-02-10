@@ -76,7 +76,27 @@ console.log(`Enter sendCommand, command: ${command}`);
 //### getFile
 //################
 function getFile(fileName, callBack) {
+var xhr = new XMLHttpRequest();
+
+	xhr.open('GET', '/..'+fileName);
+	xhr.send();
+	
+	xhr.onload = function() {
+		if (xhr.status != 200) return console.log(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+		if(typeof callBack != 'undefined') callBack(xhr.response, fileName);
+	};
+
+	xhr.onerror = function() {
+		notify("getFile Request failed");
+	};
+};
+
+//################
+//### getFile
+//################
+function xgetFile(fileName, callBack) {
 console.log(`Enter getFile, fileName: ${fileName}`);
+return loadFile(fileName, callBack);
 
 	if(!_isConnected) return;
 	
@@ -112,7 +132,7 @@ function loadTask(content, command={"action": "default"}) {
 	default:
 		var zone = _zone.getAttribute('value');
 		var skin =_skin.getAttribute('value');
-		var filePath = '/html/tasks/'+zone+'-'+skin+'.js';
+		var filePath = '/tasks/'+zone+'-'+skin+'.js';
 		
 		//getFile({"action": "getFile", "filePath": filePath, "format": "taskScript"}, loadTask);
 		break;
@@ -127,7 +147,7 @@ console.log(`Enter loadSkin, filePath: ${filePath}`);
 var Skin = document.querySelector('Skin.container');
 
 	switch(filePath) {
-	case '/html/skin/' + _skin.getAttribute('value')+'.htm':
+	case '/skin/' + _skin.getAttribute('value')+'.htm':
 		var keys;
 
 		if(content) {
@@ -146,7 +166,7 @@ var Skin = document.querySelector('Skin.container');
 	default:
 		if(filePath) return;
 		
-		var filePath = '/html/skin/' + _skin.getAttribute('value')+'.htm';
+		var filePath = '/skin/' + _skin.getAttribute('value')+'.htm';
 
 		_zone.innerHTML = _zone.getAttribute('text');
 		_skin.innerHTML = _skin.getAttribute('text');
@@ -331,25 +351,25 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 	if(content) document.querySelector('body').innerHTML += content;		
 	
 	switch(filePath) {
-	case '/html/skin/case.htm':
-		getFile("/html/menus/zones.htm", loadCase);
-	case '/html/menus/zones.htm':
-		getFile("/html/menus/categories.htm", loadCase);
+	case '/skin/case.htm':
+		getFile("/menus/zones.htm", loadCase);
+	case '/menus/zones.htm':
+		getFile("/menus/categories.htm", loadCase);
 		break;
-	case '/html/menus/categories.htm':
-		getFile("/html/menus/skins.htm", loadCase);
+	case '/menus/categories.htm':
+		getFile("/menus/skins.htm", loadCase);
 		break;
-	case '/html/menus/skins.htm':
-		getFile("/html/menus/tasks.htm", loadCase);
+	case '/menus/skins.htm':
+		getFile("/menus/tasks.htm", loadCase);
 		break;
-	case '/html/menus/tasks.htm':
-		getFile("/html/menus/notes.htm", loadCase);
+	case '/menus/tasks.htm':
+		getFile("/menus/notes.htm", loadCase);
 		break;
-	case '/html/menus/notes.htm':
+	case '/menus/notes.htm':
 		start();
 		break;
 	default:
-		if(!filePath) getFile("/html/skin/case.htm", loadCase);
+		if(!filePath) getFile("/skin/case.htm", loadCase);
 		break;
 	};
 };
@@ -360,7 +380,8 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 //debugger;
 
 	window.addEventListener("load", function(){
-		openConnection(loadCase);
+		//openConnection(loadCase);
+		loadCase();
 	});
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	

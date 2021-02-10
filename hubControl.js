@@ -3,7 +3,8 @@
 ////////////////////////////////////////////
 const debug = require('/controlHub/core/debugLog.js').debug;
 const os = require('os');
-const hubInput = require('/controlHub/core/wsInput.js');
+const htmlServer = require('/controlHub/core/htmlServer.js');
+const mqttClient = require('/controlHub/core/mqttClient.js');
 
 var _zones={};
 
@@ -12,7 +13,7 @@ const onOutput = function(zone, command) {
 //##########################################
 console.log(`Enter onOutput for command: ${command}`);
 //var hubOutput = require('/controlHub/core/restOutput.js');
-var mqttOutput = require('/controlHub/core/mqttOutput.js');
+//var mqttOutput = require('/controlHub/core/mqttOutput.js');
 var controller, task;
 
 	if(_zones[zone].popupModule) {
@@ -27,10 +28,10 @@ var controller, task;
 	
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
-	task = `{"action": "runSequence", "sequence": ${JSON.stringify(controller.tasks[command])}}`;
+	task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(controller.tasks[command])}}`;
 	debug.log(`For command: ${command}, Send task: ${task}`);
 	//hubOutput.sendTask(task);
-	mqttOutput.sendTask(task);
+	mqttClient.sendTask(task);
 };
 
 //##########################################
@@ -38,15 +39,14 @@ const onSelectTask = function(zone, command) {
 //##########################################
 debug.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
 //var hubOutput = require('/controlHub/core/restOutput.js');
-var mqttOutput = require('/controlHub/core/mqttOutput.js');
+//var mqttOutput = require('/controlHub/core/mqttOutput.js');
 var task;
 
 	_zones[zone].isTaskSet = null;
 	if(!_zones[zone].tasks[_zones[zone].focus][command]) return;
-	task = `{"action": "runSequence", "sequence": ${JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command])}}`;
+	task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command])}}`;
 	console.log(`Send selected task: ${task}`);
-	//hubOutput.sendTask(task);
-	mqttOutput.sendTask(task);
+	mqttClient.sendTask(task);
 };
 
 //##########################################
@@ -138,15 +138,15 @@ catch(error) {
 }};
  
 //##########################################
-const onInput = function(client) {
+const onInput = function(input=null) {
 try {
 //##########################################
-debug.log(`Enter onInput, inputType: ${client.input.type}`);
+console.log(`Enter onInput, inputType: ${input}`);
 
-	if(client.input.type == 'command') {client.send('Got It');onCommand(client.input);return;};
-	if(client.input.type == 'fileName') return onFileName(client);
+	if(input) onCommand(input);
+//	if(client.input.type == 'fileName') return onFileName(client);
 	
-	client.send(`Abort: Invalid Input Recieved`);
+//	client.send(`Abort: Invalid Input Recieved`);
 }
 catch(error) {
 	console.log(`Unexpected Problem: ${error}`);
@@ -159,4 +159,4 @@ catch(error) {
 ////////////////////////////////////////////
 debug.log(`Started hubControl on ${os.hostname}`);
 
-	hubInput.getInput(onInput);
+	mqttClient.captureInput(onCommand);
