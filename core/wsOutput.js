@@ -25,7 +25,7 @@ console.log('Enter onClose');
 onMessage = function(message) {
 //##########################################
 var payload = JSON.parse(message);
-debug.log(`Enter onMessage, Received server message: ${payload.type}`);
+console.log(`Enter onMessage, Received server message: `, message);
 
 	if(payload.type == 'auth_required') return client.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw"}');
 	if(payload.type == 'auth_ok') return isConnected = true;
@@ -89,10 +89,6 @@ var service, key, command, payload={"id": messageId, "type": "call_service"};
 ////////////////////////////////////////////
 console.log('Loaded wsOutput.js');
 
+	global.onOutput = runTask;
 	exports.runTask = runTask;
 	createClient();	
-/*
-	setTimeout(function timeout() {
-		ws.send(Date.now());
-	}, 500);
-*/

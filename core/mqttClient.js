@@ -12,7 +12,7 @@ const brokerOptions = {
 var broker = null, onInput = null;
 
 //##########################################
-const connectBroker = function(task) {
+const connectBroker = function() {
 //##########################################
 console.log(`Enter connectBroker`);
 
@@ -20,14 +20,16 @@ console.log(`Enter connectBroker`);
 	broker = mqtt.connect(brokerUrl, brokerOptions);
 
 	broker.on('connect', function() {
-		console.log(`Enter broker connected`);
+		console.log(`Enter MQTT broker connected`);
+		broker.subscribe('remoteInput', 0);
 	});
  
 	broker.on('message', function(topic, message) {
 		console.log(` \n \n========================================================================================`);
-		console.log(`Enter broker message received, topic: ${topic}, message: ${message}`);
+		console.log(`Enter MQTT broker message received, topic: ${topic}, message: ${message}`);
+		global.onInput(JSON.parse(message));
 		//onInput(message);
-		onInput(JSON.parse(message));
+		//onInput(JSON.parse(message));
 	});
 
 	broker.on("error", function(error) {
@@ -69,3 +71,4 @@ console.log('Loaded mqttClient.js');
 
 	exports.captureInput = captureInput;
 	exports.sendTask = sendTask;
+	connectBroker();

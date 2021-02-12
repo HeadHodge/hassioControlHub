@@ -1,13 +1,15 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
+_zones={};
+
 const debug = require('/controlHub/core/debugLog.js').debug;
 const os = require('os');
 const htmlServer = require('/controlHub/core/htmlServer.js');
 const mqttClient = require('/controlHub/core/mqttClient.js');
+const wsInput = require('/controlHub/core/wsInput.js');
 const wsOutput = require('/controlHub/core/wsOutput.js');
 
-var _zones={};
 
 //##########################################
 const onOutput = function(zone, command) {
@@ -27,7 +29,8 @@ var controller, task;
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
 	debug.log(`Task: `, controller.tasks);
-	wsOutput.runTask(JSON.stringify(controller.tasks[command]));
+	global.onOutput(JSON.stringify(controller.tasks[command]));
+	//wsOutput.runTask(JSON.stringify(controller.tasks[command]));
 };
 
 //##########################################
@@ -88,6 +91,23 @@ debug.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 };
  
 //##########################################
+const onFileName = function(client) {
+try {
+//##########################################
+debug.log(`Enter onFileName, fileName: ${client.input.fileName}, filePath: ${__dirname + client.input.fileName}`);
+var fs = require('fs');
+
+	fs.readFile(__dirname + client.input.fileName, 'utf8', function(error, content) {
+		if(error) return; //client.send(`${error.name}: ${error.message}`);
+		client.send(content);
+	});
+}
+catch(error) {
+	console.log(`Unexpected Problem: ${error}`);
+	console.error(error);
+}};
+ 
+//##########################################
 const onCommand = function(input) {
 try {
 //##########################################
@@ -116,23 +136,7 @@ catch(error) {
 	console.log(`Unexpected Problem: ${error}`);
 	console.error(error);
 }};
- 
-//##########################################
-const onFileName = function(client) {
-try {
-//##########################################
-debug.log(`Enter onFileName, fileName: ${client.input.fileName}, filePath: ${__dirname + client.input.fileName}`);
-var fs = require('fs');
 
-	fs.readFile(__dirname + client.input.fileName, 'utf8', function(error, content) {
-		if(error) return; //client.send(`${error.name}: ${error.message}`);
-		client.send(content);
-	});
-}
-catch(error) {
-	console.log(`Unexpected Problem: ${error}`);
-	console.error(error);
-}};
  
 //##########################################
 const onInput = function(input=null) {
@@ -156,4 +160,5 @@ catch(error) {
 ////////////////////////////////////////////
 debug.log(`Started hubControl on ${os.hostname}`);
 
-	mqttClient.captureInput(onCommand);
+	//mqttClient.captureInput(onCommand);
+	global.onInput = onCommand;

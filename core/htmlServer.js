@@ -10,7 +10,7 @@ var basePath = __dirname + '/../html';
 //##########################################
 const staticServe = function(req, res) {
 //##########################################
-console.log(`Enter staticServe, basePath: ${basePath}, req.url: ${req.url}`);
+debug.log(`Enter staticServe, basePath: ${basePath}, req.url: ${req.url}`);
 try {
 	fs.readFile(basePath+req.url, function(err,data) {
 		//res.setHeader('Content-Type', 'text/html');

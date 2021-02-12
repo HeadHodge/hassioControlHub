@@ -23,85 +23,15 @@ webRemote = (function($case, $map){ //invoke anonymous self executing function
 //################
 //### Global Variables
 //################
-var authToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw';
-
-document.cookie = 'X-Authorization=' + authToken + '; path=/';
-const _broker = new Paho.MQTT.Client('192.168.0.160', 1883, 'test20');
-const _brokerUrl = 'mqtt://192.168.0.160:1883'; //test broker: 'mqtt://test.mosquitto.org'
-const _brokerOptions = {
-	onSuccess	:onConnect,
-	userName	:"admin", 
-	password	:"pepper"
-};
-
+var _authToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw';
 var _isKeyDown, _wasMapRecalled;
 var	_case, _filter, _map, _shortcuts, _zone, _category, _skin, _commands, _overlay, _menu;
 var _socket, _isConnected;
 
-
-// called when the client connects
-function onConnect() {
-  // Once a connection has been made, make a subscription and send a message.
-  console.log("onConnect");
-  client.subscribe("World");
-  message = new Paho.MQTT.Message("Hello");
-  message.destinationName = "World";
-  client.send(message);
-};
-
-
-//##########################################
-const connectBroker = function(task) {
-//##########################################
-console.log(`Enter connectBroker`);
-
-/*
-	_broker.on('connect', function() {
-		console.log(`Enter broker connected`);
-	});
- 
-	_broker.on('message', function(topic, message) {
-		console.log(`Enter broker message received, topic: ${topic}, message: ${message}`);
-		//onInput(message);
-		onInput(JSON.parse(message));
-	});
-
-	_broker.on("error", function(error) {
-		console.log(`Enter broker failed: ${error.toString()}`);
-		if(_broker) _broker.end();
-		_broker = null;
-	});	
-
-	_broker.on("close", function() {
-		console.log(`Enter broker closed`);
-		broker = null;
-	});	
-*/
-	_broker.onConnectionLost=function(e){
-		console.log('Cosed');
-		console.log(e);
-	}	
-var authToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw';
-
-document.cookie = 'X-Authorization=' + authToken + '; path=/';
-
-	//if(_broker) _broker.end(); //Close existing broker
-	_broker.connect(_brokerOptions);
-};
-
-//##########################################
-const sendTask = function(task) {
-//##########################################
-console.log(`Enter sendTask`);
-
-	if(!broker) connectBroker(task);
-	broker.publish('controlInput', task);
-};
-
 //################
 //### openConnection
 //################
-function openConnection(onConnected) {
+function openConnection(callBack) {
 console.log("Enter openConnection");
 
 	if(_isConnected) return;
@@ -111,7 +41,7 @@ console.log("Enter openConnection");
 	_socket.onopen = function(event) {
 		console.log("****Server Connected****");
 		_isConnected = true;
-		if(onConnected) onConnected();
+		if(callBack) callBack();
 	};
 	
 	_socket.onclose = function(event) {
@@ -123,10 +53,6 @@ console.log("Enter openConnection");
 
 	_socket.onerror = function(error) {
 		console.log(`****Server Error: ${error.message}****`);
-		//_isConnected = null;
-		//openConnection();
-		//_socket.close();
-		//_socket = null;
 	};
 };
 
@@ -162,23 +88,6 @@ var xhr = new XMLHttpRequest();
 	xhr.onerror = function() {
 		notify("getFile Request failed");
 	};
-};
-
-//################
-//### getFile
-//################
-function xgetFile(fileName, callBack) {
-console.log(`Enter getFile, fileName: ${fileName}`);
-return loadFile(fileName, callBack);
-
-	if(!_isConnected) return;
-	
-	_socket.onmessage = function(event) {
-		console.log(`Reply received from server`);
-		callBack(event.data, fileName);
-	};
-
-	_socket.send(`{"type": "fileName", "fileName": "${fileName}"}`);
 };
 
 //################
@@ -439,7 +348,7 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 		getFile("/menus/notes.htm", loadCase);
 		break;
 	case '/menus/notes.htm':
-		//start();
+		start();
 		//filePath=null;
 		break;
 	default:
@@ -454,9 +363,9 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 //debugger;
 
 	window.addEventListener("load", function(){
-		//openConnection(loadCase);
-		connectBroker();
-		loadCase();
+		openConnection(loadCase);
+		//connectBroker();
+		//loadCase();
 	});
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	
