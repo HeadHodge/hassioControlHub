@@ -6,15 +6,13 @@ _zones={};
 const debug = require('/controlHub/core/debugLog.js').debug;
 const os = require('os');
 const htmlServer = require('/controlHub/core/htmlServer.js');
-const mqttClient = require('/controlHub/core/mqttClient.js');
 const wsInput = require('/controlHub/core/wsInput.js');
 const wsOutput = require('/controlHub/core/wsOutput.js');
 
-
 //##########################################
-const onOutput = function(zone, command) {
+const onCommand = function(zone, command, reply) {
 //##########################################
-console.log(`Enter onOutput for command: ${command}, zone: ${zone}`);
+console.log(`Enter onCommand, command: ${command}, zone: ${zone}`);
 var controller, task;
 
 	if(_zones[zone].popupModule) {
@@ -29,24 +27,18 @@ var controller, task;
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
 	debug.log(`Task: `, controller.tasks);
-	global.onOutput(JSON.stringify(controller.tasks[command]));
-	//wsOutput.runTask(JSON.stringify(controller.tasks[command]));
+	global.onOutput(JSON.stringify(controller.tasks[command]), reply);
 };
 
 //##########################################
-const onSelectTask = function(zone, command) {
+const onSelectTask = function(zone, command, reply) {
 //##########################################
 debug.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
-//var hubOutput = require('/controlHub/core/restOutput.js');
-//var mqttOutput = require('/controlHub/core/mqttOutput.js');
 var task;
 
 	_zones[zone].isTaskSet = null;
 	if(!_zones[zone].tasks[_zones[zone].focus][command]) return;
-	//task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command])}}`;
-	//console.log(`Send selected task: ${task}`);
-	//mqttClient.sendTask(task);
-	wsOutput.runTask(JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command]));
+	global.onOutput(JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command]), reply);
 };
 
 //##########################################
@@ -89,37 +81,19 @@ debug.log(`Enter onSelectFocus with ${command} in zone ${zone}`);
 
 	return console.log(`defaultController selected: ${_zones[zone].primaryModule}`);
 };
- 
-//##########################################
-const onFileName = function(client) {
-try {
-//##########################################
-debug.log(`Enter onFileName, fileName: ${client.input.fileName}, filePath: ${__dirname + client.input.fileName}`);
-var fs = require('fs');
 
-	fs.readFile(__dirname + client.input.fileName, 'utf8', function(error, content) {
-		if(error) return; //client.send(`${error.name}: ${error.message}`);
-		client.send(content);
-	});
-}
-catch(error) {
-	console.log(`Unexpected Problem: ${error}`);
-	console.error(error);
-}};
- 
 //##########################################
-const onCommand = function(input) {
+const onInput = function(input, reply) {
 try {
 //##########################################
-debug.log(`Enter onCommand, command: ${input.command}, zone: ${input.zone}`);
+debug.log(`Enter onInput, command: ${input.command}, zone: ${input.zone}`);
 _zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
 
 	if(input.command == 'Set') input.command = 'Off/On';
 	
-	//if(_zones[input.zone].isControllerSelected) {_zones[input.zone].isControllerSelected = null; if(input.command == 'Off/On') input.command = 'Open';};
 	if(_zones[input.zone].isFocusSet && input.command == 'Off/On'){input.command = 'Open'; _zones[input.zone].isFocusSet = null;};
 	if(_zones[input.zone].isFocusSet) return onSelectFocus(input.zone, input.command);
-	if(_zones[input.zone].isTaskSet) return onSelectTask(input.zone, input.command);
+	if(_zones[input.zone].isTaskSet) return onSelectTask(input.zone, input.command, reply);
 		
 	if(input.command == 'Focus') {_zones[input.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
 
@@ -130,35 +104,17 @@ _zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
 			{input.command = 'Silence';_zones[input.zone].isSilent=true;}
 	};
 	
-	onOutput(input.zone, input.command);
+	onCommand(input.zone, input.command, reply);
 }
 catch(error) {
 	console.log(`Unexpected Problem: ${error}`);
 	console.error(error);
 }};
 
- 
-//##########################################
-const onInput = function(input=null) {
-try {
-//##########################################
-console.log(`Enter onInput, inputType: ${input}`);
-
-	if(input) onCommand(input);
-//	if(client.input.type == 'fileName') return onFileName(client);
-	
-//	client.send(`Abort: Invalid Input Recieved`);
-}
-catch(error) {
-	console.log(`Unexpected Problem: ${error}`);
-	console.error(error);
-}};
-		
 ////////////////////////////////////////////
 //                MAIN
 //Open server to listen for control input
 ////////////////////////////////////////////
 debug.log(`Started hubControl on ${os.hostname}`);
 
-	//mqttClient.captureInput(onCommand);
-	global.onInput = onCommand;
+	global.onInput = onInput;

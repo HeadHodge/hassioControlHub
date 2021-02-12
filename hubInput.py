@@ -2,6 +2,7 @@
 ##            GLOBAL VARIABLES
 #############################################
 import paho.mqtt.client as mqtt
+import websocket
 import sys, time, json, _thread as thread
 from evdev import InputDevice, categorize, ecodes
 
@@ -85,7 +86,8 @@ def captureInput(client, channelNum):
         print(f'Send command from channel: {channelNum}, command: {command}, zone: {zone}')
         #ws.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
         payload = '{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}'
-        client.publish("remoteInput", payload)
+        #client.publish("remoteInput", payload)
+        client.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
 
     return
 
@@ -109,6 +111,35 @@ def on_connect(client, userdata, flags, rc):
         thread.start_new_thread(captureInput, (client, channel))
 
     client.subscribe("controlInput", 0)
+
+###################
+# onMessage
+###################
+def onMessage(ws, message):
+    print("Enter onMessage, received: ", message)
+
+###################
+# onError
+###################
+def onError(ws, error):
+    print(f"Enter onError: ", error)
+    sys.exit(1)
+
+###################
+# onClose
+###################
+def onClose(ws):
+    print("Enter onClose")
+         
+         
+###################
+# onOpen
+###################
+def onOpen(ws):
+    print("Enter onOpen USB Input")
+
+    for channel in channels:
+        thread.start_new_thread(captureInput, (ws, channel))
 	
 #############################################
 ##                MAIN
@@ -116,14 +147,25 @@ def on_connect(client, userdata, flags, rc):
 #############################################
 print('Started mqttClient.py')
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.username_pw_set('admin', password='pepper')
-client.connect("192.168.0.160", 1883)
+#client = mqtt.Client()
+#client.on_connect = on_connect
+#client.on_message = on_message
+#client.username_pw_set('admin', password='pepper')
+#client.connect("192.168.0.160", 1883)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
 # manual interface.
-client.loop_forever()
+#client.loop_forever()
+
+
+websocket.enableTrace(True)
+
+_ws = websocket.WebSocketApp("ws://192.168.0.164:8080",
+    on_message = onMessage,
+    on_error = onError,
+    on_close = onClose,
+    on_open = onOpen) 
+
+_ws.run_forever()

@@ -4,7 +4,7 @@
 const debug = require('/controlHub/core/debugLog.js').debug;
 const webSocket = require('/root/node_modules/ws');
 
-var client = null, isConnected = null, messageId = 1;
+var connection = null, isConnected = null, messageId = 1;
 
 //##########################################
 onOpen =  function() {
@@ -18,41 +18,46 @@ onClose =  function() {
 //##########################################
 console.log('Enter onClose');
 
-	createClient();
+	openConnection();
 };
 
 //##########################################
 onMessage = function(message) {
 //##########################################
 var payload = JSON.parse(message);
-console.log(`Enter onMessage, Received server message: `, message);
+debug.log(`Enter onMessage, Received server message: `, message);
 
-	if(payload.type == 'auth_required') return client.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw"}');
+	if(payload.type == 'auth_required') return connection.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw"}');
 	if(payload.type == 'auth_ok') return isConnected = true;
-	if(payload.type == 'result') return console.log(`Server result: messageId: ${payload.id}, status: ${payload.success}`);
+	if(payload.type != 'result') return console.log(`Unknown Message from wsOutput: `, message);
+	if(payload.success) return console.log(`Server result: messageId: ${payload.id}, status: ${payload.success}`);
+
+	console.log(`Server result: messageId: ${payload.id}, status: ${payload.success}, result: `, payload.result);
+	connection.reply(message);
 };
 
 //##########################################
-createClient = function() {
+openConnection = function() {
 //##########################################
-console.log(`Enter createClient`);
+console.log(`Enter openConnection`);
 
 	isConnected = false;
-	if(client) client.close();
-	client = new webSocket('ws://192.168.0.160:8123/api/websocket', {});
-	client.on('open', onOpen);
-	client.on('close', onClose);
-	client.on('message', onMessage);
+	if(connection) connection.close();
+	
+	connection = new webSocket('ws://192.168.0.160:8123/api/websocket', {});
+	connection.on('open', onOpen);
+	connection.on('close', onClose);
+	connection.on('message', onMessage);
 };
 
 //##########################################
-runTask = function(input) {
+runTask = function(input, reply) {
 //##########################################
 console.log(`Enter runTask`);
 var task = JSON.parse(input);
 var service, key, command, payload={"id": messageId, "type": "call_service"};
 
-	if(!isConnected) return console.log(`Abort runTask: client not connected to server`);
+	if(!isConnected) return console.log(`Abort runTask: Not connected to server`);
 	if(task.length == 0) return console.log(`runTask Completed`);
 
 	service = task[0];
@@ -66,7 +71,7 @@ var service, key, command, payload={"id": messageId, "type": "call_service"};
 		console.log(`Sleep: ${duration} millisecs`);
 
 		setTimeout(function timeout() {
-			runTask(JSON.stringify(task));
+			runTask(JSON.stringify(task), reply);
 		}, duration);
 		
 		return;
@@ -78,9 +83,10 @@ var service, key, command, payload={"id": messageId, "type": "call_service"};
 	console.log(`Send payload, domain: ${payload.domain}, service: ${payload.service}`);
 	
 	++messageId;
-	client.send(JSON.stringify(payload));
+	connection.reply = reply;
+	connection.send(JSON.stringify(payload));
 		
-	return runTask(JSON.stringify(task));
+	return runTask(JSON.stringify(task), reply);
 };
 
 ////////////////////////////////////////////
@@ -91,4 +97,4 @@ console.log('Loaded wsOutput.js');
 
 	global.onOutput = runTask;
 	exports.runTask = runTask;
-	createClient();	
+	openConnection();	

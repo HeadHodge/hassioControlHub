@@ -7,13 +7,13 @@ const ws = require('/root/node_modules/ws');
 var server = null;
 
 //##########################################
-const onMessage = function(message) {
+const onMessage = function(message, reply) {
 //##########################################
 try {
 	console.log(`\x20\n\x20`);
 	console.log(`==================================================================================================`);
 	console.log(`Enter onMessage from ws client:\n${message}`);
-	global.onInput(JSON.parse(message));
+	global.onInput(JSON.parse(message), reply);
 }
 catch (error) {
 	console.log(`Invalid Messag: ${error}`);
@@ -23,13 +23,22 @@ catch (error) {
 const onConnect = function(connection) {
 //##########################################
 debug.log(`Enter onConnect`);
-		
+var onReply;
+	
 	console.log(` \n`);
 	console.log(`===================================================`);
 	console.log(`= WebSocket Client Connected, waiting for input`);
 	console.log(`===================================================`);
+
+	onReply = function(reply) {
+	console.log(`Enter onReply: ${reply}`);
 		
-	connection.on('message', onMessage);
+		connection.send(reply);
+	};
+		
+	connection.on('message', function(message){
+		onMessage(message, onReply);
+	});
 };
 
 ////////////////////////////////////////////
