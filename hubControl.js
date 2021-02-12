@@ -12,7 +12,7 @@ var _zones={};
 //##########################################
 const onOutput = function(zone, command) {
 //##########################################
-console.log(`Enter onOutput for command: ${command}`);
+console.log(`Enter onOutput for command: ${command}, zone: ${zone}`);
 //var hubOutput = require('/controlHub/core/restOutput.js');
 //var mqttOutput = require('/controlHub/core/mqttOutput.js');
 var controller, task;
@@ -29,10 +29,10 @@ var controller, task;
 	
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
-	task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(controller.tasks[command])}}`;
-	debug.log(`For command: ${command}, Send task: ${task}`);
-	mqttClient.sendTask(task);
-	wsOutput.runTask(controller.tasks[command]);
+	//task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(controller.tasks[command])}}`;
+	debug.log(`Task: `, controller.tasks);
+	//mqttClient.sendTask(task);
+	wsOutput.runTask(JSON.stringify(controller.tasks[command]));
 };
 
 //##########################################
@@ -45,9 +45,10 @@ var task;
 
 	_zones[zone].isTaskSet = null;
 	if(!_zones[zone].tasks[_zones[zone].focus][command]) return;
-	task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command])}}`;
-	console.log(`Send selected task: ${task}`);
-	mqttClient.sendTask(task);
+	//task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command])}}`;
+	//console.log(`Send selected task: ${task}`);
+	//mqttClient.sendTask(task);
+	wsOutput.runTask(JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command]));
 };
 
 //##########################################

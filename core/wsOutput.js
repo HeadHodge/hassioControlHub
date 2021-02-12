@@ -4,19 +4,19 @@
 const debug = require('/controlHub/core/debugLog.js').debug;
 const webSocket = require('/root/node_modules/ws');
 
-var client = null, isConnected = null;
+var client = null, isConnected = null, messageId = 1;
 
 //##########################################
 onOpen =  function() {
 //##########################################
-console.log('Enter client.open');
+console.log('Enter onOpen');
   //ws.send(Date.now());
 };
 
 //##########################################
 onClose =  function() {
 //##########################################
-console.log('Enter client.close');
+console.log('Enter onClose');
 
 	createClient();
 };
@@ -24,11 +24,12 @@ console.log('Enter client.close');
 //##########################################
 onMessage = function(message) {
 //##########################################
-console.log(`Enter client.message: ${message}`);
+console.log(`Enter onMessage: Received server message`);
 var payload = JSON.parse(message);
 
 	if(payload.type == 'auth_required') return client.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw"}');
-	if(payload.type == 'auth_ok') isConnected = true;
+	if(payload.type == 'auth_ok') return isConnected = true;
+	if(payload.type == 'result') return console.log(`Server result: messageId: ${payload.id}, status: ${payload.success}`);
 };
 
 //##########################################
@@ -45,40 +46,30 @@ console.log(`Enter createClient`);
 };
 
 //##########################################
-runService = function(service={}) {
+runTask = function(input) {
 //##########################################
-console.log(`Enter runService, service: `, service);
-var command;
+console.log(`Enter runTask`);
+var task = JSON.parse(input);
+var service, key, command, payload={"id": messageId, "type": "call_service"};
 
-	if(service.length == 0) return console.log(`Abort runService: invalid service`);
-	command = Object.keys(service)[0].split('/');
-	console.log(`Domain: ${command[0]}, Action: ${command[1]}`);
-};
-
-//##########################################
-runTask = function(task=[]) {
-//##########################################
-console.log(`Enter runTask, contains ${task.length} services`);
-
-	if(task.length == 0) return console.log(`runTask Completed`);
 	if(!isConnected) return console.log(`Abort runTask: client not connected to server`);
+	if(task.length == 0) return console.log(`runTask Completed`);
+
+	service = task[0];
+	key = Object.keys(service)[0];
+	command = key.split('/');
+	if(command.length == 1) return console.log(`Abort runService: ignore command: `, command);
+
+	payload.domain = command[0];
+	payload.service = command[1];
+	payload.service_data = service[key];
+	console.log(`Send payload, domain: ${payload.domain}, service: ${payload.service}`);
 	
-	runService(task[0]);
-	task.shift();
-	return runTask(task);
-	
-	task = {
-		"id": 24,
-		"type": "call_service",
-		"domain": "androidtv",
-		"service": "adb_command",
-		"service_data": {
-			"entity_id": "media_player.firetv_livingroom",
-			"command": "HOME"
-		}
-	};		
+	++messageId;
+	client.send(JSON.stringify(payload));
 		
-	//client.send(JSON.stringify(task));
+	task.shift();
+	return runTask(JSON.stringify(task));
 };
 
 ////////////////////////////////////////////

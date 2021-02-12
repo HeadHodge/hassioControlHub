@@ -24,6 +24,7 @@ console.log(`Enter connectBroker`);
 	});
  
 	broker.on('message', function(topic, message) {
+		console.log(` \n \n========================================================================================`);
 		console.log(`Enter broker message received, topic: ${topic}, message: ${message}`);
 		//onInput(message);
 		onInput(JSON.parse(message));
