@@ -24,8 +24,8 @@ console.log('Enter onClose');
 //##########################################
 onMessage = function(message) {
 //##########################################
-console.log(`Enter onMessage: Received server message`);
 var payload = JSON.parse(message);
+debug.log(`Enter onMessage, Received server message: ${payload.type}`);
 
 	if(payload.type == 'auth_required') return client.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw"}');
 	if(payload.type == 'auth_ok') return isConnected = true;
@@ -56,10 +56,22 @@ var service, key, command, payload={"id": messageId, "type": "call_service"};
 	if(task.length == 0) return console.log(`runTask Completed`);
 
 	service = task[0];
+	task.shift();
 	key = Object.keys(service)[0];
 	command = key.split('/');
-	if(command.length == 1) return console.log(`Abort runService: ignore command: `, command);
 
+	if(command.length == 1) {
+		var duration = 0;
+		if(command[0] == 'sleep') duration = service[key] * 1000;
+		console.log(`Sleep: ${duration} millisecs`);
+
+		setTimeout(function timeout() {
+			runTask(JSON.stringify(task));
+		}, duration);
+		
+		return;
+	};
+	
 	payload.domain = command[0];
 	payload.service = command[1];
 	payload.service_data = service[key];
@@ -68,7 +80,6 @@ var service, key, command, payload={"id": messageId, "type": "call_service"};
 	++messageId;
 	client.send(JSON.stringify(payload));
 		
-	task.shift();
 	return runTask(JSON.stringify(task));
 };
 

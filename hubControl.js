@@ -13,12 +13,9 @@ var _zones={};
 const onOutput = function(zone, command) {
 //##########################################
 console.log(`Enter onOutput for command: ${command}, zone: ${zone}`);
-//var hubOutput = require('/controlHub/core/restOutput.js');
-//var mqttOutput = require('/controlHub/core/mqttOutput.js');
 var controller, task;
 
 	if(_zones[zone].popupModule) {
-		//module = _zones[zone].popupModule;
 		_zones[zone].popupController = require(_zones[zone].popupModule);
 		_zones[zone].popupModule = null;
 		controller = _zones[zone].popupController;
@@ -29,9 +26,7 @@ var controller, task;
 	
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
-	//task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(controller.tasks[command])}}`;
 	debug.log(`Task: `, controller.tasks);
-	//mqttClient.sendTask(task);
 	wsOutput.runTask(JSON.stringify(controller.tasks[command]));
 };
 
