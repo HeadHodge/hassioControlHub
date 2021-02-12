@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+   <title>Document</title>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script></head>
+<body>
+<script type="text/javascript">
+console.log('Websocket');
+    const _client = new Paho.MQTT.Client(getEndpoint(), clientId);
+var msgCount=0;
+
+// Create WebSocket connection.
+//const socket = new WebSocket('ws://192.168.0.160:8123/api/websocket');
+const socket = new WebSocket('ws://192.168.0.160:1883/');
+
+// Connection opened
+socket.addEventListener('open', function (event) {
+    //socket.send('Hello Server!');
+});
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+console.log('Message from server ', event.data);
+	
+	++msgCount;
+	if(msgCount == 1) socket.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw"}');
+});
+
+// Connection error
+socket.addEventListener('error', function (event) {
+    console.log('Message from server ', event.data);
+});
+</script>
+</body>
+</html>

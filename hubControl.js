@@ -5,6 +5,7 @@ const debug = require('/controlHub/core/debugLog.js').debug;
 const os = require('os');
 const htmlServer = require('/controlHub/core/htmlServer.js');
 const mqttClient = require('/controlHub/core/mqttClient.js');
+const wsOutput = require('/controlHub/core/wsOutput.js');
 
 var _zones={};
 
@@ -30,8 +31,8 @@ var controller, task;
 	
 	task = `{"action": "runSequence", "command": "${command}", "zone": "${zone}", "task": ${JSON.stringify(controller.tasks[command])}}`;
 	debug.log(`For command: ${command}, Send task: ${task}`);
-	//hubOutput.sendTask(task);
 	mqttClient.sendTask(task);
+	wsOutput.runTask(controller.tasks[command]);
 };
 
 //##########################################
