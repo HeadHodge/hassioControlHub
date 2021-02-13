@@ -1,13 +1,12 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
-_zones={};
-
 const debug = require('/controlHub/core/debugLog.js').debug;
 const os = require('os');
 const htmlServer = require('/controlHub/core/htmlServer.js');
 const wsInput = require('/controlHub/core/wsInput.js');
 const wsOutput = require('/controlHub/core/wsOutput.js');
+var _zones={};
 
 //##########################################
 const onCommand = function(zone, command, reply) {
