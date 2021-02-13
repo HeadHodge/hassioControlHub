@@ -1,4 +1,4 @@
-const debug = require('/controlHub/core/debugLog.js').debug;
+const debug = require('/inputHub/core/debugLog.js').debug;
 
 exports.focus = 'Up';
 exports.popupController = {};
@@ -7,13 +7,13 @@ exports.popupModule;
 exports.primaryModule;
 
 exports.controllers = {
-	"Home" 			: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
-	"Softer" 		: "/controlHub/controllers/controller.masterBedroom.video.js",
-	"Silence/Sound"	: "/controlHub/controllers/controller.masterBedroom.sound.js",
-	"Louder" 		: "/controlHub/controllers/controller.masterBedroom.entertainment.js",
-	"Backward"		: "/controlHub/controllers/controller.masterBedroom.fireplace.js",
-	"Stop/Start"	: "/controlHub/controllers/controller.masterBedroom.covers.js",
-	"Forward"		: "/controlHub/controllers/controller.masterBedroom.entertainment.js"
+	"Home" 			: "/inputHub/controllers/controller.masterBedroom.entertainment.js",
+	"Softer" 		: "/inputHub/controllers/controller.masterBedroom.video.js",
+	"Silence/Sound"	: "/inputHub/controllers/controller.masterBedroom.sound.js",
+	"Louder" 		: "/inputHub/controllers/controller.masterBedroom.entertainment.js",
+	"Backward"		: "/inputHub/controllers/controller.masterBedroom.fireplace.js",
+	"Stop/Start"	: "/inputHub/controllers/controller.masterBedroom.covers.js",
+	"Forward"		: "/inputHub/controllers/controller.masterBedroom.entertainment.js"
 };
 
 exports.tasks = {

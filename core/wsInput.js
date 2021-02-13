@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
-const debug = require('/controlHub/core/debugLog.js').debug;
+const debug = require('/inputHub/core/debugLog.js').debug;
 const ws = require('/root/node_modules/ws');
 
 var server = null;

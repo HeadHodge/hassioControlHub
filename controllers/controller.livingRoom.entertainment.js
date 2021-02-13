@@ -1,4 +1,4 @@
-const debug = require('/controlHub/core/debugLog.js').debug;
+const debug = require('/inputHub/core/debugLog.js').debug;
 const eventNum = 5;
 
 adbEvents = {
@@ -83,6 +83,8 @@ exports.tasks = {
 	"Stop/Start": [
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent 85"}}
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Stop/Start"]}}
+		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent 85"}}
+//input keyevent 126
 	],
 	
 	"Forward": [

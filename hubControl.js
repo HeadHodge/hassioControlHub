@@ -1,11 +1,11 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
-const debug = require('/controlHub/core/debugLog.js').debug;
+const debug = require('/inputHub/core/debugLog.js').debug;
 const os = require('os');
-const htmlServer = require('/controlHub/core/htmlServer.js');
-const wsInput = require('/controlHub/core/wsInput.js');
-const wsOutput = require('/controlHub/core/wsOutput.js');
+const htmlServer = require('/inputHub/core/htmlServer.js');
+const wsInput = require('/inputHub/core/wsInput.js');
+const wsOutput = require('/inputHub/core/wsOutput.js');
 var _zones={};
 
 //##########################################
@@ -25,7 +25,7 @@ var controller, task;
 	
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
-	debug.log(`Task: `, controller.tasks);
+	console.log(`Run Task: ${JSON.stringify(controller.tasks[command])}`);
 	global.onOutput(JSON.stringify(controller.tasks[command]), reply);
 };
 
@@ -86,7 +86,7 @@ const onInput = function(input, reply) {
 try {
 //##########################################
 debug.log(`Enter onInput, command: ${input.command}, zone: ${input.zone}`);
-_zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
+_zones[input.zone] = require(`/inputHub/zones/zone.${input.zone}.js`);
 
 	if(input.command == 'Set') input.command = 'Off/On';
 	

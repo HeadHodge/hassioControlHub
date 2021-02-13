@@ -1,7 +1,7 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
-const debug = require('/controlHub/core/debugLog.js').debug;
+const debug = require('/inputHub/core/debugLog.js').debug;
 const mqtt = require('/root/node_modules/mqtt')
 const brokerUrl = 'mqtt://192.168.0.160:1883'; //test broker: 'mqtt://test.mosquitto.org'
 const brokerOptions = {

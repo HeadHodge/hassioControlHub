@@ -1,4 +1,4 @@
-const debug = require('/controlHub/core/debugLog.js').debug;
+const debug = require('/inputHub/core/debugLog.js').debug;
 
 exports.focus = 'Up';
 exports.popupController = {};
@@ -7,19 +7,19 @@ exports.popupModule;
 exports.primaryModule;
 
 exports.controllers = {
-	"Home" 			: "/controlHub/controllers/controller.livingRoom.entertainment.js",
-	"Softer" 		: "/controlHub/controllers/controller.livingRoom.video.js",
-	"Silence/Sound"	: "/controlHub/controllers/controller.livingRoom.sound.js",
-	"Louder" 		: "/controlHub/controllers/controller.livingRoom.entertainment.js",
-	"Backward"		: "/controlHub/controllers/controller.livingRoom.fireplace.js",
-	"Stop/Start"	: "/controlHub/controllers/controller.livingRoom.covers.js",
-	"Forward"		: "/controlHub/controllers/controller.livingRoom.entertainment.js"
+	"Home" 			: "/inputHub/controllers/controller.livingRoom.entertainment.js",
+	"Softer" 		: "/inputHub/controllers/controller.livingRoom.video.js",
+	"Silence/Sound"	: "/inputHub/controllers/controller.livingRoom.sound.js",
+	"Louder" 		: "/inputHub/controllers/controller.livingRoom.entertainment.js",
+	"Backward"		: "/inputHub/controllers/controller.livingRoom.fireplace.js",
+	"Stop/Start"	: "/inputHub/controllers/controller.livingRoom.covers.js",
+	"Forward"		: "/inputHub/controllers/controller.livingRoom.entertainment.js"
 };
 
 exports.tasks = {
 		//Keep FireTV awake	
 		"Ping"  : [
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "POWER"}}
+			{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "WAKEUP"}}
 		],
 		
 		//Wake Up	
