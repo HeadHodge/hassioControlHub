@@ -37,8 +37,8 @@ debug.log(`Enter onSelectTask with ${command} in zone: ${zone}`);
 var task;
 
 	_zones[zone].isTaskSet = null;
-	if(!_zones[zone].tasks[_zones[zone].focus][command]) return;
-	global.onOutput(JSON.stringify(_zones[zone].tasks[_zones[zone].focus][command]), reply);
+	if(!_zones[zone].tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
+	global.onOutput(JSON.stringify(_zones[zone].tasks[command]), reply);
 };
 
 //##########################################
@@ -93,7 +93,7 @@ _zones[input.zone] = require(`/controlHub/zones/zone.${input.zone}.js`);
 	
 	if(_zones[input.zone].isFocusSet && input.command == 'Off/On'){input.command = 'Open'; _zones[input.zone].isFocusSet = null;};
 	if(_zones[input.zone].isFocusSet) return onSelectFocus(input.zone, input.command);
-	if(_zones[input.zone].isTaskSet) return onSelectTask(input.zone, input.command, reply);
+	if(_zones[input.zone].isTaskSet || input.command == 'Ping') return onSelectTask(input.zone, input.command, reply);
 		
 	if(input.command == 'Focus') {_zones[input.zone].isFocusSet = true; return console.log(`Set Focus Flag`);}
 

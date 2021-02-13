@@ -3,7 +3,7 @@
 #############################################
 import paho.mqtt.client as mqtt
 import websocket
-import sys, time, json, _thread as thread
+import sys, time, json, threading, _thread as thread
 from evdev import InputDevice, categorize, ecodes
 
 if len(sys.argv) < 3: 
@@ -61,9 +61,9 @@ def getCommand(inputChar, inputCode):
     except Exception as e:
         print(e)
         return(inputChar)
-      
+          
 ###################
-def captureInput(client, channelNum):
+def captureInput(connection, channelNum):
 ###################
     print("Enter captureInput on channel:"+channelNum)
     
@@ -83,89 +83,62 @@ def captureInput(client, channelNum):
         lastTime = time.time()
         
         command = getCommand(inputEvent.keycode, inputEvent.scancode)
+        
         print(f'Send command from channel: {channelNum}, command: {command}, zone: {zone}')
-        #ws.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
-        payload = '{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}'
-        #client.publish("remoteInput", payload)
-        client.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
+        connection.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
 
     return
-
-# The callback for when a PUBLISH message is received from the server.
+      
 ###################
-def on_message(client, userdata, msg):
+def pingConnection(connection):
 ###################
-    #print(f'Recieved topic: {msg.topic}, payload: {msg.payload}')
-    payload = json.loads(msg.payload)
-    print(f'Recieved topic: {msg.topic}, payload: {payload}')
+    print("Enter pingConnection")
 
-# The callback for when the client receives a CONNACK response from the server.
-###################
-def on_connect(client, userdata, flags, rc):
-###################
-    print("Connected with result code "+str(rc))
-
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    for channel in channels:
-        thread.start_new_thread(captureInput, (client, channel))
-
-    client.subscribe("controlInput", 0)
-
+    time.sleep(60)
+    connection.send('{' + f'"type": "command", "command": "Ping", "zone": "{zone}"' + '}')
+    pingConnection(connection)
+    
 ###################
 # onMessage
 ###################
-def onMessage(ws, message):
+def onMessage(connection, message):
     print("Enter onMessage, received: ", message)
 
 ###################
 # onError
 ###################
-def onError(ws, error):
+def onError(connection, error):
     print(f"Enter onError: ", error)
     sys.exit(1)
 
 ###################
 # onClose
 ###################
-def onClose(ws):
+def onClose(connection):
     print("Enter onClose")
-         
          
 ###################
 # onOpen
 ###################
-def onOpen(ws):
+def onOpen(connection):
     print("Enter onOpen USB Input")
-
+    
     for channel in channels:
-        thread.start_new_thread(captureInput, (ws, channel))
+        thread.start_new_thread(captureInput, (connection, channel))
+
+    thread.start_new_thread(pingConnection, (connection,))
 	
 #############################################
 ##                MAIN
 ##Open server to listen for control input
 #############################################
 print('Started mqttClient.py')
-
-#client = mqtt.Client()
-#client.on_connect = on_connect
-#client.on_message = on_message
-#client.username_pw_set('admin', password='pepper')
-#client.connect("192.168.0.160", 1883)
-
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-#client.loop_forever()
-
-
 websocket.enableTrace(True)
 
-_ws = websocket.WebSocketApp("ws://192.168.0.164:8080",
+_webSocket = websocket.WebSocketApp("ws://192.168.0.164:8080",
     on_message = onMessage,
     on_error = onError,
     on_close = onClose,
     on_open = onOpen) 
 
-_ws.run_forever()
+_webSocket.run_forever()

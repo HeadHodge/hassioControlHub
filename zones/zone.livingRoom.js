@@ -17,7 +17,11 @@ exports.controllers = {
 };
 
 exports.tasks = {
-	"Up": {
+		//Keep FireTV awake	
+		"Ping"  : [
+			{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "POWER"}}
+		],
+		
 		//Wake Up	
 		"Left"  : [
 			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}, //Turn TV On
@@ -43,7 +47,6 @@ exports.tasks = {
 		//Night	
 		"Down"  : [
 		]
-	}
 };
 
 ////////////////////////////////////////////

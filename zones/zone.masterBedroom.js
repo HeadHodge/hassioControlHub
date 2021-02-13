@@ -17,7 +17,11 @@ exports.controllers = {
 };
 
 exports.tasks = {
-	"Up": {
+		//Keep FireTV awake	
+		"Ping"  : [
+			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}
+		],
+		
 		//Wake Up	
 		"Left"  : [
 			{"cover/open_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
@@ -31,7 +35,6 @@ exports.tasks = {
 			{"sleep": 5},
 			{"cover/stop_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
 			{"cover/stop_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}}
-   
 		],
 	
 		//Morning	
@@ -62,23 +65,23 @@ exports.tasks = {
 			{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.25}}
 		],
 	
-	//Night	
+		//Night	
 		"Down"  : [
-		//Turn TV On
+			//Turn TV On
 			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
 			{"sleep": 5},
 			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
 
-		//Turn Sound On
+			//Turn Sound On
 			{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
 			{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
 			{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
 			{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.45}},
 
-		//Turn Fireplace On
+			//Turn Fireplace On
 			{"input_select/select_option": {"entity_id": "input_select.masterbedroom_fireplace_duration", "option": "90 Minutes"}},
 
-		//Close Shades
+			//Close Shades
 			{"cover/close_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
 			{"cover/close_cover": {"entity_id": "cover.somfy_unknown_type_5a52_id_5401_level"}},
 			{"sleep": 10},
@@ -91,7 +94,6 @@ exports.tasks = {
 			{"sleep": 30},
 			{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}}
  		]
-	}
 };
 
 ////////////////////////////////////////////
