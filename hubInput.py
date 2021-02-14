@@ -94,7 +94,7 @@ def pingConnection(connection):
 ###################
     print("Enter pingConnection")
 
-    time.sleep(60)
+    time.sleep(300)
     connection.send('{' + f'"type": "command", "command": "Ping", "zone": "{zone}"' + '}')
     pingConnection(connection)
     

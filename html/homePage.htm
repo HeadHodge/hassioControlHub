@@ -49,7 +49,7 @@ var _intervalTimer;
 		_intervalTimer = setInterval(function(){
 			console.log("****PING****");
 			_socket.send(`{"type": "command", "command": "Ping", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
-		}, 6000);
+		}, 300000);
 		
 	};
 	
