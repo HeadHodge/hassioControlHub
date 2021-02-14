@@ -12,11 +12,13 @@
 //### Via the RESTful Integration API
 //##############################################
 
-/////////////////////////// BEGIN PRIVATE NAMESPACE //////////////////////	
+/////////////////////////// BEGIN PRIVATE NAMESPACE //////////////////////
+/*
 webRemote = {
 	case: {},
 	map: {}
 }; //Create Namespace;
+*/
 
 webRemote = (function($case, $map){ //invoke anonymous self executing function
 
@@ -33,6 +35,7 @@ var _socket, _isConnected;
 //################
 function openConnection(callBack) {
 console.log("Enter openConnection");
+var _intervalTimer;
 
 	if(_isConnected) return;
 	
@@ -42,6 +45,12 @@ console.log("Enter openConnection");
 		console.log("****Server Connected****");
 		_isConnected = true;
 		if(callBack) callBack();
+		
+		_intervalTimer = setInterval(function(){
+			console.log("****PING****");
+			_socket.send(`{"type": "command", "command": "Ping", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
+		}, 6000);
+		
 	};
 	
 	_socket.onmessage = function(event) {
@@ -369,7 +378,7 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 	});
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	
-})(webRemote.case, webRemote.map);
+})();
 </script>
 </head>
 </html>
