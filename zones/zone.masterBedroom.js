@@ -19,7 +19,7 @@ exports.controllers = {
 exports.tasks = {
 		//Keep FireTV awake	
 		"Ping"  : [
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}}
+			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "WAKEUP"}}
 		],
 		
 		//Wake Up	
@@ -40,7 +40,7 @@ exports.tasks = {
 		//Morning	
 		"Up"  : [
 			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
+			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "WAKEUP"}},
 			{"sleep": 3},
 			{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
 	
@@ -70,7 +70,7 @@ exports.tasks = {
 			//Turn TV On
 			{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
 			{"sleep": 5},
-			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "POWER"}},
+			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "WAKEUP"}},
 
 			//Turn Sound On
 			{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},

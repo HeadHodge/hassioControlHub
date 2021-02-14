@@ -85,7 +85,7 @@ def captureInput(connection, channelNum):
         command = getCommand(inputEvent.keycode, inputEvent.scancode)
         
         print(f'Send command from channel: {channelNum}, command: {command}, zone: {zone}')
-        connection.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}"' + '}')
+        connection.send('{' + f'"type": "command", "command": "{command}", "zone": "{zone}", "device": "usb remote"' + '}')
 
     return
       
@@ -95,7 +95,7 @@ def pingConnection(connection):
     print("Enter pingConnection")
 
     time.sleep(300)
-    connection.send('{' + f'"type": "command", "command": "Ping", "zone": "{zone}"' + '}')
+    connection.send('{' + f'"type": "command", "command": "Ping", "zone": "{zone}", "device": "usb remote"' + '}')
     pingConnection(connection)
     
 ###################

@@ -48,7 +48,7 @@ var _intervalTimer;
 		
 		_intervalTimer = setInterval(function(){
 			console.log("****PING****");
-			_socket.send(`{"type": "command", "command": "Ping", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
+			_socket.send(`{"type": "command", "command": "Ping", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`", "device": "webBrowser"}`);
 		}, 300000);
 		
 	};
@@ -77,7 +77,7 @@ console.log(`Enter sendCommand, command: ${command}`);
 
 	if(!_isConnected) return;
 	
-	_socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`"}`);
+	_socket.send(`{"type": "command", "command": "${command}", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`", "device": "webBrowser"}`);
 };
 
 //################
