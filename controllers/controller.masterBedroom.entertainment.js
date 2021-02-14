@@ -1,7 +1,7 @@
 const debug = require('/inputHub/core/debugLog.js').debug;
 const eventNum = 4;
 
-adbEvents = {
+const adbEvents = {
 	"Home"		: `sendevent /dev/input/event${eventNum} 4 4 786979 && sendevent /dev/input/event${eventNum} 1 172 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 786979 && sendevent /dev/input/event${eventNum} 1 172 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
 	"Menu"		: `sendevent /dev/input/event${eventNum} 4 4 786496 && sendevent /dev/input/event${eventNum} 1 139 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 786496 && sendevent /dev/input/event${eventNum} 1 139 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
 	"Exit"		: `sendevent /dev/input/event${eventNum} 4 4 458993 && sendevent /dev/input/event${eventNum} 1 158 1 && sendevent /dev/input/event${eventNum} 0 0 0 && sendevent /dev/input/event${eventNum} 4 4 458993 && sendevent /dev/input/event${eventNum} 1 158 0 && sendevent /dev/input/event${eventNum} 0 0 0`,
@@ -94,13 +94,13 @@ exports.tasks = {
 	],
 	
 	"Open": [
-	//Turn on TV
+		//Turn on TV
 		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "WAKEUP"}},
-	    {"sleep": 2},
+		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "WAKEUP"}},
+	    {"sleep": 3},
 		{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
 
-	//Turn on Sound
+		//Turn on Sound
 		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
 		{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
@@ -108,13 +108,14 @@ exports.tasks = {
 	],
 		
 	"Off/On": [
-	//Turn off TV
-		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "HOME"}},
-	    {"sleep": 1},
+		//Turn off TV
+		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "HOME"}},
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}},
+	    {"sleep": 3},
 		{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-	    {"sleep": 2},
+	    //{"sleep": 2},
 
-	//Turn on Sleep Timer with Music
+		//Turn on Sleep Timer with Music
 		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
 		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.18}},

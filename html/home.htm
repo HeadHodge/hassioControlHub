@@ -39,24 +39,28 @@ var _intervalTimer;
 
 	if(_isConnected) return;
 	
+	//### new WebSocket ###
 	_socket = new WebSocket("ws://192.168.0.164:8080");
 	
+	//### onopen ###
 	_socket.onopen = function(event) {
 		console.log("****Server Connected****");
 		_isConnected = true;
 		if(callBack) callBack();
 		
 		_intervalTimer = setInterval(function(){
-			console.log("****PING****");
-			_socket.send(`{"type": "command", "command": "Ping", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`", "device": "webBrowser"}`);
+			console.log("****Check Connection****");
+			_socket.send(`{"type": "command", "command": "Echo", "id": "webClient", "zone": "`+_zone.getAttribute('value')+`", "device": "webBrowser"}`);
 		}, 300000);
 		
 	};
 	
+	//### onmessage ###
 	_socket.onmessage = function(event) {
-		alert(`[message] Data received from server: ${event.data}`);
+		console.log(`Message from server: ${event.data}`);
 	};
 	
+	//### onclose ###
 	_socket.onclose = function(event) {
 		console.log("****Server Closed****");
 		_socket = null;
@@ -64,6 +68,7 @@ var _intervalTimer;
 		openConnection();
 	};
 
+	//### onerror ###
 	_socket.onerror = function(error) {
 		console.log(`****Server Error: ${error.message}****`);
 	};

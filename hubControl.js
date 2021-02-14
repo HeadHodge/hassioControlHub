@@ -25,7 +25,7 @@ var controller, task;
 	
 	if(!controller.tasks[command]) return console.log(`Abort: Invalid command: ${command}`);
 	
-	console.log(`Run Task: ${JSON.stringify(controller.tasks[command])}`);
+	debug.log(`output task: ${JSON.stringify(controller.tasks[command])}`);
 	global.onOutput(JSON.stringify(controller.tasks[command]), reply);
 };
 
@@ -88,6 +88,7 @@ try {
 debug.log(`Enter onInput, command: ${input.command}, zone: ${input.zone}`);
 _zones[input.zone] = require(`/inputHub/zones/zone.${input.zone}.js`);
 
+	if(input.command == 'Echo') return reply('Echo');
 	if(input.command == 'Set') input.command = 'Off/On';
 	
 	if(_zones[input.zone].isFocusSet && input.command == 'Off/On'){input.command = 'Open'; _zones[input.zone].isFocusSet = null;};

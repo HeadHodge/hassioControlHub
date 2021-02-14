@@ -90,13 +90,13 @@ def captureInput(connection, channelNum):
     return
       
 ###################
-def pingConnection(connection):
+def checkConnection(connection):
 ###################
-    print("Enter pingConnection")
+    print("Enter checkConnection")
 
     time.sleep(300)
     connection.send('{' + f'"type": "command", "command": "Ping", "zone": "{zone}", "device": "usb remote"' + '}')
-    pingConnection(connection)
+    checkConnection(connection)
     
 ###################
 # onMessage
@@ -126,7 +126,7 @@ def onOpen(connection):
     for channel in channels:
         thread.start_new_thread(captureInput, (connection, channel))
 
-    thread.start_new_thread(pingConnection, (connection,))
+    thread.start_new_thread(checkConnection, (connection,))
 	
 #############################################
 ##                MAIN
