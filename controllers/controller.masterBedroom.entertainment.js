@@ -97,8 +97,9 @@ exports.tasks = {
 		//Turn on TV
 		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
 		//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "WAKEUP"}},
-	    {"sleep": 3},
-		{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
+	    //{"sleep": 3},
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 3"}},
+		//{"media_player/select_source": {"entity_id": "media_player.firetv_masterbedroom", "source": "com.att.tv"}},
 
 		//Turn on Sound
 		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
