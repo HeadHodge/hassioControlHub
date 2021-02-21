@@ -81,14 +81,16 @@ exports.tasks = {
 	
 		//Daytime	
 		"Right"  : [
+			//Turn TV Off
 			//{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "HOME"}},
 			{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}},
-			{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
 			{"sleep": 3},
+			{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
 
+			//Turn Music On
 			{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
 			{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
-			{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.25}}
+			{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.3}}
 		],
 	
 		//Night	

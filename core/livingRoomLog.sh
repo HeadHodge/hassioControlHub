@@ -1,3 +1,3 @@
 clear
 echo $1
-journalctl -f -u controlHub.masterBedroom
+journalctl -f -u controlHub.livingRoom
