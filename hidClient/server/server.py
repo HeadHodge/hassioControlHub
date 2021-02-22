@@ -57,6 +57,9 @@ class BTKbDevice():
         # setup profile options
         service_record = self.read_sdp_service_record()
         opts = {
+            'Role': 'server',
+            'RequireAuthentication': False,
+            'RequireAuthorization': False,
             "AutoConnect": True,
             "ServiceRecord": service_record
         }

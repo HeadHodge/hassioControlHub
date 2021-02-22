@@ -7,16 +7,11 @@ http://yetanotherpointlesstechblog.blogspot.com/2016/04/emulating-bluetooth-keyb
 
 Moved to Python 3 and tested with BlueZ 5.43
 """
-import os
-import sys
-import dbus
-import dbus.service
-import socket
-
+import os, sys, time, json, threading
+import dbus, dbus.service, socket
 
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
-
 
 class HumanInterfaceDeviceProfile(dbus.service.Object):
     """
@@ -77,6 +72,11 @@ class BTKbDevice:
     UUID = '00001124-0000-1000-8000-00805f9b34fb'
 
     def __init__(self, hci=0):
+        print("3. Configuring Device name " + BTKbDevice.MY_DEV_NAME)
+        # set the device class to a keybord and set the name
+        os.system("hciconfig hci0 up")
+        os.system("hciconfig hci0 class 0x0005C0")
+
         self.scontrol = None
         self.ccontrol = None  # Socket object for control
         self.sinterrupt = None
@@ -252,8 +252,17 @@ class BTKbDevice:
         Send HID message
         :param msg: (bytes) HID packet to send
         """
-        self.cinterrupt.send(bytes(bytearray(msg)))
+        print('Send Message: ', msg)
+        #self.cinterrupt.send(bytes(bytearray(msg)))
 
+    # send a string to the bluetooth host machine
+    def send_string(self, message):
+        try:
+            print('Send Message: ', message)
+            self.cinterrupt.send(bytes(message))
+        except OSError as err:
+            print('Send Error: ', error(err))
+            error(err)
 
 class BTKbService(dbus.service.Object):
     """
@@ -274,18 +283,72 @@ class BTKbService(dbus.service.Object):
         # start listening for socket connections
         self.device.listen()
 
-    @dbus.service.method('org.yaptb.btkbservice',
-                         in_signature='ay')
-    def send_keys(self, cmd):
-        self.device.send(cmd)
+    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
+    def send_keys(self, modifier_byte, keys):
+        print("Get send_keys request through dbus")
+        print("key msg: ", keys)
+        state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        state[2] = int(modifier_byte)
+        count = 4
+        for key_code in keys:
+            if(count < 10):
+                state[count] = int(key_code)
+            count += 1
+        self.device.send_string(state)
 
+    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
+    def send_mouse(self, modifier_byte, keys):
+        state = [0xA1, 2, 0, 0, 0, 0]
+        count = 2
+        for key_code in keys:
+            if(count < 6):
+                state[count] = int(key_code)
+            count += 1
+        self.device.send_string(state)
 
+    def send_message(self, msg):
+        """
+        Send HID message
+        :param msg: (bytes) HID packet to send
+        """
+        print('Send Message: ', msg)
+
+class test():
+    """
+    COMMENTS
+    """
+    import keymap
+    KEY_DOWN_TIME = 0.01
+    KEY_DELAY = 0.01
+    
+    def __init__(self, xService):
+        print('****Enter test****')
+        time.sleep(10)
+        print('****Send String****')
+        xService.send_message('Hello World')
+        
+        string_to_send = 'Hello World'
+        
+        for c in string_to_send:
+            cu = c.upper()
+            scantablekey = "KEY_"+c.upper()
+            scancode = self.keymap.keytable[scantablekey]
+            print(scancode)
+            xService.send_keys(0, [scancode])
+            time.sleep(self.KEY_DOWN_TIME)
+            xService.send_keys(0, [0])
+            time.sleep(self.KEY_DELAY)
+
+        
 if __name__ == '__main__':
     # The sockets require root permission
     if not os.geteuid() == 0:
         sys.exit('Only root can run this script')
 
+    #thread.start_new_thread(checkConnection)
+
     DBusGMainLoop(set_as_default=True)
     myservice = BTKbService()
+    threading.Thread(target=test, args=(myservice,)).start()
     mainloop = GLib.MainLoop()
     mainloop.run()

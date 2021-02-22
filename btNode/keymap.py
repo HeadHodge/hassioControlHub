@@ -14,6 +14,8 @@
 
 keytable = {
     "KEY_RESERVED" : 0,
+    "KEY_"+chr(0x03) : 3,
+    "KEY_"+chr(0x14) : 20,
     "KEY_ESC" : 41,
     "KEY_1" : 30,
     "KEY_2" : 31,
@@ -70,6 +72,7 @@ keytable = {
     "KEY_RIGHTSHIFT" : 229,
     "KEY_KPASTERISK" : 85,
     "KEY_LEFTALT" : 226,
+    "KEY_ " : 44,
     "KEY_SPACE" : 44,
     "KEY_CAPSLOCK" : 57,
     "KEY_F1" : 58,
