@@ -13,7 +13,8 @@ import dbus, dbus.service, socket
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
 
-class HumanInterfaceDeviceProfile(dbus.service.Object):
+class btProfile(dbus.service.Object):
+    print('Load hidProfile')
     """
     BlueZ D-Bus Profile for HID
     """
@@ -47,7 +48,9 @@ class HumanInterfaceDeviceProfile(dbus.service.Object):
                     self.fd = -1
 
 
-class BTKbDevice:
+class btDevice:
+    print("Load hidDevice")
+    
     """
     create a bluetooth device to emulate a HID keyboard
     """
@@ -65,14 +68,12 @@ class BTKbDevice:
 
     # file path of the sdp record to laod
     install_dir  = os.path.dirname(os.path.realpath(__file__))
-    SDP_RECORD_PATH = os.path.join(install_dir,
-                                   'sdp_record.xml')
+    SDP_RECORD_PATH = os.path.join(install_dir, 'sdp_record.xml')
     # UUID for HID service (1124)
     # https://www.bluetooth.com/specifications/assigned-numbers/service-discovery
     UUID = '00001124-0000-1000-8000-00805f9b34fb'
 
     def __init__(self, hci=0):
-        print("3. Configuring Device name " + BTKbDevice.MY_DEV_NAME)
         # set the device class to a keybord and set the name
         os.system("hciconfig hci0 up")
         os.system("hciconfig hci0 class 0x000540")
@@ -103,7 +104,7 @@ class BTKbDevice:
                                      arg0=self.DEVICE_INTERFACE,
                                      path_keyword='path')
 
-        print('Configuring for name {}'.format(BTKbDevice.MY_DEV_NAME))
+        print('Configuring for name {}'.format(self.MY_DEV_NAME))
 
         self.config_hid_profile()
 
@@ -206,15 +207,15 @@ class BTKbDevice:
 
         print('Profile registered ')
 
-    @staticmethod
-    def read_sdp_service_record():
+    #@staticmethod
+    def read_sdp_service_record(self):
         """
         Read and return SDP record from a file
         :return: (string) SDP record
         """
         print('Reading service record')
         try:
-            fh = open(BTKbDevice.SDP_RECORD_PATH, 'r')
+            fh = open(self.SDP_RECORD_PATH, 'r')
         except OSError:
             sys.exit('Could not open the sdp record. Exiting...')
 
@@ -264,91 +265,25 @@ class BTKbDevice:
             print('Send Error: ', error(err))
             error(err)
 
-class BTKbService(dbus.service.Object):
-    """
-    Setup of a D-Bus service to recieve HID messages from other
-    processes.
-    Send the recieved HID messages to the Bluetooth HID server to send
-    """
-    def __init__(self):
-        print('Setting up service')
-
-        bus_name = dbus.service.BusName('org.yaptb.btkbservice',
-                                        bus=dbus.SystemBus())
-        dbus.service.Object.__init__(self, bus_name, '/org/yaptb/btkbservice')
-
-        # create and setup our device
-        self.device = BTKbDevice()
-
-        # start listening for socket connections
-        self.device.listen()
-
-    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
-    def send_keys(self, modifier_byte, keys):
-        print("Get send_keys request through dbus")
-        print("key msg: ", keys)
-        state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        state[2] = int(modifier_byte)
-        count = 4
-        for key_code in keys:
-            if(count < 10):
-                state[count] = int(key_code)
-            count += 1
-        self.device.send_string(state)
-
-    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
-    def send_mouse(self, modifier_byte, keys):
-        state = [0xA1, 2, 0, 0, 0, 0]
-        count = 2
-        for key_code in keys:
-            if(count < 6):
-                state[count] = int(key_code)
-            count += 1
-        self.device.send_string(state)
-
-    def send_message(self, msg):
-        """
-        Send HID message
-        :param msg: (bytes) HID packet to send
-        """
-        print('Send Message: ', msg)
-
-class test():
-    """
-    COMMENTS
-    """
-    import keymap
-    KEY_DOWN_TIME = 0.01
-    KEY_DELAY = 0.01
+        
+class btKeyboard:
+    print("Loading hidKeyboard")
     
-    def __init__(self, xService):
-        print('****Enter test****')
-        time.sleep(10)
-        print('****Send String****')
-        xService.send_message('Hello World')
-        
-        string_to_send = 'Hello World'
-        
-        for c in string_to_send:
-            cu = c.upper()
-            scantablekey = "KEY_"+c.upper()
-            scancode = self.keymap.keytable[scantablekey]
-            print(scancode)
-            xService.send_keys(0, [scancode])
-            time.sleep(self.KEY_DOWN_TIME)
-            xService.send_keys(0, [0])
-            time.sleep(self.KEY_DELAY)
+    """
+    create a bluetooth device to emulate a HID keyboard
+    """
 
-        
-if __name__ == '__main__':
     # The sockets require root permission
     if not os.geteuid() == 0:
         sys.exit('Only root can run this script')
 
-    #thread.start_new_thread(checkConnection)
-
     DBusGMainLoop(set_as_default=True)
-    myservice = BTKbService()
-    threading.Thread(target=test, args=(myservice,)).start()
+
+    # create and setup our device
+    self.device = btDevice()
+
+    # start listening for socket connections
+    self.device.listen()
+
     mainloop = GLib.MainLoop()
     mainloop.run()
