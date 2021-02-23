@@ -20,8 +20,7 @@ class btProfile(dbus.service.Object):
     """
     fd = -1
 
-    @dbus.service.method('org.bluez.Profile1',
-                         in_signature='', out_signature='')
+    @dbus.service.method('org.bluez.Profile1', in_signature='', out_signature='')
     def Release(self):
             print('Release')
             mainloop.quit()
@@ -109,7 +108,7 @@ class btDevice:
         self.config_hid_profile()
 
         # set the Bluetooth device configuration
-        self.alias = BTKbDevice.MY_DEV_NAME
+        self.alias = self.MY_DEV_NAME
         self.discoverabletimeout = 0
         self.discoverable = True
 
@@ -196,13 +195,12 @@ class btDevice:
 
         manager = dbus.Interface(self.bus.get_object('org.bluez',
                                                      '/org/bluez'),
-                                 'org.bluez.ProfileManager1')
+                                                     'org.bluez.ProfileManager1')
 
-        HumanInterfaceDeviceProfile(self.bus,
-                                    BTKbDevice.PROFILE_DBUS_PATH)
+        btProfile(self.bus, self.PROFILE_DBUS_PATH)
 
-        manager.RegisterProfile(BTKbDevice.PROFILE_DBUS_PATH,
-                                BTKbDevice.UUID,
+        manager.RegisterProfile(self.PROFILE_DBUS_PATH,
+                                self.UUID,
                                 opts)
 
         print('Profile registered ')
@@ -280,10 +278,10 @@ class btKeyboard:
     DBusGMainLoop(set_as_default=True)
 
     # create and setup our device
-    self.device = btDevice()
+    device = btDevice()
 
     # start listening for socket connections
-    self.device.listen()
+    device.listen()
 
     mainloop = GLib.MainLoop()
     mainloop.run()
