@@ -38,6 +38,7 @@ class btAPI:
     """
     DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
     ADAPTER_IFACE = 'org.bluez.Adapter1'
+    UUID = '00001124-0000-1000-8000-00805f9b34fb'
 
     def __init__(self):
         print("Start btAPI")
