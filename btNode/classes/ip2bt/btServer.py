@@ -8,11 +8,7 @@ http://yetanotherpointlesstechblog.blogspot.com/2016/04/emulating-bluetooth-keyb
 Moved to Python 3 and tested with BlueZ 5.43
 """
 import os, sys, time, json, socket
-#import dbus, dbus.service, socket
-
 from gi.repository import GLib
-#from dbus.mainloop.glib import DBusGMainLoop
-
 
 class btServer:
     """
@@ -24,10 +20,13 @@ class btServer:
     def __init__(self):
         print("Starting Bluetooth Server")
 
+        # Socket server & client objects for hid control
         self.scontrol = None
-        self.ccontrol = None  # Socket object for control
+        self.ccontrol = None
+        
+        # Socket server & client object for hid interrupt
         self.sinterrupt = None
-        self.cinterrupt = None  # Socket object for interrupt
+        self.cinterrupt = None
 
         print('Start Server')
         self.listen()
@@ -44,24 +43,25 @@ class btServer:
         """
 
         print('Waiting for connections')
-        self.scontrol = socket.socket(socket.AF_BLUETOOTH,
-                                      socket.SOCK_SEQPACKET,
-                                      socket.BTPROTO_L2CAP)
+        self.scontrol = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
         self.scontrol.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sinterrupt = socket.socket(socket.AF_BLUETOOTH,
-                                        socket.SOCK_SEQPACKET,
-                                        socket.BTPROTO_L2CAP)
+        
+        self.sinterrupt = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
         self.sinterrupt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        
         self.scontrol.bind((self.address, self.P_CTRL))
         self.sinterrupt.bind((self.address, self.P_INTR))
 
         # Start listening on the server sockets
-        self.scontrol.listen(1)  # Limit of 1 connection
+        # Limit of 1 connection
+        self.scontrol.listen(1)
         self.sinterrupt.listen(1)
 
+        # Block until connected
         self.ccontrol, cinfo = self.scontrol.accept()
         print('{} connected on the control socket'.format(cinfo[0]))
 
+        # Block until connected
         self.cinterrupt, cinfo = self.sinterrupt.accept()
         print('{} connected on the interrupt channel'.format(cinfo[0]))
 
