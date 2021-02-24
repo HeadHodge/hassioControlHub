@@ -13,14 +13,14 @@ import dbus, dbus.service, socket
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
 
-class HumanInterfaceDeviceProfile(dbus.service.Object):
+class btProfile(dbus.service.Object):
+    print('Load hidProfile')
     """
     BlueZ D-Bus Profile for HID
     """
     fd = -1
 
-    @dbus.service.method('org.bluez.Profile1',
-                         in_signature='', out_signature='')
+    @dbus.service.method('org.bluez.Profile1', in_signature='', out_signature='')
     def Release(self):
             print('Release')
             mainloop.quit()
@@ -47,11 +47,13 @@ class HumanInterfaceDeviceProfile(dbus.service.Object):
                     self.fd = -1
 
 
-class BTKbDevice:
+class btDevice:
+    print("Load hidDevice")
+    
     """
     create a bluetooth device to emulate a HID keyboard
     """
-    MY_DEV_NAME = 'X_Keyboard'
+    MY_DEV_NAME = 'smartKeypads'
     # Service port - must match port configured in SDP record
     P_CTRL = 17
     # Service port - must match port configured in SDP record#Interrrupt port
@@ -65,14 +67,12 @@ class BTKbDevice:
 
     # file path of the sdp record to laod
     install_dir  = os.path.dirname(os.path.realpath(__file__))
-    SDP_RECORD_PATH = os.path.join(install_dir,
-                                   'btProfile.xml')
+    SDP_RECORD_PATH = os.path.join(install_dir, 'sdp_record.xml')
     # UUID for HID service (1124)
     # https://www.bluetooth.com/specifications/assigned-numbers/service-discovery
     UUID = '00001124-0000-1000-8000-00805f9b34fb'
 
     def __init__(self, hci=0):
-        print("3. Configuring Device name " + BTKbDevice.MY_DEV_NAME)
         # set the device class to a keybord and set the name
         os.system("hciconfig hci0 up")
         os.system("hciconfig hci0 class 0x000540")
@@ -103,16 +103,16 @@ class BTKbDevice:
                                      arg0=self.DEVICE_INTERFACE,
                                      path_keyword='path')
 
-        print('Configuring for name {}'.format(BTKbDevice.MY_DEV_NAME))
+        print('Configuring for name {}'.format(self.MY_DEV_NAME))
 
         self.config_hid_profile()
 
         # set the Bluetooth device configuration
-        self.alias = BTKbDevice.MY_DEV_NAME
+        self.alias = self.MY_DEV_NAME
         self.discoverabletimeout = 0
         self.discoverable = True
 
-    def interfaces_added(self, parm1, parm2):
+    def interfaces_added(self):
         pass
 
     def _properties_changed(self, interface, changed, invalidated, path):
@@ -123,7 +123,7 @@ class BTKbDevice:
 
     def on_disconnect(self):
         print('The client has been disconnect')
-        #self.listen()
+        self.listen()
 
     @property
     def address(self):
@@ -195,25 +195,25 @@ class BTKbDevice:
 
         manager = dbus.Interface(self.bus.get_object('org.bluez',
                                                      '/org/bluez'),
-                                 'org.bluez.ProfileManager1')
+                                                     'org.bluez.ProfileManager1')
 
-        #HumanInterfaceDeviceProfile(self.bus, BTKbDevice.PROFILE_DBUS_PATH)
+        btProfile(self.bus, self.PROFILE_DBUS_PATH)
 
-        manager.RegisterProfile(BTKbDevice.PROFILE_DBUS_PATH,
-                                BTKbDevice.UUID,
+        manager.RegisterProfile(self.PROFILE_DBUS_PATH,
+                                self.UUID,
                                 opts)
 
         print('Profile registered ')
 
-    @staticmethod
-    def read_sdp_service_record():
+    #@staticmethod
+    def read_sdp_service_record(self):
         """
         Read and return SDP record from a file
         :return: (string) SDP record
         """
         print('Reading service record')
         try:
-            fh = open(BTKbDevice.SDP_RECORD_PATH, 'r')
+            fh = open(self.SDP_RECORD_PATH, 'r')
         except OSError:
             sys.exit('Could not open the sdp record. Exiting...')
 
@@ -246,34 +246,38 @@ class BTKbDevice:
         self.cinterrupt, cinfo = self.sinterrupt.accept()
         print('{} connected on the interrupt channel'.format(cinfo[0]))
 
-    def send(self, msg):
+    # send a string to the bluetooth host machine
+    def send_string(self, message):
         """
         Send HID message
         :param msg: (bytes) HID packet to send
         """
-        print('Send Message: ', msg)
-        #self.cinterrupt.send(bytes(bytearray(msg)))
-
-    # send a string to the bluetooth host machine
-    def send_string(self, message):
         try:
             print('Send Message: ', message)
-            self.cinterrupt.send(bytes(message))
-        except OSError as err:
-            print('Send Error: ', error(err))
-            error(err)
-
-    #DBusGMainLoop(set_as_default=True)
-
+            self.cinterrupt.send(bytes(message), 'UTF-8')
+        except:
+            print('send_string failed, Error: ', sys.exc_info()[0])
+            cinterrupt.close()
+            sinterrupt.close()
         
-if __name__ == '__main__':
+class btKeyboard:
+    print("Loading hidKeyboard")
+    
+    """
+    create a bluetooth device to emulate a HID keyboard
+    """
+
     # The sockets require root permission
     if not os.geteuid() == 0:
         sys.exit('Only root can run this script')
 
-    #thread.start_new_thread(checkConnection)
-
     DBusGMainLoop(set_as_default=True)
-    myservice = BTKbDevice()
+
+    # create and setup our device
+    device = btDevice()
+
+    # start listening for socket connections
+    device.listen()
+
     mainloop = GLib.MainLoop()
     mainloop.run()
