@@ -13,45 +13,12 @@ import dbus, dbus.service, socket
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
 
-class HumanInterfaceDeviceProfile(dbus.service.Object):
-    """
-    BlueZ D-Bus Profile for HID
-    """
-    fd = -1
 
-    @dbus.service.method('org.bluez.Profile1',
-                         in_signature='', out_signature='')
-    def Release(self):
-            print('Release')
-            mainloop.quit()
-
-    @dbus.service.method('org.bluez.Profile1',
-                         in_signature='oha{sv}', out_signature='')
-    def NewConnection(self, path, fd, properties):
-            self.fd = fd.take()
-            print('NewConnection({}, {})'.format(path, self.fd))
-            for key in properties.keys():
-                    if key == 'Version' or key == 'Features':
-                            print('  {} = 0x{:04x}'.format(key,
-                                                           properties[key]))
-                    else:
-                            print('  {} = {}'.format(key, properties[key]))
-
-    @dbus.service.method('org.bluez.Profile1',
-                         in_signature='o', out_signature='')
-    def RequestDisconnection(self, path):
-            print('RequestDisconnection {}'.format(path))
-
-            if self.fd > 0:
-                    os.close(self.fd)
-                    self.fd = -1
-
-
-class BTKbDevice:
+class btServer:
     """
     create a bluetooth device to emulate a HID keyboard
     """
-    MY_DEV_NAME = 'BT_HID_Keyboard'
+    MY_DEV_NAME = 'X_HID_Keyboard'
     # Service port - must match port configured in SDP record
     P_CTRL = 17
     # Service port - must match port configured in SDP record#Interrrupt port
@@ -72,10 +39,10 @@ class BTKbDevice:
     UUID = '00001124-0000-1000-8000-00805f9b34fb'
 
     def __init__(self, hci=0):
-        print("3. Configuring Device name " + BTKbDevice.MY_DEV_NAME)
+        print("3. Configuring Device name " + self.MY_DEV_NAME)
         # set the device class to a keybord and set the name
-        os.system("hciconfig hci0 up")
-        os.system("hciconfig hci0 class 0x000540")
+        #os.system("hciconfig hci0 up")
+        #os.system("hciconfig hci0 class 0x000540")
 
         self.scontrol = None
         self.ccontrol = None  # Socket object for control
@@ -83,16 +50,11 @@ class BTKbDevice:
         self.cinterrupt = None  # Socket object for interrupt
         self.dev_path = '/org/bluez/hci{}'.format(hci)
         print('Setting up BT device')
+        
+        """
         self.bus = dbus.SystemBus()
-        self.adapter_methods = dbus.Interface(
-            self.bus.get_object('org.bluez',
-                                self.dev_path),
-            self.ADAPTER_IFACE)
-        self.adapter_property = dbus.Interface(
-            self.bus.get_object('org.bluez',
-                                self.dev_path),
-            self.DBUS_PROP_IFACE)
-
+        self.adapter_methods = dbus.Interface(self.bus.get_object('org.bluez', self.dev_path), self.ADAPTER_IFACE)
+        self.adapter_property = dbus.Interface(self.bus.get_object('org.bluez', self.dev_path), self.DBUS_PROP_IFACE)
         self.bus.add_signal_receiver(self.interfaces_added,
                                      dbus_interface=self.DBUS_OM_IFACE,
                                      signal_name='InterfacesAdded')
@@ -102,15 +64,16 @@ class BTKbDevice:
                                      signal_name='PropertiesChanged',
                                      arg0=self.DEVICE_INTERFACE,
                                      path_keyword='path')
+        """
 
-        print('Configuring for name {}'.format(BTKbDevice.MY_DEV_NAME))
+        print('Configuring for name {}'.format(self.MY_DEV_NAME))
 
-        self.config_hid_profile()
+        #self.config_hid_profile()
 
         # set the Bluetooth device configuration
-        self.alias = BTKbDevice.MY_DEV_NAME
-        self.discoverabletimeout = 0
-        self.discoverable = True
+        #self.alias = BTKbDevice.MY_DEV_NAME
+        #self.discoverabletimeout = 0
+        #self.discoverable = True
 
     def interfaces_added(self):
         pass
@@ -128,6 +91,7 @@ class BTKbDevice:
     @property
     def address(self):
         """Return the adapter MAC address."""
+        return 'DC:A6:32:65:8A:AB'
         return self.adapter_property.Get(self.ADAPTER_IFACE,
                                          'Address')
 
@@ -197,10 +161,10 @@ class BTKbDevice:
                                                      '/org/bluez'),
                                  'org.bluez.ProfileManager1')
 
-        HumanInterfaceDeviceProfile(self.bus, BTKbDevice.PROFILE_DBUS_PATH)
+        #HumanInterfaceDeviceProfile(self.bus, BTKbDevice.PROFILE_DBUS_PATH)
 
-        manager.RegisterProfile(BTKbDevice.PROFILE_DBUS_PATH,
-                                BTKbDevice.UUID,
+        manager.RegisterProfile(self.PROFILE_DBUS_PATH,
+                                self.UUID,
                                 opts)
 
         print('Profile registered ')
@@ -213,7 +177,7 @@ class BTKbDevice:
         """
         print('Reading service record')
         try:
-            fh = open(BTKbDevice.SDP_RECORD_PATH, 'r')
+            fh = open(self.SDP_RECORD_PATH, 'r')
         except OSError:
             sys.exit('Could not open the sdp record. Exiting...')
 
@@ -262,82 +226,6 @@ class BTKbDevice:
         except OSError as err:
             print('Send Error: ', error(err))
             error(err)
-
-class BTKbService(dbus.service.Object):
-    """
-    Setup of a D-Bus service to recieve HID messages from other
-    processes.
-    Send the recieved HID messages to the Bluetooth HID server to send
-    """
-    def __init__(self):
-        print('Setting up service')
-
-        bus_name = dbus.service.BusName('org.yaptb.btkbservice',
-                                        bus=dbus.SystemBus())
-        dbus.service.Object.__init__(self, bus_name, '/org/yaptb/btkbservice')
-
-        # create and setup our device
-        self.device = BTKbDevice()
-
-        # start listening for socket connections
-        self.device.listen()
-
-    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
-    def send_keys(self, modifier_byte, keys):
-        print("Get send_keys request through dbus")
-        print("key msg: ", keys)
-        state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        state[2] = int(modifier_byte)
-        count = 4
-        for key_code in keys:
-            if(count < 10):
-                state[count] = int(key_code)
-            count += 1
-        self.device.send_string(state)
-
-    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
-    def send_mouse(self, modifier_byte, keys):
-        state = [0xA1, 2, 0, 0, 0, 0]
-        count = 2
-        for key_code in keys:
-            if(count < 6):
-                state[count] = int(key_code)
-            count += 1
-        self.device.send_string(state)
-
-    def send_message(self, msg):
-        """
-        Send HID message
-        :param msg: (bytes) HID packet to send
-        """
-        print('Send Message: ', msg)
-
-class test():
-    """
-    COMMENTS
-    """
-    import keymap
-    KEY_DOWN_TIME = 0.01
-    KEY_DELAY = 0.01
-    
-    def __init__(self, xService):
-        print('****Enter test****')
-        time.sleep(10)
-        print('****Send String****')
-        xService.send_message('Hello World')
-        
-        string_to_send = 'Hello World'
-        
-        for c in string_to_send:
-            cu = c.upper()
-            scantablekey = "KEY_"+c.upper()
-            scancode = self.keymap.keytable[scantablekey]
-            print(scancode)
-            xService.send_keys(0, [scancode])
-            time.sleep(self.KEY_DOWN_TIME)
-            xService.send_keys(0, [0])
-            time.sleep(self.KEY_DELAY)
-
         
 if __name__ == '__main__':
     # The sockets require root permission
@@ -346,8 +234,20 @@ if __name__ == '__main__':
 
     #thread.start_new_thread(checkConnection)
 
-    DBusGMainLoop(set_as_default=True)
-    myservice = BTKbService()
-    threading.Thread(target=test, args=(myservice,)).start()
+    #DBusGMainLoop(set_as_default=True)
+    # create and setup our device
+    device = btServer()
+
+    # start listening for socket connections
+    device.listen()
+    
+    time.sleep(10)
+    state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
+    device.send_string(state)
+    
+    time.sleep(.35)
+    state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
+    device.send_string(state)
+
     mainloop = GLib.MainLoop()
     mainloop.run()

@@ -280,7 +280,7 @@ class BTKbService(dbus.service.Object):
         self.device = BTKbDevice()
 
         # start listening for socket connections
-        self.device.listen()
+        #self.device.listen()
 
     @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
     def send_keys(self, modifier_byte, keys):
@@ -312,31 +312,6 @@ class BTKbService(dbus.service.Object):
         """
         print('Send Message: ', msg)
 
-class test():
-    """
-    COMMENTS
-    """
-    import keymap
-    KEY_DOWN_TIME = 0.01
-    KEY_DELAY = 0.01
-    
-    def __init__(self, xService):
-        print('****Enter test****')
-        time.sleep(10)
-        print('****Send String****')
-        xService.send_message('Hello World')
-        
-        string_to_send = 'Hello World'
-        
-        for c in string_to_send:
-            cu = c.upper()
-            scantablekey = "KEY_"+c.upper()
-            scancode = self.keymap.keytable[scantablekey]
-            print(scancode)
-            xService.send_keys(0, [scancode])
-            time.sleep(self.KEY_DOWN_TIME)
-            xService.send_keys(0, [0])
-            time.sleep(self.KEY_DELAY)
 
         
 if __name__ == '__main__':
@@ -348,6 +323,5 @@ if __name__ == '__main__':
 
     DBusGMainLoop(set_as_default=True)
     myservice = BTKbService()
-    threading.Thread(target=test, args=(myservice,)).start()
     mainloop = GLib.MainLoop()
     mainloop.run()

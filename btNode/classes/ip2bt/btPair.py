@@ -51,7 +51,7 @@ class BTKbDevice:
     """
     create a bluetooth device to emulate a HID keyboard
     """
-    MY_DEV_NAME = 'BT_HID_Keyboard'
+    MY_DEV_NAME = 'X_Keyboard'
     # Service port - must match port configured in SDP record
     P_CTRL = 17
     # Service port - must match port configured in SDP record#Interrrupt port
@@ -66,7 +66,7 @@ class BTKbDevice:
     # file path of the sdp record to laod
     install_dir  = os.path.dirname(os.path.realpath(__file__))
     SDP_RECORD_PATH = os.path.join(install_dir,
-                                   'sdp_record.xml')
+                                   'btProfile.xml')
     # UUID for HID service (1124)
     # https://www.bluetooth.com/specifications/assigned-numbers/service-discovery
     UUID = '00001124-0000-1000-8000-00805f9b34fb'
@@ -112,7 +112,7 @@ class BTKbDevice:
         self.discoverabletimeout = 0
         self.discoverable = True
 
-    def interfaces_added(self):
+    def interfaces_added(self, parm1, parm2):
         pass
 
     def _properties_changed(self, interface, changed, invalidated, path):
@@ -123,7 +123,7 @@ class BTKbDevice:
 
     def on_disconnect(self):
         print('The client has been disconnect')
-        self.listen()
+        #self.listen()
 
     @property
     def address(self):
@@ -197,7 +197,7 @@ class BTKbDevice:
                                                      '/org/bluez'),
                                  'org.bluez.ProfileManager1')
 
-        HumanInterfaceDeviceProfile(self.bus, BTKbDevice.PROFILE_DBUS_PATH)
+        #HumanInterfaceDeviceProfile(self.bus, BTKbDevice.PROFILE_DBUS_PATH)
 
         manager.RegisterProfile(BTKbDevice.PROFILE_DBUS_PATH,
                                 BTKbDevice.UUID,
@@ -263,80 +263,7 @@ class BTKbDevice:
             print('Send Error: ', error(err))
             error(err)
 
-class BTKbService(dbus.service.Object):
-    """
-    Setup of a D-Bus service to recieve HID messages from other
-    processes.
-    Send the recieved HID messages to the Bluetooth HID server to send
-    """
-    def __init__(self):
-        print('Setting up service')
-
-        bus_name = dbus.service.BusName('org.yaptb.btkbservice',
-                                        bus=dbus.SystemBus())
-        dbus.service.Object.__init__(self, bus_name, '/org/yaptb/btkbservice')
-
-        # create and setup our device
-        self.device = BTKbDevice()
-
-        # start listening for socket connections
-        self.device.listen()
-
-    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
-    def send_keys(self, modifier_byte, keys):
-        print("Get send_keys request through dbus")
-        print("key msg: ", keys)
-        state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        state[2] = int(modifier_byte)
-        count = 4
-        for key_code in keys:
-            if(count < 10):
-                state[count] = int(key_code)
-            count += 1
-        self.device.send_string(state)
-
-    @dbus.service.method('org.yaptb.btkbservice', in_signature='yay')
-    def send_mouse(self, modifier_byte, keys):
-        state = [0xA1, 2, 0, 0, 0, 0]
-        count = 2
-        for key_code in keys:
-            if(count < 6):
-                state[count] = int(key_code)
-            count += 1
-        self.device.send_string(state)
-
-    def send_message(self, msg):
-        """
-        Send HID message
-        :param msg: (bytes) HID packet to send
-        """
-        print('Send Message: ', msg)
-
-class test():
-    """
-    COMMENTS
-    """
-    import keymap
-    KEY_DOWN_TIME = 0.01
-    KEY_DELAY = 0.01
-    
-    def __init__(self, xService):
-        print('****Enter test****')
-        time.sleep(10)
-        print('****Send String****')
-        xService.send_message('Hello World')
-        
-        string_to_send = 'Hello World'
-        
-        for c in string_to_send:
-            cu = c.upper()
-            scantablekey = "KEY_"+c.upper()
-            scancode = self.keymap.keytable[scantablekey]
-            print(scancode)
-            xService.send_keys(0, [scancode])
-            time.sleep(self.KEY_DOWN_TIME)
-            xService.send_keys(0, [0])
-            time.sleep(self.KEY_DELAY)
+    #DBusGMainLoop(set_as_default=True)
 
         
 if __name__ == '__main__':
@@ -347,7 +274,6 @@ if __name__ == '__main__':
     #thread.start_new_thread(checkConnection)
 
     DBusGMainLoop(set_as_default=True)
-    myservice = BTKbService()
-    threading.Thread(target=test, args=(myservice,)).start()
+    myservice = BTKbDevice()
     mainloop = GLib.MainLoop()
     mainloop.run()

@@ -53,7 +53,7 @@ class btDevice:
     """
     create a bluetooth device to emulate a HID keyboard
     """
-    MY_DEV_NAME = 'BT_HID_Keyboard'
+    MY_DEV_NAME = 'smartKeypads'
     # Service port - must match port configured in SDP record
     P_CTRL = 17
     # Service port - must match port configured in SDP record#Interrrupt port
@@ -246,23 +246,19 @@ class btDevice:
         self.cinterrupt, cinfo = self.sinterrupt.accept()
         print('{} connected on the interrupt channel'.format(cinfo[0]))
 
-    def send(self, msg):
+    # send a string to the bluetooth host machine
+    def send_string(self, message):
         """
         Send HID message
         :param msg: (bytes) HID packet to send
         """
-        print('Send Message: ', msg)
-        #self.cinterrupt.send(bytes(bytearray(msg)))
-
-    # send a string to the bluetooth host machine
-    def send_string(self, message):
         try:
             print('Send Message: ', message)
-            self.cinterrupt.send(bytes(message))
-        except OSError as err:
-            print('Send Error: ', error(err))
-            error(err)
-
+            self.cinterrupt.send(bytes(message), 'UTF-8')
+        except:
+            print('send_string failed, Error: ', sys.exc_info()[0])
+            cinterrupt.close()
+            sinterrupt.close()
         
 class btKeyboard:
     print("Loading hidKeyboard")
