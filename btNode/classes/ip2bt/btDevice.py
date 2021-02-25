@@ -77,32 +77,3 @@ class btDevice:
     def register_profile(self, UUID, options):
         self.device_manager.RegisterProfile('/org/bluez/hidProfile', UUID, options)
 
-
-    """    
-    def config_hid_profile(self):
-        
-        #Setup and register HID Profile
-
-        print('Configuring Bluez Profile')
-        service_record = self.read_sdp_service_record()
-
-        opts = {
-            'Role': 'server',
-            'RequireAuthentication': False,
-            'RequireAuthorization': False,
-            'AutoConnect': True,
-            'ServiceRecord': service_record,
-        }
-
-        manager = dbus.Interface(self.bus.get_object('org.bluez',
-                                                     '/org/bluez'),
-                                 'org.bluez.ProfileManager1')
-
-        #HumanInterfaceDeviceProfile(self.bus, BTKbDevice.PROFILE_DBUS_PATH)
-
-        manager.RegisterProfile(BTKbDevice.PROFILE_DBUS_PATH,
-                                BTKbDevice.UUID,
-                                opts)
-
-        print('Profile registered ')
-    """    

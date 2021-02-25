@@ -8,7 +8,6 @@ http://yetanotherpointlesstechblog.blogspot.com/2016/04/emulating-bluetooth-keyb
 Moved to Python 3 and tested with BlueZ 5.43
 """
 import os, sys, time
-from gi.repository import GLib
 from btDevice import btDevice
 
 """
@@ -17,11 +16,11 @@ create a bluetooth device to emulate a HID keyboard
 class btPair:
     print(f"Starting btPair")
     MY_DEV_NAME = 'XXX_Keyboard'
-    WORKING_DIR  = os.path.dirname(os.path.realpath(__file__))
-    SDP_RECORD_PATH = os.path.join(WORKING_DIR, 'btProfile.xml')
     DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
     ADAPTER_IFACE = 'org.bluez.Adapter1'
     UUID = '00001124-0000-1000-8000-00805f9b34fb'
+    WORKING_DIR  = os.path.dirname(os.path.realpath(__file__))
+    SDP_RECORD_PATH = os.path.join(WORKING_DIR, 'btProfile.xml')
 
     def __init__(self):
         print(f"Starting btPair for: {self.MY_DEV_NAME}")
@@ -74,5 +73,3 @@ if __name__ == '__main__':
         sys.exit('Only root can run this script')
 
     myservice = btPair()
-    #mainloop = GLib.MainLoop()
-    #mainloop.run()
