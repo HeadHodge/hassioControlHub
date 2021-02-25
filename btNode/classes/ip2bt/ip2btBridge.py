@@ -10,10 +10,12 @@ import sys, time, json
 from wsServer import wsServer
 #from btServer import btServer
 
+def pName(myname):
+    print('name:', myname)
 
 def def1():
     print('def1')
-    server = wsServer()
+    server = wsServer(pName)
     #asyncio.set_event_loop(asyncio.new_event_loop())        
     #asyncio.get_event_loop().run_forever()
 

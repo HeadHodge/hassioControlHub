@@ -8,8 +8,9 @@ class wsServer:
     """
     """
     
-    def __init__(self):
+    def __init__(self, pname):
         print('Starting wsServer')
+        pname('pissy')
         #self._ip = ip
         #self._port = port
         start_server = websockets.serve(self.onConnect, "127.0.0.1", 8181)
@@ -21,12 +22,13 @@ class wsServer:
         #eventloop.run_forever()
 
     async def onConnect(self, websocket, path):
-        print('Connected')
+        #global myName         
+        print('Connected', myName)
 
         try:
             await websocket.send('{"format": "greeting", "greeting": "Hello?", "from": ""}')
             async for text in websocket:
-                print('received text: ', json.loads(text))
+                #print('received text: ', json.loads(text))
                 await websocket.send('{"format": "reply", "reply": "Got It"}')
         except Exception as e:
             print(e)
