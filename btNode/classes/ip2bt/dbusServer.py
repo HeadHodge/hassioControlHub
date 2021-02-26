@@ -3,37 +3,32 @@
 # thanhle Bluetooth keyboard/Mouse emulator DBUS Service
 #
 
-from __future__ import absolute_import, print_function
-from optparse import OptionParser, make_option
+#from __future__ import absolute_import, print_function
+#from optparse import OptionParser, make_option
 import os
 import sys
-import uuid
+import time
+#import uuid
 import dbus
 import dbus.service
 import dbus.mainloop.glib
-import time
-import socket
+#import socket
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
-import logging
-from logging import debug, info, warning, error
+#import logging
+#from logging import debug, info, warning, error
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
-
-class BTKbService(dbus.service.Object):
+class dbusServer(dbus.service.Object):
+    print("Load dbusServer")
 
     def __init__(self):
-        print("1. Setting up service")
-        # set up as a dbus service
-        bus_name = dbus.service.BusName(
-            "org.thanhle.btkbservice", bus=dbus.SystemBus())
-        dbus.service.Object.__init__(
-            self, bus_name, "/org/thanhle/btkbservice")
-        # create and setup our device
-        #self.device = BTKbDevice()
-        # start listening for connections
-        #self.device.listen()
+        print("Start dbusServer")
+
+        # set up as a dbus server
+        bus_name = dbus.service.BusName("org.thanhle.btkbservice", dbus.SystemBus())
+        dbus.service.Object.__init__(self, bus_name, "/org/thanhle/btkbservice")
 
     @dbus.service.method('org.thanhle.btkbservice', in_signature='s')
     def send_string(self, string):
@@ -73,7 +68,7 @@ if __name__ == "__main__":
             sys.exit("Only root can run this script")
 
         DBusGMainLoop(set_as_default=True)
-        myservice = BTKbService()
+        myservice = dbusServer()
         loop = GLib.MainLoop()
         loop.run()
     except KeyboardInterrupt:

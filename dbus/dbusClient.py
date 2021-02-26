@@ -49,6 +49,11 @@ class BtkStringClient():
         for bit in element:
             bin_str += str(bit)
         self.iface.send_keys(int(bin_str, 2), self.state[4:10])
+    
+    def send_string(self, text=''):
+        """sends a single frame of the current key state to the emulator server"""
+        self.iface.send_string('Hello World')
+
     """
     def send_key_down(self, scancode):
         #sends a key down event to the server
@@ -59,18 +64,19 @@ class BtkStringClient():
         #sends a key up event to the server
         self.state[4] = 0
         self.send_key_state()
-    """
     
     def send_string(self, string_to_send):
         for c in string_to_send:
             scancode = ord(c)
             print(scancode)
+            self.send_string('Hello World')
             self.state[4] = scancode
             self.send_key_state()
             time.sleep(BtkStringClient.KEY_DOWN_TIME)
             self.state[4] = 0
             self.send_key_state()
             time.sleep(BtkStringClient.KEY_DELAY)
+    """
 
 
 if __name__ == "__main__":
@@ -79,7 +85,7 @@ if __name__ == "__main__":
     #    exit()
     dc = BtkStringClient()
     #string_to_send = sys.argv[1]
-    #string_to_send = 'Hello World'
+    string_to_send = 'Hello World'
     string_to_send = ''+chr(172)
     print("Sending " + string_to_send)
     dc.send_string(string_to_send)
