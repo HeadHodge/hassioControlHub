@@ -3,50 +3,54 @@
 #############################################
 import threading, asyncio
 import sys, time, json
-#from classes.wsServer import wsServer
-#from classes.btKeyboard import *
-#from gi.repository import GLib
-#from dbus.mainloop.glib import DBusGMainLoop
 from wsServer import wsServer
 from btServer import btServer
+from gi.repository import GLib
 
 class ip2btBridge:
     print('Load ip2btBridge')
     """
     """  
+    ipIN = None
+    btOUT = None
+    
     def __init__(self):
         print('Starting ip2btBridge')
-        threading.Thread(target=self.def1()).start()
-
-        #loop = asyncio.get_event_loop()
-        #loop.create_task(self.def1())
-
-        print('End Test')
-        asyncio.get_event_loop().run_forever()
+        task = threading.Thread(target=self.def1())
+        task.daemon = True
+        task.start()
         
-    def myName(self, name):
+        task1 = threading.Thread(target=self.def2())
+        task1.daemon = True
+        #task1.start()
+
+        mainloop = GLib.MainLoop()
+        mainloop.run()
+        print('Exit ip2btBridge')
+        
+    def printName(self, name):
         print(f'my name is: {name}')
         
     def def1(self):
-        print('def1')
-        server = wsServer(self)
-
-    async def def2(self):
-        print('def2')
-        server = btServer()
+        print('enter def1')
+       
+        #self.printName('Robby')
+        btIN = btServer(self)
         
-    """
-    #asyncio.set_event_loop(asyncio.new_event_loop())        
-    #asyncio.get_event_loop().run_forever()
-    print('Start Test')
-    #asyncio.get_event_loop().run_until_complete(def1())
-    #asyncio.get_event_loop().run_until_complete(wsServer)
-    #asyncio.run(def1())
-    #asyncio.get_event_loop().run_forever()
+        while True:
+            time.sleep(5)
+        #eventloop = asyncio.get_event_loop()
+        #eventloop.run_forever()
 
-    threading.Thread(target=def1()).start()
-    ##asyncio.get_event_loop().run_until_complete(def1())
-    print('End Test')
-    asyncio.get_event_loop().run_forever()
-    """
+        print('exit def1')
+
+    def def2(self):
+        print('enter def2')
+        btOUT = btServer(self)
+        print('exit def2')
+
+#try:
 myclass = ip2btBridge()
+    
+#except:
+#    print('Abort 1p2btBridge', sys.exc_info()[0])

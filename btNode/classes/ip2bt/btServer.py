@@ -8,6 +8,7 @@ http://yetanotherpointlesstechblog.blogspot.com/2016/04/emulating-bluetooth-keyb
 Moved to Python 3 and tested with BlueZ 5.43
 """
 import os, sys, time, json, socket
+import asyncio
 from gi.repository import GLib
 
 class btServer:
@@ -17,7 +18,7 @@ class btServer:
     P_CTRL = 17 # Service port - must match port configured in SDP record
     P_INTR = 19 # Service port - must match port configured in SDP record#Interrrupt port
         
-    def __init__(self):
+    def __init__(self, bridge):
         print("Starting Bluetooth Server")
 
         # Socket server & client objects for hid control
@@ -30,6 +31,17 @@ class btServer:
 
         print('Start Server')
         self.listen()
+        
+        time.sleep(10)
+        state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
+        self.send_string(state)
+    
+        time.sleep(.35)
+        state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        self.send_string(state)
+        
+        #mainloop = GLib.MainLoop()
+        #mainloop.run()
     
     @property
     def address(self):
@@ -41,7 +53,6 @@ class btServer:
         """
         Listen for connections coming from HID client
         """
-
         print('Waiting for connections')
         self.scontrol = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
         self.scontrol.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -64,30 +75,33 @@ class btServer:
         # Block until connected
         self.cinterrupt, cinfo = self.sinterrupt.accept()
         print('{} connected on the interrupt channel'.format(cinfo[0]))
-
+ 
     # send a string to the bluetooth host machine
     def send_string(self, message):
         try:
             print('Send Message: ', message)
             self.cinterrupt.send(bytes(message))
-        except OSError as err:
-            print('Send Error: ', error(err))
-            error(err)
-        
+        except:
+            print('Send Error: ')
+"""        
 if __name__ == '__main__':
     # The sockets require root permission
     if not os.geteuid() == 0:
         sys.exit('Only root can run this script')
 
-    device = btServer()
+    try:
+        device = btServer()
     
-    time.sleep(10)
-    state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
-    device.send_string(state)
+        time.sleep(10)
+        state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
+        device.send_string(state)
     
-    time.sleep(.35)
-    state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
-    device.send_string(state)
+        time.sleep(.35)
+        state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        device.send_string(state)
 
-    mainloop = GLib.MainLoop()
-    mainloop.run()
+        mainloop = GLib.MainLoop()
+        mainloop.run()
+    except:
+        print('\n! Received keyboard interrupt, quitting threads.\n')
+"""
