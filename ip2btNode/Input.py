@@ -4,24 +4,30 @@ import core.dbusClient as dbusClient
 import core.dbusServer as dbusServer
 import core.wsServer as wsServer
 
-#import dbus
-#import dbus.service
-#from dbus.mainloop.glib import DBusGMainLoop
-#from core.dbusServer import dbusServer
-#import core.dbusClient as dbusClient
-#import core.wsServer as wsServer
-
 try:
+    print(' \nStart ip2btInput Module')
+
+    # Start dbusClient Module
     try:
         dbusClient.start()
-        dbusClient.send_string("moo")
+        #dbusClient.send_string("moo")
     except:
         print('Abort start dbusClient: ', sys.exc_info()[0])
         
-    dbusServer.start('smartKeypads.ip2btInput')
-    wsServer.start()
+    # Start dbusServer Module for 'smartKeypads.ip2btInput'
+    try:
+        dbusServer.start('smartKeypads.ip2btInput')
+    except:
+        print('Abort start dbusServer: ', sys.exc_info()[0])
 
-    print('start mainLoop')
+    # Start wsServer
+    try:
+        wsServer.start()
+    except:
+        print('Abort start wsServer: ', sys.exc_info()[0])
+
+    # Start event loop for servers
+    print('start mainLoop\n')
     eventloop = asyncio.get_event_loop()
     eventloop.run_forever()
 
@@ -29,4 +35,4 @@ try:
     #loop = GLib.MainLoop()
     #loop.run()
 except:
-    print('Abort Input.py', sys.exc_info()[0])
+    print('Abort ip2btInput.py', sys.exc_info()[0])

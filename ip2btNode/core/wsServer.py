@@ -10,18 +10,17 @@ def start(options={"ip":"127.0.0.1", "port":8181}):
     print('Starting wsServer', options)
         
     start_server = websockets.serve(onConnect, options['ip'], options['port'])
-    print('Server Created')
+    print('wsServer Created')
     eventloop = asyncio.get_event_loop()
     eventloop.run_until_complete(start_server)
-    print('Connecting')
-    #eventloop.run_forever()
+    print('wsServer Connecting')
     
 async def sleep(self):
     print('sleep')
     await asyncio.sleep(1)
         
 async def onConnect(websocket, path):
-    print('Connected')
+    print('wsServer Connected')
 
     try:
         await websocket.send('{"format": "greeting", "greeting": "Hello?", "from": ""}')
@@ -31,5 +30,5 @@ async def onConnect(websocket, path):
     except Exception as e:
         print(e)
     finally:
-        print('Disconnected')
+        print('wsServer Disconnected')
  
