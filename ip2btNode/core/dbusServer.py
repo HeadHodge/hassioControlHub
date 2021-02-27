@@ -3,31 +3,33 @@
 # thanhle Bluetooth keyboard/Mouse emulator DBUS Service
 #
 
+import os, sys, time
+import dbus, dbus.service
+from dbus.mainloop.glib import DBusGMainLoop
 #from __future__ import absolute_import, print_function
 #from optparse import OptionParser, make_option
-import os
-import sys
-import time
 #import uuid
-import dbus
-import dbus.service
-import dbus.mainloop.glib
+#import dbus.mainloop.glib
 #import socket
-from gi.repository import GLib
-from dbus.mainloop.glib import DBusGMainLoop
+#from gi.repository import GLib
 #import logging
 #from logging import debug, info, warning, error
-
 #logging.basicConfig(level=logging.DEBUG)
 
-class dbusServer(dbus.service.Object):
-    print("Load dbusServer")
+def start(dbusName):
+    print("Start dbusServer")
 
-    def __init__(self):
-        print("Start dbusServer")
+    exportMethods(dbusName)
+
+class exportMethods(dbus.service.Object):
+    print("Load exportMethods")
+
+    def __init__(self, dbusName = "smartKeypads.ip2btBridge"):
+        print(f"Start exportMethods for dbusName: '{dbusName}'")
 
         # set up as a dbus server
-        bus_name = dbus.service.BusName("smartKeypads.ip2btBridge", dbus.SessionBus())
+        #DBusGMainLoop(set_as_default=True)
+        bus_name = dbus.service.BusName(dbusName, dbus.SessionBus())
         dbus.service.Object.__init__(self, bus_name, "/methods")
 
     @dbus.service.method('ip2bt.Input', in_signature='s')
@@ -61,6 +63,9 @@ class dbusServer(dbus.service.Object):
 
 
 # main routine
+
+DBusGMainLoop(set_as_default=True)
+
 if __name__ == "__main__":
     # we an only run as root
     try:

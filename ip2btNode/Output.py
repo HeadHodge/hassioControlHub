@@ -6,17 +6,9 @@ import dbus.service
 import dbus.mainloop.glib
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
-from ..dbusIPC import dbusClient
-from wsServer import wsServer
 
 class ipInput(dbus.service.Object):
     print("Load ipInput")
 
     def __init__(self):
         print("Start ipInput")
-
-        bridgeClient = dbusClient()
-        inServer = wsServer()
-
-
-ipInput = ipInput()
