@@ -14,12 +14,14 @@ def start():
     DBusGMainLoop(set_as_default=True) #Run before starting any dbus service
     exportMethods()
 
+def printName(name):
+    print(f'myName: {name}')
+
 class exportMethods(dbus.service.Object):
     print("Load exportMethods")
 
     def __init__(self):
         print(f"Start exportMethods for dbusName: 'smartKeypads.ip2btBridge'")
-
         # set up as a dbus server
         bus_name = dbus.service.BusName('smartKeypads.ip2btBridge', dbus.SessionBus())
         dbus.service.Object.__init__(self, bus_name, "/ip2btBridge/methods")

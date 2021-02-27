@@ -23,7 +23,7 @@ class exportMethods(dbus.service.Object):
         # set up as a dbus server
         #DBusGMainLoop(set_as_default=True)
         bus_name = dbus.service.BusName(dbusName, dbus.SessionBus())
-        dbus.service.Object.__init__(self, bus_name, "ip2btInput/methods")
+        dbus.service.Object.__init__(self, bus_name, "/ip2btInput/methods")
         
         print('start dbusInputServer loop')
         loop = GLib.MainLoop()
