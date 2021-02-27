@@ -23,18 +23,18 @@ class exportMethods(dbus.service.Object):
         # set up as a dbus server
         #DBusGMainLoop(set_as_default=True)
         bus_name = dbus.service.BusName(dbusName, dbus.SessionBus())
-        dbus.service.Object.__init__(self, bus_name, "/methods")
+        dbus.service.Object.__init__(self, bus_name, "ip2btInput/methods")
         
         print('start dbusInputServer loop')
         loop = GLib.MainLoop()
         loop.run()
 
-    @dbus.service.method('ip2bt.Input', in_signature='s')
+    @dbus.service.method('ip2btInput.BridgeMethods', in_signature='s')
     def send_string(self, string):
         print("Get send_string request through dbus")
-        print("key msg: ", string)
+        print("ip2bt.Bridge message: ", string)
 
-    @dbus.service.method('ip2bt.Input', in_signature='yay')
+    @dbus.service.method('ip2btInput.BridgeMethods', in_signature='yay')
     def send_keys(self, modifier_byte, keys):
         print("Get send_keys request through dbus")
         print("key msg: ", keys)
@@ -47,7 +47,7 @@ class exportMethods(dbus.service.Object):
             count += 1
         #self.device.send_string(state)
 
-    @dbus.service.method('ip2bt.Input', in_signature='yay')
+    @dbus.service.method('ip2btInput.BridgeMethods', in_signature='yay')
     def send_mouse(self, modifier_byte, keys):
         print("Get send_keys request through dbus")
         state = [0xA1, 2, 0, 0, 0, 0]

@@ -26,7 +26,7 @@ try:
 
     # Start dbusClient Module
     try:
-        dbusClient.start('smartKeypads.ip2btBridge', 'ip2bt.Input')
+        dbusClient.start('smartKeypads.ip2btBridge', 'ip2btBridge.InputMethods')
         dbusClient.send_string("mewoooing")
         #threading.Thread(target=dbusClient.start, args=('smartKeypads.ip2btBridge', 'ip2bt.Input')).start()
     except:

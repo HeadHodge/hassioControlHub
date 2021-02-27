@@ -8,7 +8,7 @@ iface = None
 def start(dbusName='smartKeypads.ip2btBridge', ifaceName='ip2bt.Input'):
     global iface
     print("Start dbusClient")
-    methods = dbus.SessionBus().get_object(dbusName, '/methods')
+    methods = dbus.SessionBus().get_object(dbusName, '/ip2btBridge/methods')
     iface = dbus.Interface(methods, ifaceName)
         
 def printName(name):
