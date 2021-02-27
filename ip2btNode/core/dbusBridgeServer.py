@@ -5,23 +5,28 @@
 
 import os, sys, time
 import dbus, dbus.service
+from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
+print('Load dbusBridgeServer')
 
-def start(dbusName):
-    print("Start dbusServer")
-
-    exportMethods(dbusName)
+def start():
+    print("Start dbusBridgeServer")
+    DBusGMainLoop(set_as_default=True) #Run before starting any dbus service
+    exportMethods()
 
 class exportMethods(dbus.service.Object):
     print("Load exportMethods")
 
-    def __init__(self, dbusName = "smartKeypads.ip2btBridge"):
-        print(f"Start exportMethods for dbusName: '{dbusName}'")
+    def __init__(self):
+        print(f"Start exportMethods for dbusName: 'smartKeypads.ip2btBridge'")
 
         # set up as a dbus server
-        #DBusGMainLoop(set_as_default=True)
-        bus_name = dbus.service.BusName(dbusName, dbus.SessionBus())
+        bus_name = dbus.service.BusName('smartKeypads.ip2btBridge', dbus.SessionBus())
         dbus.service.Object.__init__(self, bus_name, "/methods")
+        
+        print('Start dbusBridgeServer loop')
+        loop = GLib.MainLoop()
+        loop.run()
 
     @dbus.service.method('ip2bt.Input', in_signature='s')
     def send_string(self, string):
@@ -53,12 +58,9 @@ class exportMethods(dbus.service.Object):
         self.device.send_string(state)
 
 
-# main routine
-
-DBusGMainLoop(set_as_default=True)
-
+# main thread routine
 if __name__ == "__main__":
-    # we an only run as root
+    # Auto start module when running stand-alone
     try:
         if not os.geteuid() == 0:
             sys.exit("Only root can run this script")

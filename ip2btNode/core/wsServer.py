@@ -8,12 +8,15 @@ print('Load wsServer')
 
 def start(options={"ip":"127.0.0.1", "port":8181}):
     print('Starting wsServer', options)
-        
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    eventloop = asyncio.get_event_loop()
+
     start_server = websockets.serve(onConnect, options['ip'], options['port'])
     print('wsServer Created')
-    eventloop = asyncio.get_event_loop()
     eventloop.run_until_complete(start_server)
-    print('wsServer Connecting')
+
+    print('start wsServer connection Loop')
+    eventloop.run_forever()
     
 async def sleep(self):
     print('sleep')

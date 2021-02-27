@@ -5,7 +5,9 @@
 
 import os, sys, time
 import dbus, dbus.service
+from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
+print("Load dbusInputServer")
 
 def start(dbusName):
     print("Start dbusServer")
@@ -22,6 +24,10 @@ class exportMethods(dbus.service.Object):
         #DBusGMainLoop(set_as_default=True)
         bus_name = dbus.service.BusName(dbusName, dbus.SessionBus())
         dbus.service.Object.__init__(self, bus_name, "/methods")
+        
+        print('start dbusInputServer loop')
+        loop = GLib.MainLoop()
+        loop.run()
 
     @dbus.service.method('ip2bt.Input', in_signature='s')
     def send_string(self, string):

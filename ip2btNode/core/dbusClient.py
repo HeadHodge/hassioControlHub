@@ -1,17 +1,15 @@
 #!/usr/bin/python3
 import os, sys, time
 import dbus
-#import dbus.service
-#import dbus.mainloop.glib
 
-print("Loading dbusClient")
+print("Load dbusClient")
 iface = None
 
-def start():
+def start(dbusName='smartKeypads.ip2btBridge', ifaceName='ip2bt.Input'):
     global iface
-    print("Starting dbusClient")
-    methods = dbus.SessionBus().get_object('smartKeypads.ip2btBridge', '/methods')
-    iface = dbus.Interface(methods, 'ip2bt.Input')
+    print("Start dbusClient")
+    methods = dbus.SessionBus().get_object(dbusName, '/methods')
+    iface = dbus.Interface(methods, ifaceName)
         
 def printName(name):
     print(name)
