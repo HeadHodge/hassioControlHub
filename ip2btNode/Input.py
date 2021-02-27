@@ -1,7 +1,8 @@
-import os, sys, time
+import os, sys, time, asyncio
 from gi.repository import GLib
 import core.dbusClient as dbusClient
 import core.dbusServer as dbusServer
+import core.wsServer as wsServer
 
 #import dbus
 #import dbus.service
@@ -11,13 +12,21 @@ import core.dbusServer as dbusServer
 #import core.wsServer as wsServer
 
 try:
-    dbusClient.start()
-    dbusClient.send_string("moo")
+    try:
+        dbusClient.start()
+        dbusClient.send_string("moo")
+    except:
+        print('Abort start dbusClient: ', sys.exc_info()[0])
+        
     dbusServer.start('smartKeypads.ip2btInput')
-    #dbusServer.exportMethods()
+    wsServer.start()
 
     print('start mainLoop')
-    loop = GLib.MainLoop()
-    loop.run()
-except KeyboardInterrupt:
-    sys.exit()
+    eventloop = asyncio.get_event_loop()
+    eventloop.run_forever()
+
+    #print('start mainLoop')
+    #loop = GLib.MainLoop()
+    #loop.run()
+except:
+    print('Abort Input.py', sys.exc_info()[0])

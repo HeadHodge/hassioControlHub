@@ -4,6 +4,8 @@
 import sys, time, json, websockets
 import asyncio
 
+print('Load wsServer')
+
 def start(options={"ip":"127.0.0.1", "port":8181}):
     print('Starting wsServer', options)
         
@@ -12,13 +14,13 @@ def start(options={"ip":"127.0.0.1", "port":8181}):
     eventloop = asyncio.get_event_loop()
     eventloop.run_until_complete(start_server)
     print('Connecting')
-    eventloop.run_forever()
+    #eventloop.run_forever()
     
 async def sleep(self):
     print('sleep')
     await asyncio.sleep(1)
         
-async def onConnect(self, websocket, path):
+async def onConnect(websocket, path):
     print('Connected')
 
     try:
