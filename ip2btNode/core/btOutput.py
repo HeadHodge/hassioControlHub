@@ -2,11 +2,11 @@ import traceback
 import os, sys, time, asyncio
 from gi.repository import GLib
 import core.btServer as btServer
-print(' \nLoad ip2btOutput Module')
+print('Load btOutput Module')
 
 def start():
     try:
-        print(' \nStart ip2btOutput Module')
+        print('Start btOutput Module')
     
         # Start btServer
         try:
@@ -17,11 +17,11 @@ def start():
 
     
         # Start event loop for servers
-        print('start ip2btOutput mainLoop\n')
+        print('start btOutput mainLoop')
         #eventloop = asyncio.get_event_loop()
         #eventloop.run_forever()
         eventloop = GLib.MainLoop()
         eventloop.run()
     except:
-        print('Abort ip2btInput.py', sys.exc_info()[0])
+        print('Abort btOutput.py', sys.exc_info()[0])
         traceback.print_exc()

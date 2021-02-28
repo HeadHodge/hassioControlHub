@@ -1,44 +1,33 @@
 #############################################
 ##            GLOBAL VARIABLES
 #############################################
-from gi.repository import GLib
+#from gi.repository import GLib
 from multiprocessing import Process
-import traceback, threading
-import os, sys, time, asyncio
-#import core.dbusClient as dbusClient
-#import core.dbusBridgeServer as dbusBridgeServer
-import ip2btInput
-import ip2btOutput
-#import core.wsServer as wsServer
-#import core.btServer as btServer
+import os, sys, time, asyncio, traceback
+import core.ipInput as ipInput
+import core.btOutput as btOutput
 
 print('Load ip2btBridge')
 
-def callback(func):
-    func('hellooooooo')
-
-
 try:
-    # Start dbusBridgeServer Module for 'smartKeypads.ip2btBridge'
-
+    # Start ipInput Module
     try:
-        p = Process(target=ip2btInput.start)
+        p = Process(target=ipInput.start)
         p.start()
-        print('hello1')
-    except:
-        print('Abort start ip2btInput: ', sys.exc_info()[0])
+     except:
+        print('Abort start ipInput: ', sys.exc_info()[0])
         traceback.print_exc()
 
+    # Start btOutput Module
     try:
-        p = Process(target=ip2btOutput.start)
+        p = Process(target=btOutput.start)
         p.start()
-        print('hello2')
     except:
-        print('Abort start ip2btOutput: ', sys.exc_info()[0])
+        print('Abort start btOutput: ', sys.exc_info()[0])
         traceback.print_exc()
 
-    # Start event loop for servers
-    print('start ip2btBridge mainLoop\n')
+    # Start event loop
+    print('start ip2btBridge mainLoop')
     eventloop = asyncio.get_event_loop()
     eventloop.run_forever()
     #loop = GLib.MainLoop()
