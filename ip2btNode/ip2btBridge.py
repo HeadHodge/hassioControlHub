@@ -1,15 +1,16 @@
 #############################################
 ##            GLOBAL VARIABLES
 #############################################
+from gi.repository import GLib
+from multiprocessing import Process
 import traceback, threading
 import os, sys, time, asyncio
 #import core.dbusClient as dbusClient
 #import core.dbusBridgeServer as dbusBridgeServer
-#import ip2btOutput
-import core.wsServer as wsServer
-import core.btServer as btServer
-from gi.repository import GLib
-from multiprocessing import Process
+import ip2btInput
+import ip2btOutput
+#import core.wsServer as wsServer
+#import core.btServer as btServer
 
 print('Load ip2btBridge')
 
@@ -21,19 +22,19 @@ try:
     # Start dbusBridgeServer Module for 'smartKeypads.ip2btBridge'
 
     try:
-        p = Process(target=wsServer.start)
+        p = Process(target=ip2btInput.start)
         p.start()
         print('hello1')
     except:
-        print('Abort start dbusBridgeServer: ', sys.exc_info()[0])
+        print('Abort start ip2btInput: ', sys.exc_info()[0])
         traceback.print_exc()
 
     try:
-        p = Process(target=btServer.start)
+        p = Process(target=ip2btOutput.start)
         p.start()
         print('hello2')
     except:
-        print('Abort start dbusBridgeServer: ', sys.exc_info()[0])
+        print('Abort start ip2btOutput: ', sys.exc_info()[0])
         traceback.print_exc()
 
     # Start event loop for servers

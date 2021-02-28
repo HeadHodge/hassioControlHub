@@ -53,7 +53,7 @@ def listen():
     """
     Listen for connections coming from HID client
     """
-    print(f'Waiting for connections on {address()} ports {P_CTRL} and {P_INTR}')
+    print(f'Waiting for bluetooth connections on {address()} ports {P_CTRL} and {P_INTR}')
     global ccontrol, cinterrupt
     
     scontrol = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
