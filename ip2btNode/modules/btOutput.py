@@ -6,13 +6,13 @@ import os, sys, time, asyncio
 sys.path.append('/inputHub/ip2btNode/modules')
 import btServer
 
-def start():
+def start(outputData):
     try:
         print('Start btOutput Module')
     
         # Start btServer
         try:
-            btServer.start()
+            btServer.start(outputData)
         except:
             print('Abort start btServer: ', sys.exc_info()[0])
             traceback.print_exc()
