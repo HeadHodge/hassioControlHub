@@ -2,19 +2,20 @@
 ##            GLOBAL VARIABLES
 #############################################
 #from gi.repository import GLib
+print('Load ip2btBridge')
 from multiprocessing import Process
 import os, sys, time, asyncio, traceback
-import core.ipInput as ipInput
-import core.btOutput as btOutput
 
-print('Load ip2btBridge')
+sys.path.append('/inputHub/ip2btNode/modules')
+import ipInput
+import btOutput
 
 try:
     # Start ipInput Module
     try:
         p = Process(target=ipInput.start)
         p.start()
-     except:
+    except:
         print('Abort start ipInput: ', sys.exc_info()[0])
         traceback.print_exc()
 

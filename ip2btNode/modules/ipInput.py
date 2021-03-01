@@ -1,8 +1,9 @@
+print('Load ipInput Module')
 import os, sys, time, asyncio
 import traceback, threading
-#from gi.repository import GLib
-import core.wsServer as wsServer
-print('Load ipInput Module')
+
+sys.path.append('/inputHub/ip2btNode/modules')
+import wsServer
 
 def start():
     try:

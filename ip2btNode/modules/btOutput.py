@@ -1,8 +1,10 @@
+print('Load btOutput Module')
+from gi.repository import GLib
 import traceback
 import os, sys, time, asyncio
-from gi.repository import GLib
-import core.btServer as btServer
-print('Load btOutput Module')
+
+sys.path.append('/inputHub/ip2btNode/modules')
+import btServer
 
 def start():
     try:

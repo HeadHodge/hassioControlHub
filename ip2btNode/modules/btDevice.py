@@ -17,9 +17,8 @@ class btDevice:
     def __init__(self):
         print("Start btDevice")
 
-        self.dev_path = '/org/bluez/hci0'
         self.bus = dbus.SystemBus()
-        self.device_property = dbus.Interface(self.bus.get_object('org.bluez', self.dev_path), self.DBUS_PROP_IFACE)
+        self.device_property = dbus.Interface(self.bus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
         self.device_manager = dbus.Interface(self.bus.get_object('org.bluez', '/org/bluez'), 'org.bluez.ProfileManager1')
 
     @property
