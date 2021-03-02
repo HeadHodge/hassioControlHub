@@ -15,14 +15,14 @@ import dbus
 DBusGMainLoop(set_as_default=True)
 _bluetoothData = queue.Queue()
 _bluetoothState = 0
+_bluetoothAddress = '0:0:0:0:0:0'
 _system_bus = dbus.SystemBus()
 
 def onSignal(sender1=None, sender2=None, sender3=None):
-    print(f'****onSignal called from: {sender1}****')
-    
-    myproperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
-    print('bluetooth connection state: ', myproperty.Get('org.bluez.Device1', 'Connected'))
-        
+    dBusProperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
+    _bluetoothState = dBusProperty.Get('org.bluez.Device1', 'Connected')
+    print(f'****onSignal called from: {sender1}, isConnected: {_bluetoothState}****')
+         
 def ipInput():
     print('Start ipInput')
 
@@ -39,7 +39,7 @@ def ipInput():
         traceback.print_exc()
 
 def btOutput():
-    print('Start btOutput Module')
+    print('Start btOutput')
     
     try:
         # Start btServer
@@ -78,34 +78,14 @@ try:
         print('Abort start btOutput: ', sys.exc_info()[0])
         traceback.print_exc()
         
-    """
-    bus.add_signal_receiver(self._properties_changed,
-                            dbus_interface=self.DBUS_PROP_IFACE,
-                            signal_name='PropertiesChanged',
-                            arg0=self.DEVICE_INTERFACE,
-                            path_keyword='path')
-
-    """
+    # Connect to dbus
     try:
+        dBusProperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
+        _bluetoothAddress = dBusProperty.Get('org.bluez.Adapter1', 'Address')
+        print(f'bluetooth address: {_bluetoothAddress}')
         
-        system_bus = dbus.SystemBus()
-        objectManager = system_bus.get_object('org.bluez', '/')
-        om_iface = dbus.Interface(objectManager, 'org.freedesktop.DBus.ObjectManager')
-
-        for inf in om_iface.GetManagedObjects():
-            print(inf)
-
-        myproperty = dbus.Interface(system_bus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
-        print(myproperty.Get('org.bluez.Adapter1', 'Address'))
-
-        myproperty = dbus.Interface(system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
-        print(myproperty.Get('org.bluez.Device1', 'Connected'))
-
-        myproperty = dbus.Interface(system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.bluez.Device1')
-        #print(myproperty.Connect())
-        #myproperty.connect_to_signal("PropertiesChanged", onConnectionSignal)
-        
-        system_bus.add_signal_receiver(onSignal, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
+        _system_bus.add_signal_receiver(onSignal, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
+        print(f'enabled bluetooth PropertiesChanged signal')
         
     except:
         print('Abort start btOutput: ', sys.exc_info()[0])
@@ -115,8 +95,6 @@ try:
 
     # Start event loop
     print('Start ip2btBridge eventLoop')
-    #eventloop = asyncio.get_event_loop()
-    #eventloop.run_forever()
     eventloop = GLib.MainLoop()
     eventloop.run()
     
