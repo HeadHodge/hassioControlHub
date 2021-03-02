@@ -13,7 +13,8 @@ import btServer
 import dbus
 
 DBusGMainLoop(set_as_default=True)
-_dataOut = queue.Queue()
+_bluetoothData = queue.Queue()
+_bluetoothState = 0
 _system_bus = dbus.SystemBus()
 
 def onSignal(sender1=None, sender2=None, sender3=None):
@@ -22,9 +23,6 @@ def onSignal(sender1=None, sender2=None, sender3=None):
     myproperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
     print('bluetooth connection state: ', myproperty.Get('org.bluez.Device1', 'Connected'))
         
-def onConnectionSignal():
-    print(f'****onConnectionSignal called from: ****')
- 
 def ipInput():
     print('Start ipInput')
 
@@ -45,7 +43,7 @@ def btOutput():
     
     try:
         # Start btServer
-        btServer.start(_dataOut)
+        btServer.start(_bluetoothData, _bluetoothState)
 
         # Start btOutput event loop
         print('start btOutput eventLoop')
@@ -58,11 +56,11 @@ def btOutput():
 try:
     state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
     print('send string: ', state)
-    _dataOut.put([ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ])
+    _bluetoothData.put([ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ])
     
     state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]            
     print('send string: ', state)
-    _dataOut.put([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ])
+    _bluetoothData.put([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ])
 
     # Start ipInput Module
     try:
@@ -105,7 +103,7 @@ try:
 
         myproperty = dbus.Interface(system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.bluez.Device1')
         #print(myproperty.Connect())
-        myproperty.connect_to_signal("PropertiesChanged", onConnectionSignal)
+        #myproperty.connect_to_signal("PropertiesChanged", onConnectionSignal)
         
         system_bus.add_signal_receiver(onSignal, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
         

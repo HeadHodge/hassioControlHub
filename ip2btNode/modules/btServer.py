@@ -11,27 +11,34 @@ print("Load btServer")
 import traceback
 import os, sys, time, json, socket
 import asyncio, queue
-from gi.repository import GLib
 
 """
 create a bluetooth device to emulate a HID keyboard
 """
 _dataOut = None
+_isConnected = 0
+
 P_CTRL = 17 # Service port - must match port configured in SDP record
 P_INTR = 19 # Service port - must match port configured in SDP record#Interrrupt port
         
-def start(dataOut):
-    global _dataOut
-    
+def start(dataOut, isConnected):
     print("Start btServer")
+    global _dataOut, _isConnected
+    
     _dataOut = dataOut
+    _isConnected = isConnected
     
     connect()
+
+def onDbusSignal(sender1=None, sender2=None, sender3=None):
+    print(f'****onDbusSignal called from: {sender1}****')
     
+    myproperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
+    print('bluetooth connection state: ', myproperty.Get('org.bluez.Device1', 'Connected'))
+     
 def address():
     """Return the adapter MAC address."""
     return 'DC:A6:32:65:8A:AB'
-    #return adapter_property.Get(ADAPTER_IFACE, 'Address')
   
 def connect():
     """
@@ -81,6 +88,8 @@ def connect():
 
 """
 if __name__ == '__main__':
+from gi.repository import GLib
+from dbus.mainloop.glib import DBusGMainLoop
     # The sockets require root permission
     if not os.geteuid() == 0:
         sys.exit('Only root can run this script')
