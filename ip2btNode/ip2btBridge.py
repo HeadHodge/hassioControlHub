@@ -1,17 +1,30 @@
 #############################################
 ##            GLOBAL VARIABLES
 #############################################
-#from gi.repository import GLib
 print('Load ip2btBridge')
+from gi.repository import GLib
+from dbus.mainloop.glib import DBusGMainLoop
 from multiprocessing import Process
 import os, sys, time, asyncio, traceback, queue
 
 sys.path.append('/inputHub/ip2btNode/modules')
 import wsServer
 import btServer
+import dbus
 
+DBusGMainLoop(set_as_default=True)
 _dataOut = queue.Queue()
+_system_bus = dbus.SystemBus()
 
+def onSignal(sender1=None, sender2=None, sender3=None):
+    print(f'****onSignal called from: {sender1}****')
+    
+    myproperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
+    print('bluetooth connection state: ', myproperty.Get('org.bluez.Device1', 'Connected'))
+        
+def onConnectionSignal():
+    print(f'****onConnectionSignal called from: ****')
+ 
 def ipInput():
     print('Start ipInput')
 
@@ -67,13 +80,47 @@ try:
         print('Abort start btOutput: ', sys.exc_info()[0])
         traceback.print_exc()
         
+    """
+    bus.add_signal_receiver(self._properties_changed,
+                            dbus_interface=self.DBUS_PROP_IFACE,
+                            signal_name='PropertiesChanged',
+                            arg0=self.DEVICE_INTERFACE,
+                            path_keyword='path')
+
+    """
+    try:
+        
+        system_bus = dbus.SystemBus()
+        objectManager = system_bus.get_object('org.bluez', '/')
+        om_iface = dbus.Interface(objectManager, 'org.freedesktop.DBus.ObjectManager')
+
+        for inf in om_iface.GetManagedObjects():
+            print(inf)
+
+        myproperty = dbus.Interface(system_bus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
+        print(myproperty.Get('org.bluez.Adapter1', 'Address'))
+
+        myproperty = dbus.Interface(system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
+        print(myproperty.Get('org.bluez.Device1', 'Connected'))
+
+        myproperty = dbus.Interface(system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.bluez.Device1')
+        #print(myproperty.Connect())
+        myproperty.connect_to_signal("PropertiesChanged", onConnectionSignal)
+        
+        system_bus.add_signal_receiver(onSignal, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
+        
+    except:
+        print('Abort start btOutput: ', sys.exc_info()[0])
+        traceback.print_exc()
+
+
 
     # Start event loop
-    print('start ip2btBridge mainLoop')
-    eventloop = asyncio.get_event_loop()
-    eventloop.run_forever()
-    #loop = GLib.MainLoop()
-    #loop.run()
+    print('Start ip2btBridge eventLoop')
+    #eventloop = asyncio.get_event_loop()
+    #eventloop.run_forever()
+    eventloop = GLib.MainLoop()
+    eventloop.run()
     
 except:
     print('Abort ip2btBridge.py', sys.exc_info()[0])
