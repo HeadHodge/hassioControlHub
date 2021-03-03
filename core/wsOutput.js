@@ -4,7 +4,7 @@
 const debug = require('/inputHub/core/debugLog.js').debug;
 const webSocket = require('/root/node_modules/ws');
 
-var connection = null, isConnected = null, activeSessions = {}, sessionId = 1;
+var connection = null, isConnected = null, activeSessions = {}, sessionId = 10;
 
 //##########################################
 onOpen =  function() {
@@ -28,8 +28,8 @@ var payload = JSON.parse(message);
 
 	debug.log(`Enter onMessage, Received server message: `, message);
 
-	if(payload.type == 'auth_required') return connection.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1YmM0ZGYxNGY4ZGE0MTdkYTNhZjdkNjkwYzg0NDQ2ZSIsImlhdCI6MTYxMzAxMDQ4MiwiZXhwIjoxOTI4MzcwNDgyfQ.MffxNYX4VssITLgdZBPilKTq3p4R9RuoQP2yeeoyyPw"}');
-	if(payload.type == 'auth_ok') return isConnected = true;
+	if(payload.type == 'auth_required') return connection.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}');
+	if(payload.type == 'auth_ok') {isConnected = true; connection.send('{"id": 1, "type": "subscribe_events", "event_type": "message_posted"}'); return};
 	if(payload.type != 'result') return console.log(`Unknown Message from wsOutput: `, message);
 
 	console.log(` \n`);
