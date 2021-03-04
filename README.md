@@ -8,7 +8,7 @@ The main modules are loosely coupled to each other via network communications us
 
 <b>Module Descriptions:</b>
     
- usb2keyCode:
+<b>usb2keyCode:</b>
 
    Captures usb serial hid device (i.e. usb wired/wireless keyboards) scan code input, converts data to a standard key code format and offloads the results to the keyCode2hassio module. 
     
