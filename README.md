@@ -8,19 +8,19 @@ The main modules are loosely coupled to each other via network communications us
 
 <b>Module Descriptions:</b>
     
-<b>usb2keyCode:</b>
+<b>_usb2keyCode:</b>
 
    Captures usb serial hid device (i.e. usb wired/wireless keyboards) scan code input, converts data to a standard key code format and offloads the results to the keyCode2hassio module. 
     
-<b>html2keyCode:</b>
+<b>_html2keyCode:</b>
 
 Captures key code input from html browser pages, then converts to a standard key format and offloads the result to the keyCode2hassio hub.
     
-<b>keyCode2hassio:</b>
+<b>_keyCode2hassio:</b>
 
 Standard keyCodes are captured from other modules via websockets. The keyCodes are transformed into the proper format needed to control the Hassio hub's attached smart devices using their websockets API.
 
-<b>keyCode2bt:</b>
+<b>_keyCode2bt:</b>
 
 This module is basically a virtual/emulated bluetooth keyboard. It capture keyCodes from the Hassio Hub using their websockets API and sends the keyCodes to any connected via bluetooth to any device thats accepts a HID bluetooh keyboard for input. There a several sub-modules to facilitate the device bluetooth pairing.
  
