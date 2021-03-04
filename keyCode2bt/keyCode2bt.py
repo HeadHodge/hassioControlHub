@@ -7,7 +7,13 @@ from dbus.mainloop.glib import DBusGMainLoop
 from multiprocessing import Process
 import os, sys, time, asyncio, traceback, queue
 
-sys.path.append('/inputHub/ip2btNode/modules')
+path = os.path.join(os.path.dirname(__file__), '../imports/websockets')
+sys.path.append(path)
+path = os.path.join(os.path.dirname(__file__), '../imports/bluetooth')
+sys.path.append(path)
+path = os.path.join(os.path.dirname(__file__), '../imports/dbus')
+sys.path.append(path)
+
 import wsServer
 import btServer
 import dbus
