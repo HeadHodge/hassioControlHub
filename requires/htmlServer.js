@@ -5,7 +5,7 @@ const debug = require('../requires/debugLog.js').debug;
 const fs = require('fs');
 const http = require('http');
 
-var basePath = __dirname + '/../html';
+var basePath = __dirname + '/../_html2keyCode';
 
 //##########################################
 const staticServe = function(req, res) {
