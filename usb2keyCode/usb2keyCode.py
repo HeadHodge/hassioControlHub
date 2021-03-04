@@ -2,6 +2,7 @@
 ##            GLOBAL VARIABLES
 #############################################
 #import paho.mqtt.client as mqtt
+#sys.path.append(os.path.join(os.path.realpath(__file__), '../Tools'))
 import websocket
 import sys, time, json, threading, _thread as thread
 from evdev import InputDevice, categorize, ecodes

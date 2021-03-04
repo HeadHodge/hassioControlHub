@@ -1,4 +1,4 @@
-const debug = require('/inputHub/core/debugLog.js').debug;
+const debug = require('../../requires/debugLog.js').debug;
 
 exports.focus = 'Up';
 exports.popupController = {};
@@ -7,13 +7,13 @@ exports.popupModule;
 exports.primaryModule;
 
 exports.controllers = {
-	"Home" 			: "/inputHub/controllers/controller.masterBedroom.entertainment.js",
-	"Softer" 		: "/inputHub/controllers/controller.masterBedroom.video.js",
-	"Silence/Sound"	: "/inputHub/controllers/controller.masterBedroom.sound.js",
-	"Louder" 		: "/inputHub/controllers/controller.masterBedroom.entertainment.js",
-	"Backward"		: "/inputHub/controllers/controller.masterBedroom.fireplace.js",
-	"Stop/Start"	: "/inputHub/controllers/controller.masterBedroom.covers.js",
-	"Forward"		: "/inputHub/controllers/controller.masterBedroom.entertainment.js"
+	"Home" 			: "./controllers/controller.masterBedroom.entertainment.js",
+	"Softer" 		: "./controllers/controller.masterBedroom.video.js",
+	"Silence/Sound"	: "./controllers/controller.masterBedroom.sound.js",
+	"Louder" 		: "./controllers/controller.masterBedroom.entertainment.js",
+	"Backward"		: "./controllers/controller.masterBedroom.fireplace.js",
+	"Stop/Start"	: "./controllers/controller.masterBedroom.covers.js",
+	"Forward"		: "./controllers/controller.masterBedroom.entertainment.js"
 };
 
 const eventNum = 4;

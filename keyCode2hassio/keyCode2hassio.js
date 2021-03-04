@@ -1,11 +1,11 @@
 ////////////////////////////////////////////
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
-const debug = require('/inputHub/core/debugLog.js').debug;
 const os = require('os');
-const htmlServer = require('/inputHub/core/htmlServer.js');
-const wsInput = require('/inputHub/core/wsInput.js');
-const wsOutput = require('/inputHub/core/wsOutput.js');
+const debug = require('../requires/debugLog.js').debug;
+const htmlServer = require('../requires/htmlServer.js');
+const wsInput = require('../requires/wsInput.js');
+const wsOutput = require('../requires/wsOutput.js');
 var _zones={};
 
 //##########################################
@@ -86,7 +86,7 @@ const onInput = function(input, reply) {
 try {
 //##########################################
 debug.log(`Enter onInput, command: ${input.command}, zone: ${input.zone}`);
-_zones[input.zone] = require(`/inputHub/zones/zone.${input.zone}.js`);
+_zones[input.zone] = require(`./zones/zone.${input.zone}.js`);
 
 	if(input.command == 'Echo') return reply('Echo');
 	if(input.command == 'Set') input.command = 'Off/On';

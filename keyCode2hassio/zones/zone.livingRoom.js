@@ -1,4 +1,4 @@
-const debug = require('/inputHub/core/debugLog.js').debug;
+const debug = require('../../requires/debugLog.js').debug;
 
 exports.focus = 'Up';
 exports.popupController = {};
@@ -23,13 +23,13 @@ const adbEvents = {
 };
 
 exports.controllers = {
-	"Home" 			: "/inputHub/controllers/controller.livingRoom.entertainment.js",
-	"Softer" 		: "/inputHub/controllers/controller.livingRoom.video.js",
-	"Silence/Sound"	: "/inputHub/controllers/controller.livingRoom.sound.js",
-	"Louder" 		: "/inputHub/controllers/controller.livingRoom.entertainment.js",
-	"Backward"		: "/inputHub/controllers/controller.livingRoom.fireplace.js",
-	"Stop/Start"	: "/inputHub/controllers/controller.livingRoom.covers.js",
-	"Forward"		: "/inputHub/controllers/controller.livingRoom.entertainment.js"
+	"Home" 			: "./controllers/controller.livingRoom.entertainment.js",
+	"Softer" 		: "./controllers/controller.livingRoom.video.js",
+	"Silence/Sound"	: "./controllers/controller.livingRoom.sound.js",
+	"Louder" 		: "./controllers/controller.livingRoom.entertainment.js",
+	"Backward"		: "./controllers/controller.livingRoom.fireplace.js",
+	"Stop/Start"	: "./controllers/controller.livingRoom.covers.js",
+	"Forward"		: "./controllers/controller.livingRoom.entertainment.js"
 };
 
 exports.tasks = {
