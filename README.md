@@ -22,5 +22,5 @@ Standard keyCodes are captured from other modules via websockets. The keyCodes a
 
 <b>_keyCode2bt:</b>
 
-This module is basically a virtual/emulated bluetooth keyboard. It capture keyCodes from the Hassio Hub using their websockets API and sends the keyCodes to any connected via bluetooth to any device thats accepts a HID bluetooh keyboard for input. There a several sub-modules to facilitate the device bluetooth pairing.
+This module is basically a virtual/emulated bluetooth keyboard. It captures keyCodes from the Hassio Hub using their websockets API and sends the keyCodes to any connected via bluetooth to any device thats accepts a HID bluetooh keyboard for input. There a several sub-modules to facilitate the device bluetooth pairing.
  
