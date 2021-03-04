@@ -1,6 +1,4 @@
-<center><b>smartRemotes</b></center>
-
-
+                                        <b>smartRemotes</b>
 
 <b>Overview:</b>
 
