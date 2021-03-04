@@ -6,7 +6,7 @@ smartRemotes is a collection of modules to capture remote key codes and scan cod
 
 The main modules are loosely coupled to each other via network communications using websockets. This is a stateful communications protocol that is efficient for continuous data flow and is available on practically any platform you can think of. The ubiquitos nature of websockets along with the JSON standard for object serializaton, makes for an easy convient way to communicate between diverse systems.
 
-<b>Module Descriptions</b>
+<b>Module Descriptions:</b>
     
 <b>usb2keyCode:<b>
 
