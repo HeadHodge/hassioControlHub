@@ -1,4 +1,4 @@
-                                        <b>smartRemotes</b>
+                                            smartRemotes
 
 <b>Overview:</b>
 
