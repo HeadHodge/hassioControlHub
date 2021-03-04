@@ -10,11 +10,11 @@ The main modules are loosely coupled to each other via network communications us
     
 <b>usb2keyCode:<b>
 
-Captures usb serial hid device (i.e. usb wired/wireless keyboards) scan code input, converts data to a standard key code format and then offloads the result to the keyCode2hassio module. 
+Captures usb serial hid device (i.e. usb wired/wireless keyboards) scan code input, converts data to a standard key code format and offloads the results to the keyCode2hassio module. 
     
 <b>html2keyCode:</b>
 
-Captures key code input from html browser pages, then coverts to a standard key format and then offloads the result to the keyCode2hassio hub.
+Captures key code input from html browser pages, then converts to a standard key format and offloads the result to the keyCode2hassio hub.
     
 <b>keyCode2hassio:</b>
     
