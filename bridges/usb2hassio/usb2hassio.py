@@ -6,15 +6,17 @@ from gi.repository import GLib
 from multiprocessing import Process
 import os, sys, time, json, traceback, queue
 
-path = os.path.join(os.path.dirname(__file__), '../imports/websockets')
+path = os.path.join(os.path.dirname(__file__), '../../imports/websockets')
 sys.path.append(path)
-import wsClient, wsServer
+path = os.path.join(os.path.dirname(__file__), '../../imports/key2hassioMap')
+sys.path.append(path)
+import wsClient, wsServer, key2hassioMap
 
 # keyCode formatted Input
 _inputOptions = {
-    "endpoint": "ws://192.168.0.164:8080",
+    "endpoint": "ws://192.168.0.164:808",
     "address": "192.168.0.164",
-    "port": "8080",
+    "port": "808",
     "path": "/",
     "queue": None,
     "onEvent": None
@@ -32,7 +34,7 @@ _outputOptions = {
    
 async def onInputEvent(eventType='post', eventData=''):
     print(f'onInputEvent type: {eventType}, type: {eventData}')
-    content = json.loads(eventData)
+    keyCodeMap.translate(json.loads(eventData))
     return '{"format": "reply", "reply": "Got It"}'
  
 async def onOutputEvent(eventType='post', eventData=''):
@@ -46,6 +48,11 @@ async def onOutputEvent(eventType='post', eventData=''):
 #############################################
 ##                MAIN
 #############################################
+
+
+eventData='{"type": "command", "command": "Echo", "id": "webClient", "zone": "masterBedroom", "device": "webBrowser"}'
+key2hassioMap.translate(json.loads(eventData))
+"""
 try:
     # Start wsServer Module
     try:
@@ -67,3 +74,4 @@ try:
 except:
     print('Abort keyCode2hassio.py', sys.exc_info()[0])
     traceback.print_exc()
+"""
