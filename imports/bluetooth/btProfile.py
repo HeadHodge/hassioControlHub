@@ -132,3 +132,6 @@ if __name__ == '__main__':
     except:
         print('Abort btProfile.py', sys.exc_info()[0])
         traceback.print_exc()
+        
+# Run this module on main thread to unit test with following code
+if __name__ == '__main__':

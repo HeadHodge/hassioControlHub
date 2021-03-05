@@ -12,20 +12,30 @@ import wsClient, wsServer
 
 # keyCode formatted Input
 _inputOptions = {
-    "endpoint": "ws://127.0.0.1:8181",
+    "endpoint": "ws://127.0.0.1:8280",
     "address": "127.0.0.1",
-    "port": "8181",
+    "port": "8280",
     "path": "/",
     "queue": None,
     "onEvent": None
    }
 
 # hassio service events Output
-_outputOptions = {
+_xoutputOptions = {
     "endpoint": "ws://192.168.0.160:8123/api/websocket",
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
+    "queue": None,
+    "onEvent": None
+   }
+   
+# hassio service events Output
+_outputOptions = {
+    "endpoint": "ws://127.0.0.1:8080",
+    "address": "192.168.0.164",
+    "port": "8080",
+    "path": "/",
     "queue": None,
     "onEvent": None
    }
@@ -47,6 +57,7 @@ async def onOutputEvent(type='post', data=''):
 ##                MAIN
 #############################################
 try:
+    """
     # Start wsServer Module
     try:
         wsServer = Process(target=wsServer.start, args=(_inputOptions,))
@@ -54,7 +65,7 @@ try:
     except:
         print('Abort run wsServer: ', sys.exc_info()[0])
         traceback.print_exc()
-   
+    """   
     # Start wsClient Module
     try:
         _outputOptions['onEvent'] = onOutputEvent
@@ -63,7 +74,6 @@ try:
     except:
         print('Abort run wsClient: ', sys.exc_info()[0])
         traceback.print_exc()
-    
 except:
     print('Abort keyCode2hassio.py', sys.exc_info()[0])
     traceback.print_exc()

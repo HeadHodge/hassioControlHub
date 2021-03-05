@@ -33,6 +33,7 @@ def start(options):
         _options = options
         
         start_server = websockets.serve(onConnect, options["address"], options["port"])
+        #start_server = websockets.serve(onConnect, '127.0.0.1', 8080)
         asyncio.get_event_loop().run_until_complete(start_server)
 
         print(f'wait for connections on address: {options["address"]}, port: {options["port"]}')
@@ -45,3 +46,16 @@ def start(options):
 #######################################
 #              MAIN
 #######################################
+# Run this module on main thread to unit test with following code
+
+if __name__ == "__main__":
+    options = {
+        "endpoint": "ws://127.0.0.1:8080/",
+        "address": "127.0.0.1",
+        "port": "8080",
+        "path": "/",
+        "queue": None,
+        "onEvent": None
+        }
+        
+    start(options)

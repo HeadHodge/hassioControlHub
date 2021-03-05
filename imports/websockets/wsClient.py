@@ -54,3 +54,6 @@ def start(options):
 ##########################
 #         MAIN
 ##########################
+# Run this module on main thread to unit test with following code
+if __name__ == '__main__':
+    pass
