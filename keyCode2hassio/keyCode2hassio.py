@@ -12,16 +12,16 @@ import wsClient, wsServer
 
 # keyCode formatted Input
 _inputOptions = {
-    "endpoint": "ws://127.0.0.1:8280",
-    "address": "127.0.0.1",
-    "port": "8280",
+    "endpoint": "ws://192.168.0.164:8080",
+    "address": "192.168.0.164",
+    "port": "8080",
     "path": "/",
     "queue": None,
     "onEvent": None
    }
 
 # hassio service events Output
-_xoutputOptions = {
+_outputOptions = {
     "endpoint": "ws://192.168.0.160:8123/api/websocket",
     "address": "192.168.0.160",
     "port": "8123",
@@ -30,24 +30,14 @@ _xoutputOptions = {
     "onEvent": None
    }
    
-# hassio service events Output
-_outputOptions = {
-    "endpoint": "ws://127.0.0.1:8080",
-    "address": "192.168.0.164",
-    "port": "8080",
-    "path": "/",
-    "queue": None,
-    "onEvent": None
-   }
-   
-async def onInputEvent(type='post', data=''):
-    print(f'onInputEvent type: {type}, type: {data}')
-    content = json.loads(data)
-    return None
-    
-async def onOutputEvent(type='post', data=''):
-    print(f'onOutputEvent type: {type}, type: {data}')
-    content = json.loads(data)
+async def onInputEvent(eventType='post', eventData=''):
+    print(f'onInputEvent type: {eventType}, type: {eventData}')
+    content = json.loads(eventData)
+    return '{"format": "reply", "reply": "Got It"}'
+ 
+async def onOutputEvent(eventType='post', eventData=''):
+    print(f'onOutputEvent type: {eventType}, type: {eventData}')
+    content = json.loads(eventData)
 
     if(content['type'] != "auth_required"): return None
     print('auth_required')
@@ -57,15 +47,15 @@ async def onOutputEvent(type='post', data=''):
 ##                MAIN
 #############################################
 try:
-    """
     # Start wsServer Module
     try:
+        _inputOptions['onEvent'] = onInputEvent
         wsServer = Process(target=wsServer.start, args=(_inputOptions,))
         wsServer.start()
     except:
         print('Abort run wsServer: ', sys.exc_info()[0])
         traceback.print_exc()
-    """   
+
     # Start wsClient Module
     try:
         _outputOptions['onEvent'] = onOutputEvent

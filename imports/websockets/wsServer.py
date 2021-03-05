@@ -10,15 +10,23 @@ _options = None
 #######################################
 async def onInput(connection, post):
 #######################################
-    print('received post: ', json.loads(post))
-    await connection.send('{"format": "reply", "reply": "Got It"}')
+    print('received post: ', post)
+    try:    
+        reply = await _options['onEvent']('post', post)
+        print('reply: ', reply)
+        if(reply == None): return
+    
+        await connection.send('{"format": "reply", "reply": "Got It"}')
+    except:
+        print('Abort onInput', sys.exc_info()[0])
+        traceback.print_exc()
        
 #######################################
 async def onConnect(connection, path):
 #######################################
     print('wsServer Connected')
 
-    await connection.send('{"format": "greeting", "greeting": "Hello?", "from": ""}')
+    #await connection.send('{"format": "greeting", "greeting": "Hello?", "from": ""}')
         
     async for post in connection:
         await onInput(connection, post)
@@ -33,7 +41,6 @@ def start(options):
         _options = options
         
         start_server = websockets.serve(onConnect, options["address"], options["port"])
-        #start_server = websockets.serve(onConnect, '127.0.0.1', 8080)
         asyncio.get_event_loop().run_until_complete(start_server)
 
         print(f'wait for connections on address: {options["address"]}, port: {options["port"]}')
@@ -50,8 +57,8 @@ def start(options):
 
 if __name__ == "__main__":
     options = {
-        "endpoint": "ws://127.0.0.1:8080/",
-        "address": "127.0.0.1",
+        "endpoint": "ws://192.168.0.164:8080",
+        "address": "192.168.0.164",
         "port": "8080",
         "path": "/",
         "queue": None,
