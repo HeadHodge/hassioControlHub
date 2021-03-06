@@ -2,22 +2,28 @@
 ##            MODULE VARIABLES
 #############################################
 print('Load keyCode2hassio')
+    
 from gi.repository import GLib
 from multiprocessing import Process
 import os, sys, time, json, traceback, queue
 
+if len(sys.argv) < 3: 
+    print('Terminate usb2hassio, missing required zone name and/or event list arguments')
+    print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
+    sys.exit()
+
+path = os.path.join(os.path.dirname(__file__), '../../imports/usb')
+sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/websockets')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/key2hassioMap')
 sys.path.append(path)
-import wsClient, wsServer, key2hassioMap
+import wsClient, usbServer, key2hassioMap
 
 # keyCode formatted Input
 _inputOptions = {
-    "endpoint": "ws://192.168.0.164:808",
-    "address": "192.168.0.164",
-    "port": "808",
-    "path": "/",
+    "zone": sys.argv[1],
+    "channels": sys.argv[2].split(','),
     "queue": None,
     "onEvent": None
    }
@@ -32,10 +38,10 @@ _outputOptions = {
     "onEvent": None
    }
    
-async def onInputEvent(eventType='post', eventData=''):
+def onInputEvent(eventType='key', eventData=''):
     print(f'onInputEvent type: {eventType}, type: {eventData}')
-    keyCodeMap.translate(json.loads(eventData))
-    return '{"format": "reply", "reply": "Got It"}'
+    #keyCodeMap.translate(json.loads(eventData))
+    #return '{"format": "reply", "reply": "Got It"}'
  
 async def onOutputEvent(eventType='post', eventData=''):
     print(f'onOutputEvent type: {eventType}, type: {eventData}')
@@ -52,19 +58,19 @@ def reply(content):
 ##                MAIN
 #############################################
 
-eventData='{"type": "command", "command": "Louder", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
-print(f'key2hassio translation: {key2hassioMap.translateKey(json.loads(eventData), reply)}')
-"""
+#eventData='{"type": "command", "command": "Louder", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
+#print(f'key2hassio translation: {key2hassioMap.translateKey(json.loads(eventData), reply)}')
+
 try:
     # Start wsServer Module
     try:
         _inputOptions['onEvent'] = onInputEvent
-        wsServer = Process(target=wsServer.start, args=(_inputOptions,))
-        wsServer.start()
+        usbServer = Process(target=usbServer.start, args=(_inputOptions,))
+        usbServer.start()
     except:
-        print('Abort run wsServer: ', sys.exc_info()[0])
+        print('Abort run usbServer: ', sys.exc_info()[0])
         traceback.print_exc()
-
+    """
     # Start wsClient Module
     try:
         _outputOptions['onEvent'] = onOutputEvent
@@ -73,7 +79,7 @@ try:
     except:
         print('Abort run wsClient: ', sys.exc_info()[0])
         traceback.print_exc()
+    """
 except:
     print('Abort keyCode2hassio.py', sys.exc_info()[0])
     traceback.print_exc()
-"""

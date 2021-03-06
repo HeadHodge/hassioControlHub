@@ -44,6 +44,7 @@ commands = {
 }
 
 _zone = None
+_onInput = None
 
 ###################
 def getCommand(inputChar, inputCode):
@@ -85,11 +86,21 @@ def captureInput(channel):
             #print(f'keyState: {inputEvent.keystate}')
             
             if(inputEvent.keystate != 0): continue
-            if(inputEvent.scancode == lastCode and time.time() - lastTime < 0.75): continue
+            if(inputEvent.scancode == lastCode and time.time() - lastTime < 0.80): continue
             lastCode = inputEvent.scancode
             lastTime = time.time()
         
-            print(f'captured scanCode: {inputEvent.scancode}, keyCode: {inputEvent.keycode} on channel: {channel}')
+            #print(f'captured scanCode: {inputEvent.scancode}, keyCode: {inputEvent.keycode} on channel: {channel}')
+
+            eventData = {
+                "keyCode" : inputEvent.keycode,
+                "scanCode": inputEvent.scancode,
+                "keyState": inputEvent.keystate,
+                "channel" : channel,
+                "time"    : time.time()
+            }
+
+            _onInput('key', json.dumps(eventData))
     except:
         print(f'Abort captureInput: {sys.exc_info()[0]}')
         traceback.print_exc()
@@ -97,14 +108,15 @@ def captureInput(channel):
 ###################
 # start
 ###################
-def start(zone='masterBedroom', channels=[3,4,5,6]):
+def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
     print('Start usbServer')
-    global _zone
+    global _zone, _onInput
 
     try:
-        _zone = zone
+        _zone = options['zone']
+        _onInput = options['onEvent']
         
-        for channel in channels:
+        for channel in options['channels']:
             threading.Thread(target=captureInput, args=(channel,)).start()
 
     except:
@@ -132,14 +144,3 @@ if __name__ == "__main__":
 # Run this module on main thread to unit test with following code
 
     start()
-    
-    """
-    if len(sys.argv) < 3: 
-        print('Terminate hubClient, missing required zone and/or event list argument')
-        sys.exit()
-    
-    zone = sys.argv[1]
-    
-    channels = sys.argv[2].split(',')
-    start(zone, channels)
-    """
