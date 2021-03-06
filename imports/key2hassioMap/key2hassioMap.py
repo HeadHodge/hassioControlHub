@@ -98,7 +98,7 @@ def translateKey(key, reply):
             key["command"] = 'Silence'
             _zones[key["zone"]].isSilent=true
     
-    onCommand(key["zone"], key["command"], reply)
+    return onCommand(key["zone"], key["command"], reply)
 
 #############################################
 ##                MAIN

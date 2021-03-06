@@ -53,7 +53,7 @@ def reply(content):
 #############################################
 
 eventData='{"type": "command", "command": "Louder", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
-key2hassioMap.translateKey(json.loads(eventData), reply)
+print(f'key2hassio translation: {key2hassioMap.translateKey(json.loads(eventData), reply)}')
 """
 try:
     # Start wsServer Module
