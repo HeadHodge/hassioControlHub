@@ -64,7 +64,7 @@ def onSelectFocus(zone, command):
         'Forward': Forward,
     }
     
-    _zones[zone]['primaryModule'] = case.get(command, lambda: None)()
+    _zones[zone]['primaryModule'] = case.get(command, None)()
     print('defaultController selected: ${_zones[zone].primaryModule}')
 
 #############################################
