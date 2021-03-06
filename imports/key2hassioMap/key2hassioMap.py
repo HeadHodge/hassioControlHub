@@ -6,6 +6,67 @@ import importlib
 
 _zones = {}
 
+##########################################
+def onCommand(zone, command, reply):
+##########################################
+    print(f'Enter onCommand, command: {command}, zone: {zone}')
+    controller = None; task = None
+
+    if(_zones[zone]['popupModule']):
+        _zones[zone]['popupController'] = require(_zones[zone].popupModule)
+        _zones[zone]['popupModule'] = None
+        controller = _zones[zone].popupController
+    else:
+        _zones[zone].primaryController = require(_zones[zone].primaryModule)
+        controller = _zones[zone].primaryController
+    
+    if(not controller[tasks[command]]): return print(f'Abort: Invalid command: {command}')
+    
+    print(f'output task: {JSON.stringify(controller.tasks[command])}')
+    return JSON.stringify(controller.tasks[command])
+    
+##########################################
+def onSelectTask(zone, command, reply):
+##########################################
+    print(f'Enter onSelectTask with {command} in zone: {zone}')
+    task = None
+
+    _zones[zone]['isTaskSet'] = None
+    if(not _zones[zone][tasks['command']]): print(f'Abort: Invalid command: {command}'); return
+    return JSON.stringify(_zones[zone].tasks[command])
+    
+##########################################
+def onSelectFocus(zone, command):
+##########################################
+    print(f'Enter onSelectFocus with {command} in zone {zone}')
+
+    _zones[zone]['isFocusSet'] = None
+    
+    if(command == 'Ok'):
+        _zones[zone].isTaskSet = True
+        return console.log('taskList selected for ${zone}')
+
+    def Home()        : return _zones[zone][controllers['Home']]
+    def Louder()      : return _zones[zone][controllers['Louder']]
+    def Softer()      : return _zones[zone][controllers['Softer']]
+    def SilenceSound(): return _zones[zone][controllers['Silence/Sound']]
+    def Backward()    : return _zones[zone][controllers['Backward']]
+    def StopStart()   : return _zones[zone][controllers['Stop/Start']]
+    def Forward()     : return _zones[zone][controllers['Forward']]
+
+    case = {
+        'Home': Home,
+        'Louder': Louder,
+        'Softer': Softer,
+        'Silence/Sound': SilenceSound,
+        'Backward': Backward,
+        'Stop/Start': StopStart,
+        'Forward': Forward,
+    }
+    
+    _zones[zone]['primaryModule'] = case.get(command, lambda: None)()
+    print('defaultController selected: ${_zones[zone].primaryModule}')
+
 #############################################
 def translateKey(key, reply):
 #############################################
