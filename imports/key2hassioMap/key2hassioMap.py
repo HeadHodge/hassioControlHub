@@ -2,7 +2,7 @@
 ##            MODULE VARIABLES
 #############################################
 print('Load key2hassioMap')
-import importlib
+import importlib, json
 
 _zones = {}
 
@@ -12,18 +12,18 @@ def onCommand(zone, command, reply):
     print(f'Enter onCommand, command: {command}, zone: {zone}')
     controller = None; task = None
 
-    if(_zones[zone]['popupModule']):
-        _zones[zone]['popupController'] = require(_zones[zone].popupModule)
-        _zones[zone]['popupModule'] = None
+    if(_zones[zone].popupModule):
+        _zones[zone].popupController = importlib.import_module('controllers.' + _zones[zone].popupModule)
+        _zones[zone].popupModule = None
         controller = _zones[zone].popupController
     else:
-        _zones[zone].primaryController = require(_zones[zone].primaryModule)
+        _zones[zone].primaryController = importlib.import_module('controllers.' + _zones[zone].primaryModule)
         controller = _zones[zone].primaryController
     
-    if(not controller[tasks[command]]): return print(f'Abort: Invalid command: {command}')
+    if(not controller.tasks[command]): return print(f'Abort: Invalid command: {command}')
     
-    print(f'output task: {JSON.stringify(controller.tasks[command])}')
-    return JSON.stringify(controller.tasks[command])
+    print(f'output task: {json.dumps(controller.tasks[command])}')
+    return json.dumps(controller.tasks[command])
     
 ##########################################
 def onSelectTask(zone, command, reply):
@@ -74,12 +74,15 @@ def translateKey(key, reply):
     global _zone
     
     _zones[key["zone"]] = importlib.import_module('zones.zone_' + key["zone"])
+    print(_zones[key["zone"]])
 
     if(key["command"] == 'Echo'): reply('Echo'); return
         
     if(key["command"] == 'Set'): key["command"] = 'Off/On'
     
-    if(_zones[key["zone"]].isFocusSet and key["command"] == 'Off/On'): key["command"] = 'Open'; _zones[key["zone"]].isFocusSet = null
+    if(_zones[key["zone"]].isFocusSet == True and key["command"] == 'Off/On'): 
+        key["command"] = 'Open'
+        _zones[key["zone"]].isFocusSet = None
         
     if(_zones[key["zone"]].isFocusSet): return onSelectFocus(key["zone"], key["command"])
     if(_zones[key["zone"]].isTaskSet or key["command"] == 'Ping'): return onSelectTask(key["zone"], key["command"], reply)

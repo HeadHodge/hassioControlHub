@@ -52,7 +52,7 @@ def reply(content):
 ##                MAIN
 #############################################
 
-eventData='{"type": "command", "command": "Echo", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
+eventData='{"type": "command", "command": "Louder", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
 key2hassioMap.translateKey(json.loads(eventData), reply)
 """
 try:

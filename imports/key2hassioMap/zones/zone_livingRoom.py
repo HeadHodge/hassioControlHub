@@ -3,7 +3,8 @@ popupController = {}
 primaryController = {}
 popupModule = None
 primaryModule = None
-
+isFocusSet = None
+isTaskSet = None
 eventNum = 4
 
 adbEvents = {
@@ -22,13 +23,13 @@ adbEvents = {
 }
 
 controllers = {
-	"Home" 			: "./controllers/controller.livingRoom.entertainment.js",
-	"Softer" 		: "./controllers/controller.livingRoom.video.js",
-	"Silence/Sound"	: "./controllers/controller.livingRoom.sound.js",
-	"Louder" 		: "./controllers/controller.livingRoom.entertainment.js",
-	"Backward"		: "./controllers/controller.livingRoom.fireplace.js",
-	"Stop/Start"	: "./controllers/controller.livingRoom.covers.js",
-	"Forward"		: "./controllers/controller.livingRoom.entertainment.js"
+	"Home" 			: "controller_livingRoom_entertainment",
+	"Softer" 		: "controller_livingRoom_video",
+	"Silence/Sound"	: "controller_livingRoom_sound",
+	"Louder" 		: "controller_livingRoom_entertainment",
+	"Backward"		: "controller_livingRoom_fireplace",
+	"Stop/Start"	: "controller_livingRoom_covers",
+	"Forward"		: "controller_livingRoom_entertainment"
 }
 
 tasks = {
