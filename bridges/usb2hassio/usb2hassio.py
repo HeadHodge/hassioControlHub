@@ -16,9 +16,11 @@ path = os.path.join(os.path.dirname(__file__), '../../imports/usb')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/websockets')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/key2hassioMap')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps/key2hassioMap')
 sys.path.append(path)
-import wsClient, usbServer, key2hassioMap
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps/usb2keyMap')
+sys.path.append(path)
+import wsClient, usbServer, usb2keyMap, key2hassioMap
 
 # keyCode formatted Input
 _inputOptions = {
