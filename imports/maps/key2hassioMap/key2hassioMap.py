@@ -40,19 +40,19 @@ def onSelectFocus(zone, command):
 ##########################################
     #print(f'Enter onSelectFocus with {command} in zone {zone}')
 
-    _zones[zone]['isFocusSet'] = None
+    _zones[zone].isFocusSet = None
     
     if(command == 'Ok'):
         _zones[zone].isTaskSet = True
         return console.log('taskList selected for ${zone}')
 
-    def Home()        : return _zones[zone][controllers['Home']]
-    def Louder()      : return _zones[zone][controllers['Louder']]
-    def Softer()      : return _zones[zone][controllers['Softer']]
-    def SilenceSound(): return _zones[zone][controllers['Silence/Sound']]
-    def Backward()    : return _zones[zone][controllers['Backward']]
-    def StopStart()   : return _zones[zone][controllers['Stop/Start']]
-    def Forward()     : return _zones[zone][controllers['Forward']]
+    def Home()        : return _zones[zone].controllers['Home']
+    def Louder()      : return _zones[zone].controllers['Louder']
+    def Softer()      : return _zones[zone].controllers['Softer']
+    def SilenceSound(): return _zones[zone].controllers['Silence/Sound']
+    def Backward()    : return _zones[zone].controllers['Backward']
+    def StopStart()   : return _zones[zone].controllers['Stop/Start']
+    def Forward()     : return _zones[zone].controllers['Forward']
 
     case = {
         'Home': Home,
@@ -64,8 +64,8 @@ def onSelectFocus(zone, command):
         'Forward': Forward,
     }
     
-    _zones[zone]['primaryModule'] = case.get(command, None)()
-    print('defaultController selected: ${_zones[zone].primaryModule}')
+    _zones[zone].primaryModule = case.get(command, None)()
+    print(f'defaultController selected: {_zones[zone].primaryModule}')
 
 #############################################
 def translateKey(key):
@@ -87,7 +87,7 @@ def translateKey(key):
     if(_zones[key["zone"]].isTaskSet or key["code"] == 'Ping'): return onSelectTask(key["zone"], key["code"], reply)
 
         
-    if(key["code"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return console.log('Set Focus Flag')
+    if(key["code"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
 
     if(key["code"] == 'Silence/Sound'):
         if(_zones[key["zone"]].isSilent):
