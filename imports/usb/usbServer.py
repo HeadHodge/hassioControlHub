@@ -41,7 +41,7 @@ def captureInput(channel):
                 "scanCode": inputEvent.scancode,
                 "keyState": inputEvent.keystate,
                 "channel" : channel,
-                "device"  : device,
+                "device"  : device.name,
                 "zone"    : _zone,
                 "time"    : time.time()
             }

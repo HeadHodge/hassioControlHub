@@ -1,3 +1,8 @@
+#############################################
+##            MODULE VARIABLES
+#############################################
+print('Load zone_livingRoom')
+
 focus = 'Up'
 popupController = {}
 primaryController = {}
@@ -5,6 +10,7 @@ popupModule = None
 primaryModule = None
 isFocusSet = None
 isTaskSet = None
+isSilent = None
 eventNum = 4
 
 adbEvents = {
@@ -68,6 +74,5 @@ tasks = {
 ########################################
 #               MAIN
 ########################################
-print('Loaded zone.livingRoom.js')
 
 primaryModule = controllers['Home']

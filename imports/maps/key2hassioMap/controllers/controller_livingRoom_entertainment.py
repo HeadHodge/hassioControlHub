@@ -1,3 +1,8 @@
+#############################################
+##            MODULE VARIABLES
+#############################################
+print('Load controller_livingRoom_entertainment')
+
 eventNum = 5;
 
 adbEvents = {

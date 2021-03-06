@@ -26,7 +26,6 @@ import wsClient, usbServer, usb2keyMap, key2hassioMap
 _inputOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
-    "queue": None,
     "onEvent": None
    }
 
@@ -41,10 +40,11 @@ _outputOptions = {
    }
    
 def onInputEvent(eventType='key', eventData=''):
-    print(f'onInputEvent type: {eventType}, type: {eventData}')
-    #keyCodeMap.translate(json.loads(eventData))
-    #return '{"format": "reply", "reply": "Got It"}'
- 
+    print(f' \nonInput Event, eventType: {eventType}')
+    print(f'***Input: {eventData}')
+    key = usb2keyMap.translateKey(json.loads(eventData))
+    print(' \n***Output: ', key2hassioMap.translateKey(json.loads(key)))
+    
 async def onOutputEvent(eventType='post', eventData=''):
     print(f'onOutputEvent type: {eventType}, type: {eventData}')
     content = json.loads(eventData)

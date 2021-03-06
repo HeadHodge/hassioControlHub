@@ -1,3 +1,8 @@
+#############################################
+##            MODULE VARIABLES
+#############################################
+print('Load controller_masterBedroom_entertainment')
+
 eventNum = 4
 
 adbEvents = {
@@ -126,4 +131,3 @@ tasks = {
 #########################################
 #                MAIN
 #########################################
-print('Loaded controller.masterBedroom.entertainment.js')

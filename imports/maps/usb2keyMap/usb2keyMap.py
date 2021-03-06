@@ -41,13 +41,13 @@ scan2key = {
 }
 
 #############################################
-def translateKey(input, reply):
+def translateKey(input):
 #############################################
-    print(f'translate keycode: {input}')
+    #print(f'translate keycode: {input}')
 
     key = {
         "context": "multiMedia",
-        "code": scan2key.get(input['keyCode'], None),
+        "code": scan2key.get(input['scanCode'], None),
         "zone": input['zone'],
         "device": "usb"
     }

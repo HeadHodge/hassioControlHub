@@ -1,21 +1,27 @@
+#############################################
+##            MODULE VARIABLES
+#############################################
+print('Load zone_masterBedroom')
 
 focus = 'Up'
 popupController = {}
 primaryController = {}
 popupModule = None
 primaryModule = None
+isFocusSet = None
+isTaskSet = None
+isSilent = None
+eventNum = 4
 
 controllers = {
-	"Home" 			: "./controllers/controller.masterBedroom.entertainment.js",
-	"Softer" 		: "./controllers/controller.masterBedroom.video.js",
-	"Silence/Sound"	: "./controllers/controller.masterBedroom.sound.js",
-	"Louder" 		: "./controllers/controller.masterBedroom.entertainment.js",
-	"Backward"		: "./controllers/controller.masterBedroom.fireplace.js",
-	"Stop/Start"	: "./controllers/controller.masterBedroom.covers.js",
-	"Forward"		: "./controllers/controller.masterBedroom.entertainment.js"
+	"Home" 			: "controller_masterBedroom_entertainment",
+	"Softer" 		: "controller_masterBedroom_video",
+	"Silence/Sound"	: "controller_masterBedroom_sound",
+	"Louder" 		: "controller_masterBedroom_entertainment",
+	"Backward"		: "controller_masterBedroom_fireplace",
+	"Stop/Start"	: "controller_masterBedroom_covers",
+	"Forward"		: "controller_masterBedroom_entertainment"
 }
-
-eventNum = 4
 
 adbEvents = {
 	"Home"		: f'sendevent /dev/input/event{eventNum} 4 4 786979 && sendevent /dev/input/event{eventNum} 1 172 1 && sendevent /dev/input/event{eventNum} 0 0 0 && sendevent /dev/input/event{eventNum} 4 4 786979 && sendevent /dev/input/event{eventNum} 1 172 0 && sendevent /dev/input/event{eventNum} 0 0 0',
@@ -127,6 +133,5 @@ tasks = {
 #######################################
 #                MAIN
 #######################################
-print('Loaded zone.masterBedroom.js')
 
 primaryModule = controllers['Home']
