@@ -4,7 +4,7 @@
 print('Load key2hassioMap')
 import importlib
 
-mdule = importlib.import_module('zones.zone_masterBedroom')
+mdule = importlib.import_module('zones.zone_livingRoom')
 
 #############################################
 def translate(keyCode):

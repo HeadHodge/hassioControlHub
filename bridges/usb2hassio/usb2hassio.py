@@ -50,7 +50,7 @@ async def onOutputEvent(eventType='post', eventData=''):
 #############################################
 
 
-eventData='{"type": "command", "command": "Echo", "id": "webClient", "zone": "masterBedroom", "device": "webBrowser"}'
+eventData='{"type": "command", "command": "Echo", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
 key2hassioMap.translate(json.loads(eventData))
 """
 try:
