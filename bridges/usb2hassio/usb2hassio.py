@@ -44,14 +44,16 @@ async def onOutputEvent(eventType='post', eventData=''):
     if(content['type'] != "auth_required"): return None
     print('auth_required')
     return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'       
-   
+
+def reply(content):
+    print(f'reply: {content}')
+    
 #############################################
 ##                MAIN
 #############################################
 
-
 eventData='{"type": "command", "command": "Echo", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
-key2hassioMap.translate(json.loads(eventData))
+key2hassioMap.translateKey(json.loads(eventData), reply)
 """
 try:
     # Start wsServer Module
