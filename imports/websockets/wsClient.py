@@ -18,7 +18,7 @@ async def onInput(post):
 ##########################
     try:    
         payload = await _options['onEvent']('post', post)
-        print('send payload: ', payload)
+        print(' \nsend payload: ', payload)
         #if(payload == None): return
         await _connection.send(payload)
     except:

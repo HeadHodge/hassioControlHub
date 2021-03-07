@@ -48,13 +48,17 @@ def onInputEvent(eventType='key', eventData=''):
     print(f'***Input: {eventData}')
     
     key = usb2keyMap.translateKey(eventData)
-    hassioCommand = key2hassioMap.translateKey(key)
+    hassioSequence = key2hassioMap.translateKey(key)
 
-    if(hassioCommand != None): _ioQueue.put(hassioCommand)
-    #print(' \n***Queue: ', hassioCommand)
+    if(hassioSequence == None): return
+    
+    for task in hassioSequence:
+        _ioQueue.put(task)
+        
+    #print(' \n***Queue: ', hassioSequence)
     
 async def onOutputEvent(eventType='post', eventData=''):
-    print(f'onOutputEvent type: {eventType}, type: {eventData}')
+    print(f' \nonOutputEvent type: {eventType}, type: {eventData}')
     global _ioQueue, _sessionId
     
     content = json.loads(eventData)
@@ -66,12 +70,11 @@ async def onOutputEvent(eventType='post', eventData=''):
         if(_ioQueue.empty()): continue
         
         #send payload to hassio server
-        sequence = _ioQueue.get()
-        task = sequence[0]
+        task = _ioQueue.get()
         key = list(task.keys())[0]
         data = task[key]
         command = key.split('/')
-        if(command[0] == 'sleep') time.sleep(imt(data)); continue
+        if(command[0] == 'sleep'): time.sleep(imt(data)); continue
         
         _sessionId += 1
         
