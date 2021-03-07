@@ -15,7 +15,7 @@ _queue = None
 ############################
 def captureInput(channel, options):
 ############################
-    print(f'captureInput on channel: {channel}')
+    #print(f'captureInput on channel: {channel}')
     
     try:
         lastCode = 0

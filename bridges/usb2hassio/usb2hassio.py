@@ -44,22 +44,25 @@ _outputOptions = {
    }
  
 def onInputEvent(eventType='key', eventData=''):
-    print(f' \nonInput Event, eventType: {eventType}')
-    print(f'***Input: {eventData}')
+    #print(f' \nonInput Event, eventType: {eventType}')
+    print(f'***INPUT: {eventData}')
     
     key = usb2keyMap.translateKey(eventData)
-    if(key == None): print(f'no translation found for {eventData["keyCode"]}'); return
+    if(key == None): return
+    print(f'***TRANSLATE: {key}')
     
     hassioSequence = key2hassioMap.translateKey(key)
     if(hassioSequence == None): print(f'no translation found for {key["code"]}'); return
     
     for task in hassioSequence:
+        print(f'***OUTPUT: {task}')
         _ioQueue.put(task)
         
     #print(' \n***Queue: ', hassioSequence)
     
 async def onOutputEvent(eventType='post', eventData=''):
-    print(f' \nonOutputEvent type: {eventType}, type: {eventData}')
+    print(f' \n********************************************')
+    print(f'***REPLY: {eventData}')
     global _ioQueue, _sessionId
     
     content = json.loads(eventData)
@@ -72,7 +75,7 @@ async def onOutputEvent(eventType='post', eventData=''):
         
         #send payload to hassio server
         task = _ioQueue.get()
-        print(f'deQueue task: {task}')
+        #print(f'deQueue task: {task}')
         
         key = list(task.keys())[0]
         data = task[key]
