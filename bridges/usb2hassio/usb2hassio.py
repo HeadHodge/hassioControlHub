@@ -48,9 +48,10 @@ def onInputEvent(eventType='key', eventData=''):
     print(f'***Input: {eventData}')
     
     key = usb2keyMap.translateKey(eventData)
+    if(key == None): print(f'no translation found for {eventData["keyCode"]}'); return
+    
     hassioSequence = key2hassioMap.translateKey(key)
-
-    if(hassioSequence == None): print('no translation found'); return
+    if(hassioSequence == None): print(f'no translation found for {key["code"]}'); return
     
     for task in hassioSequence:
         _ioQueue.put(task)
@@ -71,10 +72,12 @@ async def onOutputEvent(eventType='post', eventData=''):
         
         #send payload to hassio server
         task = _ioQueue.get()
+        print(f'deQueue task: {task}')
+        
         key = list(task.keys())[0]
         data = task[key]
         command = key.split('/')
-        if(command[0] == 'sleep'): time.sleep(imt(data)); continue
+        if(command[0] == 'sleep'): time.sleep(int(data)); continue
         
         _sessionId += 1
         

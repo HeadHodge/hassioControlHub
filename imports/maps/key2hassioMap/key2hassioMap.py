@@ -2,7 +2,7 @@
 ##            MODULE VARIABLES
 #############################################
 print('Load key2hassioMap')
-import importlib, json
+import os, sys, importlib, json, traceback
 
 _zones = {}
 
@@ -24,9 +24,8 @@ def getTask(zone, code):
     #print(f'Enter onSelectTask with {code} in zone: {zone}')
     task = None
 
-    _zones[zone]['isTaskSet'] = None
-    if(not _zones[zone][tasks['code']]): print(f'Abort: Invalid code: {code}'); return None
-    return _zones[zone].tasks[code]
+    _zones[zone].isTaskSet = None
+    return _zones[zone].tasks.get(code, None)
     
 ##########################################
 def setFocus(zone, code):
@@ -35,9 +34,9 @@ def setFocus(zone, code):
 
     _zones[zone].isFocusSet = None
     
-    if(code == 'Ok'):
+    if(code == 'Menu'):
         _zones[zone].isTaskSet = True
-        return console.log('taskList selected for ${zone}')
+        print(f'taskList selected for {zone}');return
 
     def Home()        : return _zones[zone].controllers['Home']
     def Louder()      : return _zones[zone].controllers['Louder']
@@ -57,40 +56,46 @@ def setFocus(zone, code):
         'Forward'    : Forward
     }
     
-    _zones[zone].primaryModule = case.get(code, None)()
-    print(f'primaryController selected: {_zones[zone].primaryModule}')
+    newModule = case.get(code, None)
+    if(newModule == None): return
+    _zones[zone].primaryModule = case.get(code, None)
+    print(f'new primaryController selected: {_zones[zone].primaryModule}')
 
 #############################################
 def translateKey(key):
 #############################################
-    #print(f'translate keycode: {key}')
-    global _zone
+    try:
+        #print(f'translate keycode: {key}')
+        global _zone
     
-    _zones[key["zone"]] = importlib.import_module('zones.zone_' + key["zone"])
+        _zones[key["zone"]] = importlib.import_module('zones.zone_' + key["zone"])
 
-    #if(key["code"] == 'Echo'): reply('Echo'); return
+        #if(key["code"] == 'Echo'): reply('Echo'); return
         
-    if(key["code"] == 'Set'): key["code"] = 'OffOn'
+        if(key["code"] == 'Set'): key["code"] = 'OffOn'
     
-    if(_zones[key["zone"]].isFocusSet == True and key["code"] == 'OffOn'): 
-        key["code"] = 'Open'
-        _zones[key["zone"]].isFocusSet = None
+        if(_zones[key["zone"]].isFocusSet == True and key["code"] == 'OffOn'): 
+            key["code"] = 'Open'
+            _zones[key["zone"]].isFocusSet = None
         
-    if(_zones[key["zone"]].isFocusSet): return setFocus(key["zone"], key["code"])
-    if(_zones[key["zone"]].isTaskSet or key["code"] == 'Ping'): return getTask(key["zone"], key["code"], reply)
+        if(_zones[key["zone"]].isFocusSet): return setFocus(key["zone"], key["code"])
+        if(_zones[key["zone"]].isTaskSet or key["code"] == 'Ping'): return getTask(key["zone"], key["code"])
 
         
-    if(key["code"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
+        if(key["code"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
 
-    if(key["code"] == 'Silence/Sound'):
-        if(_zones[key["zone"]].isSilent):
-            key["code"] = 'Sound'
-            _zones[key["zone"]].isSilent=null
-        else:
-            key["code"] = 'Silence'
-            _zones[key["zone"]].isSilent=True
+        if(key["code"] == 'Silence/Sound'):
+            if(_zones[key["zone"]].isSilent):
+                key["code"] = 'Sound'
+                _zones[key["zone"]].isSilent=null
+            else:
+                key["code"] = 'Silence'
+                _zones[key["zone"]].isSilent=True
     
-    return getCommand(key["zone"], key["code"])
+        return getCommand(key["zone"], key["code"])
+    except:
+        print('Abort translateKey: ', sys.exc_info()[0])
+        traceback.print_exc()
 
 #############################################
 ##                MAIN
