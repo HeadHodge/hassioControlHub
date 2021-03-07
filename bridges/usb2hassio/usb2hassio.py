@@ -51,7 +51,7 @@ def onInputEvent(eventType='key', eventData=''):
     print(f'***TRANSLATE: {key}')
     
     hassioSequence = key2hassioMap.translateKey(key)
-    if(hassioSequence == None): print(f'no translation found for {key["code"]}'); return
+    if(hassioSequence == None): return
     
     for task in hassioSequence:
         print(f'***OUTPUT: {task}')

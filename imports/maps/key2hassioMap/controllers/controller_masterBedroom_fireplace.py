@@ -1,10 +1,11 @@
-const debug = require('../../requires/debugLog.js').debug;
+#############################################
+##            GLOBAL VARIABLES
+#############################################
+print('Load controller_masterBedroom_fireplace');
+name = 'MasterBedroom Firepllace Tasks';
+zone = 'masterBedroom';
 
-exports.name = 'MasterBedroom Entertainment Tasks';
-exports.zone = 'masterBedroom';
-exports.focus = 'Up';
-
-exports.tasks = {
+tasks = {
 	"Left": [
 		{"input_select/select_option": {"entity_id": "input_select.masterbedroom_fireplace_duration", "option": "30 Minutes"}}
 	],
@@ -22,11 +23,10 @@ exports.tasks = {
 	],
 	
 	"Ok": [
-		{"switch/turn_off": {"entity_id": "switch.31485653bcddc23a2807"}} //Turn off Fireplace
+		{"switch/turn_off": {"entity_id": "switch.31485653bcddc23a2807"}}
 	]
 };
 
-////////////////////////////////////////////
-//                MAIN
-////////////////////////////////////////////
-console.log('Loaded controller.masterBedroom.fireplace.js');
+#############################################
+##                MAIN
+#############################################

@@ -36,15 +36,15 @@ def setFocus(zone, code):
     
     if(code == 'Menu'):
         _zones[zone].isTaskSet = True
-        print(f'taskList selected for {zone}');return
+        print(f'select task for {zone}');return
 
-    def Home()        : return _zones[zone].controllers['Home']
-    def Louder()      : return _zones[zone].controllers['Louder']
-    def Softer()      : return _zones[zone].controllers['Softer']
-    def SoundToggle() : return _zones[zone].controllers['SoundToggle']
-    def Backward()    : return _zones[zone].controllers['Backward']
-    def PlayToggle()  : return _zones[zone].controllers['PlayToggle']
-    def Forward()     : return _zones[zone].controllers['Forward']
+    def Home()        : return _zones[zone].controllers.get('Home', None)
+    def Louder()      : return _zones[zone].controllers.get('Louder', None)
+    def Softer()      : return _zones[zone].controllers.get('Softer', None)
+    def SoundToggle() : return _zones[zone].controllers.get('SoundToggle', None)
+    def Backward()    : return _zones[zone].controllers.get('Backward', None)
+    def PlayToggle()  : return _zones[zone].controllers.get('PlayToggle', None)
+    def Forward()     : return _zones[zone].controllers.get('Forward', None)
 
     case = {
         'Home'       : Home,
@@ -56,10 +56,10 @@ def setFocus(zone, code):
         'Forward'    : Forward
     }
     
-    newModule = case.get(code, None)
-    if(newModule == None): return
-    _zones[zone].primaryModule = case.get(code, None)
-    print(f'new primaryController selected: {_zones[zone].primaryModule}')
+    selection = case.get(code, None)
+    if(selection == None): return
+    _zones[zone].primaryModule = selection()
+    print(f'new controller selected: {_zones[zone].primaryModule}')
 
 #############################################
 def translateKey(key):
@@ -69,19 +69,16 @@ def translateKey(key):
         global _zone
     
         _zones[key["zone"]] = importlib.import_module('zones.zone_' + key["zone"])
-
-        #if(key["code"] == 'Echo'): reply('Echo'); return
         
-        if(key["code"] == 'Set'): key["code"] = 'OffOn'
+        if(key["code"] == 'Set'): key["code"] = 'OnToggle'
     
-        if(_zones[key["zone"]].isFocusSet == True and key["code"] == 'OffOn'): 
+        if(_zones[key["zone"]].isFocusSet == True and key["code"] == 'OnToggle'): 
             key["code"] = 'Open'
             _zones[key["zone"]].isFocusSet = None
         
         if(_zones[key["zone"]].isFocusSet): return setFocus(key["zone"], key["code"])
-        if(_zones[key["zone"]].isTaskSet or key["code"] == 'Ping'): return getTask(key["zone"], key["code"])
-
-        
+        if(_zones[key["zone"]].isTaskSet): return getTask(key["zone"], key["code"])
+      
         if(key["code"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
 
         if(key["code"] == 'Silence/Sound'):

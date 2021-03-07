@@ -1,10 +1,12 @@
-const debug = require('../../requires/debugLog.js').debug;
+#############################################
+##            MODULE VARIABLES
+#############################################
+print('Load controller_livingRoom_fireplace')
 
-exports.name = 'MasterBedroom Entertainment Tasks';
-exports.zone = 'masterBedroom';
-exports.focus = 'Up';
+name = 'Fireplace Tasks';
+zone = 'livingRoom';
 
-exports.tasks = {
+tasks = {
 	"Left": [
 		{"input_select/select_option": {"entity_id": "input_select.livingroom_fireplace_duration", "option": "30 Minutes"}}
 	],
@@ -22,11 +24,10 @@ exports.tasks = {
 	],
 	
 	"Ok": [
-		{"input_select/select_option": {"entity_id": "input_select.livingroom_fireplace_duration", "option": "OFF"}} //Turn off Fireplace
+		{"input_select/select_option": {"entity_id": "input_select.livingroom_fireplace_duration", "option": "OFF"}}
 	]
 };
 
-////////////////////////////////////////////
-//                MAIN
-////////////////////////////////////////////
-console.log('Loaded controller.livingRoom.fireplace.js');
+#######################################
+#                MAIN
+#######################################
