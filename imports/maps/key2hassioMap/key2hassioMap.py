@@ -15,10 +15,8 @@ def getCommand(zone, code):
     _zones[zone].primaryController = importlib.import_module('controllers.' + _zones[zone].primaryModule)
     controller = _zones[zone].primaryController
     
-    if(not controller.tasks[code]): print(f'Abort: Invalid code: {code}'); return None
-    
     #print(f'output task: {json.dumps(controller.tasks[code])}')
-    return controller.tasks[code]
+    return controller.tasks.get(code, None)
     
 ##########################################
 def getTask(zone, code):

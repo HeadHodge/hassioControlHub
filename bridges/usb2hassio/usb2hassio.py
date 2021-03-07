@@ -50,7 +50,7 @@ def onInputEvent(eventType='key', eventData=''):
     key = usb2keyMap.translateKey(eventData)
     hassioSequence = key2hassioMap.translateKey(key)
 
-    if(hassioSequence == None): return
+    if(hassioSequence == None): print('no translation found'); return
     
     for task in hassioSequence:
         _ioQueue.put(task)

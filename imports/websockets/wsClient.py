@@ -53,7 +53,11 @@ def start(options):
         asyncio.set_event_loop(asyncio.new_event_loop())
 
         while True:
-            asyncio.get_event_loop().run_until_complete(connect())
+            try:
+                asyncio.get_event_loop().run_until_complete(connect())
+            except:
+                print('Abort: run_until_complete(connect()', sys.exc_info()[0])
+                traceback.print_exc()
     except:
         print('Abort wsClient.py', sys.exc_info()[0])
         traceback.print_exc()
