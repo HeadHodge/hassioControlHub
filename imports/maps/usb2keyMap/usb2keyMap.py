@@ -17,21 +17,21 @@ scan2key = {
     10: "9",
     11: "0",
     28: "Ok",
-    59: "Silence/Sound",
+    59: "SoundToggle",
     103: "Up",
     104: "Less",
     105: "Left",
     106: "Right",
     108: "Down",
     109: "More",
-    113: "Silence/Sound",
+    113: "SoundToggle",
     114: "Softer",
     115: "Louder",
-    116: "Off/On",
+    116: "PowerToggle",
     127: "Menu",
     158: "Exit",
     163: "Forward",
-    164: "Stop/Start",
+    164: "PlayToggle",
     165: "Backward",
     172: "Home",
     191: "Set",
@@ -52,7 +52,7 @@ def translateKey(input):
         "device": "usb"
     }
 
-    return json.dumps(key)
+    return key
 
 #############################################
 ##                MAIN

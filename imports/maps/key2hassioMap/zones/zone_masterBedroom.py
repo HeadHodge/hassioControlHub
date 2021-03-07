@@ -4,9 +4,7 @@
 print('Load zone_masterBedroom')
 
 focus = 'Up'
-popupController = {}
 primaryController = {}
-popupModule = None
 primaryModule = None
 isFocusSet = None
 isTaskSet = None

@@ -10,9 +10,10 @@ from evdev import InputDevice, categorize, ecodes
 
 _zone = None
 _onInput = None
+_queue = None
                
 ############################
-def captureInput(channel):
+def captureInput(channel, options):
 ############################
     print(f'captureInput on channel: {channel}')
     
@@ -21,7 +22,7 @@ def captureInput(channel):
         lastTime = time.time()
         device = InputDevice(f'/dev/input/event{channel}')
         device.grab()
-        print(f'grabbed channel: {channel} from device: {device} in zone: {_zone}')
+        print(f'grabbed: {device} in zone: {_zone}')
     
         for event in device.async_read_loop():
             if event.type != 1 : continue
@@ -46,7 +47,7 @@ def captureInput(channel):
                 "time"    : time.time()
             }
 
-            _onInput('key', json.dumps(eventData))
+            _onInput('key', eventData, options)
     except:
         print(f'Abort captureInput: {sys.exc_info()[0]}')
         traceback.print_exc()
@@ -56,14 +57,17 @@ def captureInput(channel):
 ###################
 def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
     print('Start usbServer')
-    global _zone, _onInput
+    global _zone, _onInput, _queue
 
     try:
+        _queue = options['queue']
         _zone = options['zone']
         _onInput = options['onEvent']
         
+        options['reply'] = 'goodbye'
+        
         for channel in options['channels']:
-            threading.Thread(target=captureInput, args=(channel,)).start()
+            threading.Thread(target=captureInput, args=(channel, options)).start()
 
     except:
         print('Abort usbServer', sys.exc_info()[0])
