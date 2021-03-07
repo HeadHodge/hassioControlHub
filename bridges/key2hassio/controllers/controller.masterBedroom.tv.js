@@ -1,4 +1,4 @@
-const debug = require('../../requires/debugLog.js').debug;
+const debug = require('../../../requires/debugLog.js').debug;
 exports.name = 'MasterBedroom Entertainment Tasks';
 exports.zone = 'masterBedroom';
 exports.focus = 'Up';

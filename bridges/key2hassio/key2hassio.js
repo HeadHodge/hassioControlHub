@@ -2,10 +2,10 @@
 //            GLOBAL VARIABLES
 ////////////////////////////////////////////
 const os = require('os');
-const debug = require('../requires/debugLog.js').debug;
-const htmlServer = require('../requires/htmlServer.js');
-const wsInput = require('../requires/wsInput.js');
-const wsOutput = require('../requires/wsOutput.js');
+const debug = require('../../requires/debugLog.js').debug;
+const htmlServer = require('../../requires/htmlServer.js');
+const wsInput = require('../../requires/wsInput.js');
+const wsOutput = require('../../requires/wsOutput.js');
 var _zones={};
 
 //##########################################
