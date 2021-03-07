@@ -47,7 +47,7 @@ def captureInput(channel, options):
                 "time"    : time.time()
             }
 
-            _onInput('key', eventData, options)
+            _onInput('key', eventData)
     except:
         print(f'Abort captureInput: {sys.exc_info()[0]}')
         traceback.print_exc()
@@ -63,9 +63,7 @@ def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
         _queue = options['queue']
         _zone = options['zone']
         _onInput = options['onEvent']
-        
-        options['reply'] = 'goodbye'
-        
+       
         for channel in options['channels']:
             threading.Thread(target=captureInput, args=(channel, options)).start()
 

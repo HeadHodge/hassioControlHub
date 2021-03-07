@@ -17,10 +17,10 @@ def pname(name):
 async def onInput(post):
 ##########################
     try:    
-        reply = await _options['onEvent']('post', post)
-        print('reply: ', reply)
-        if(reply == None): return
-        await _connection.send(reply)
+        payload = await _options['onEvent']('post', post)
+        print('send payload: ', payload)
+        #if(payload == None): return
+        await _connection.send(payload)
     except:
         print('Abort onInput', sys.exc_info()[0])
         traceback.print_exc()
@@ -49,11 +49,11 @@ def start(options):
 
     try:    
         _options = options
+
         asyncio.set_event_loop(asyncio.new_event_loop())
 
         while True:
             asyncio.get_event_loop().run_until_complete(connect())
-        #asyncio.get_event_loop().run_forever()
     except:
         print('Abort wsClient.py', sys.exc_info()[0])
         traceback.print_exc()

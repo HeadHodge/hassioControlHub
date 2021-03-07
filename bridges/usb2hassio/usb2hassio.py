@@ -23,7 +23,7 @@ sys.path.append(path)
 import wsClient, usbServer, usb2keyMap, key2hassioMap
 
 _ioQueue = queue.Queue()
-_ioQueue = {"greeting": "hello"}
+_sessionId = 0
 
 # keyCode formatted Input
 _inputOptions = {
@@ -42,40 +42,50 @@ _outputOptions = {
     "queue": _ioQueue,
     "onEvent": None
    }
-   
-_buffer = 'hello'
-   
-def onInputEvent(eventType='key', eventData='', options=None):
+ 
+def onInputEvent(eventType='key', eventData=''):
     print(f' \nonInput Event, eventType: {eventType}')
-    print(f'***Input: {eventData}', options, _inputOptions)
-    global _buffer
-    print(f'Got for Input {_ioQueue}')
-    
-    _outputOptions["reply"] = {"greeting": "hello"}
+    print(f'***Input: {eventData}')
     
     key = usb2keyMap.translateKey(eventData)
     hassioCommand = key2hassioMap.translateKey(key)
 
-    #if(hassioCommand != None): ioQueue.put(hassioCommand)
-    print(' \n***Queue: ', hassioCommand)
-    _buffer = 'goodbye'
+    if(hassioCommand != None): _ioQueue.put(hassioCommand)
+    #print(' \n***Queue: ', hassioCommand)
     
 async def onOutputEvent(eventType='post', eventData=''):
     print(f'onOutputEvent type: {eventType}, type: {eventData}')
-    global _ioQueue
+    global _ioQueue, _sessionId
+    
     content = json.loads(eventData)
-
     if(content['type'] == "auth_required"): print('auth_required'); return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'       
 
     print(f'Wait for Output ')
-    _ioQueue = {"greeting": "goodbye"}
-    while True:
-        time.sleep(.5)
-        print(f'Wait for Output {_buffer}')
-        continue
-        hassioCommand = ioQueue.get()
-        print(' \n***Unqueue: ', hassioCommand)
     
+    while True:
+        if(_ioQueue.empty()): continue
+        
+        #send payload to hassio server
+        sequence = _ioQueue.get()
+        task = sequence[0]
+        key = list(task.keys())[0]
+        data = task[key]
+        command = key.split('/')
+        if(command[0] == 'sleep') time.sleep(imt(data)); continue
+        
+        _sessionId += 1
+        
+        payload = {
+            "id": _sessionId, 
+            "type": "call_service",	
+            "domain": command[0],
+            "service": command[1],
+            "service_data": data
+        }
+        
+        #print(' \n***Output: ', payload)
+        return json.dumps(payload)
+        
 def reply(content):
     print(f'reply: {content}')
     
