@@ -5,7 +5,7 @@ print('Load keyCode2hassio')
     
 from gi.repository import GLib
 from multiprocessing import Process
-import os, sys, time, json, traceback, queue, threading
+import os, sys, time, json, traceback, queue, threading, asyncio
 if len(sys.argv) < 3: 
     print('Terminate usb2hassio, missing required zone name and/or event list arguments')
     print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
@@ -70,7 +70,7 @@ async def onOutputEvent(eventType='post', eventData=''):
     print(f'Wait for Output ')
     
     while True:
-        if(_ioQueue.empty()): continue
+        if(_ioQueue.empty()): await asyncio.sleep(.1);continue
         
         #send payload to hassio server
         task = _ioQueue.get()

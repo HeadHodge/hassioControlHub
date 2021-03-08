@@ -12,16 +12,25 @@ print('Load wsServer')
 import sys, time, json, traceback, asyncio
 from aiohttp import web
 
-async def handle(request):
-    name = request.match_info.get('name', "Anonymous")
-    text = "Hello, " + name
-    return web.Response(text=text)
+async def websocket_handler(request):
+    print('s 1')
+    
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
+    print('s 2')
+
+    async for msg in ws:
+        print(msg)
+
+    print('websocket connection closed')
+
+    return ws
     
 #######################################
 #              MAIN
 #######################################
 app = web.Application()
-app.add_routes([web.static('/smartRemotes', '/smartRemotes/_html2keyCode')])
+app.add_routes([web.get('/', websocket_handler)])
 
 if __name__ == '__main__':
-    web.run_app(app, port=80)
+    web.run_app(app)
