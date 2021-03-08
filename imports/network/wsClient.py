@@ -33,7 +33,9 @@ async def onConnect(connection):
             post = await connection.recv()
             print(f'POST: {post}')
             
-            payload = await _options['onEvent']('post', post)
+            #payload = await _options['onEvent']('post', post)
+            payload = await asyncio.get_running_loop().run_in_executor(None, _options['onEvent']('post', post))
+
             await connection.send(payload)
             
         except:
