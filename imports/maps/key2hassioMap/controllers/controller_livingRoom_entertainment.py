@@ -64,19 +64,25 @@ tasks = {
 	],
 	
 	"Louder": [
-		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "JBL Soundbar", "command": "Louder"}}
+		{"media_player/volume_up": {"entity_id": "media_player.living_room"}},
+		{"media_player/volume_mute": {"entity_id": "media_player.living_room", "is_volume_muted": False}}
 	],
 	
 	"Softer": [
-		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "JBL Soundbar", "command": "Softer"}}
+		{"media_player/volume_down": {"entity_id": "media_player.living_room"}},
+		{"media_player/volume_mute": {"entity_id": "media_player.living_room", "is_volume_muted": False}}
+	],
+    
+	"SoundToggle": [
+		{"media_player/volume_mute": {"entity_id": "rmedia_player.living_room", "is_volume_muted": True}}
 	],
 			
 	"Sound": [
-		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "JBL Soundbar", "command": "Silence/Sound"}}
+		{"media_player/volume_mute": {"entity_id": "media_player.living_room", "is_volume_muted": False}}
 	],
 			
 	"Silence": [
-		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "JBL Soundbar", "command": "Silence/Sound"}}
+		{"media_player/volume_mute": {"entity_id": "media_player.living_room", "is_volume_muted": True}}
 	],
 	
 	"Backward": [
