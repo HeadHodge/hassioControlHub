@@ -17,7 +17,8 @@ def pname(name):
 def getInput():
 ##########################
     try:
-        print('***WAIT for Output')
+        print(' \n***WAIT for Output')
+        print(f'*************************************************************************\n \n')
 
         while True:
             if(_options['queue'].empty()): continue

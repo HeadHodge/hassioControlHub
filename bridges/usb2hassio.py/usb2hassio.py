@@ -56,7 +56,7 @@ def onInputEvent(eventType='key', eventData=''):
     if(hassioSequence == None): return
     
     for task in hassioSequence:
-        print(f'***QUEUE: {task}')
+        print(f' \n***QUEUE: {task}')
         
         key = list(task.keys())[0]
         data = task[key]
