@@ -23,6 +23,9 @@ import httpServer, wsClient, wsioServer, key2hassioMap
 _ioQueue = queue.Queue()
 _sessionId = 0
 
+
+#_ioQueue.put('jello')
+
 # keyCode formatted Input
 _inputOptions = {
     #"zone": sys.argv[1],
@@ -38,31 +41,46 @@ _outputOptions = {
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue,
-    "onEvent": None
-   }
+    "queue": _ioQueue
+}
  
 #############################################
 def onInputEvent(eventType='key', eventData=''):
 #############################################
+    print(f' \n*************************************************************************')
     print(f'***INPUT: {eventData}')
+    global _ioQueue, _sessionId
     
     if(eventData.get('command', None) == 'Echo'): print('ignore Echo'); return
-    return
     
-    key = usb2keyMap.translateKey(eventData)
-    if(key == None): return
-    print(f'***TRANSLATE: {key}')
+    #key = usb2keyMap.translateKey(eventData)
+    #if(key == None): return
+    #print(f'***TRANSLATE: {key}')
     
-    hassioSequence = key2hassioMap.translateKey(key)
+    hassioSequence = key2hassioMap.translateKey(eventData)
     if(hassioSequence == None): return
     
     for task in hassioSequence:
-        print(f'***OUTPUT: {task}')
-        _ioQueue.put(task)
+        print(f' \n***QUEUE: {task}')
         
-    #print(' \n***Queue: ', hassioSequence)
-    
+        key = list(task.keys())[0]
+        data = task[key]
+        command = key.split('/')
+        if(command[0] == 'sleep'): time.sleep(int(data)); continue
+        
+        _sessionId += 1
+        
+        payload = {
+            "id": _sessionId, 
+            "type": "call_service",	
+            "domain": command[0],
+            "service": command[1],
+            "service_data": data
+        }
+        
+        _ioQueue.put(payload)
+
+"""    
 #############################################
 def onOutputEvent(eventType='post', eventData=''):
 #############################################
@@ -80,7 +98,7 @@ def onOutputEvent(eventType='post', eventData=''):
         
         #send payload to hassio server
         task = _ioQueue.get()
-        #print(f'deQueue task: {task}')
+        print(f'deQueue task: {task}')
         
         key = list(task.keys())[0]
         data = task[key]
@@ -97,8 +115,10 @@ def onOutputEvent(eventType='post', eventData=''):
             "service_data": data
         }
         
-        #print(' \n***Output: ', payload)
+        print(' \n***Output: ', payload)
+        return payload
         return json.dumps(payload)
+"""
             
 #############################################
 ##                MAIN
@@ -123,7 +143,7 @@ try:
         
     # Start wsClient Module
     try:
-        _outputOptions['onEvent'] = onOutputEvent
+        #_outputOptions['onEvent'] = onOutputEvent
         wsClient = threading.Thread(target=wsClient.start, args=(_outputOptions,))
         wsClient.start()
     except:
@@ -134,6 +154,7 @@ except:
     print('Abort key2hassio', sys.exc_info()[0])
     traceback.print_exc()
 
+#_ioQueue.put('jello')
 
 
 #eventData='{"type": "command", "command": "Louder", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'

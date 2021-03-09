@@ -14,15 +14,19 @@ def pname(name):
     print(name)
 
 ##########################
-async def onInput(post):
+def getInput():
 ##########################
-    try:    
-        payload = await _options['onEvent']('post', post)
-        #print(' \nsend payload: ', payload)
-        #if(payload == None): return
-        await _connection.send(payload)
+    try:
+        print('***WAIT for Output')
+
+        while True:
+            if(_options['queue'].empty()): continue
+
+            task = _options['queue'].get()
+            return json.dumps(task)
+            
     except:
-        print('Abort onInput', sys.exc_info()[0])
+        print('Abort getPayload', sys.exc_info()[0])
         traceback.print_exc()
         
 ##########################
@@ -30,16 +34,15 @@ async def onConnect(connection):
 ##########################
     while True:
         try:    
-            post = await connection.recv()
-            print(f'POST: {post}')
+            reply = await connection.recv()
+            print(f' \n***REPLY: {reply}')
             
-            #payload = await _options['onEvent']('post', post)
-            payload = await asyncio.get_running_loop().run_in_executor(None, _options['onEvent']('post', post))
-
+            loop = asyncio.get_running_loop()
+            payload = await loop.run_in_executor(None, getInput)
+            print(f' \n***OUTPUT payload: {payload}')
             await connection.send(payload)
-            
         except:
-            print('Abort onInput', sys.exc_info()[0])
+            print('Abort onConnect', sys.exc_info()[0])
             traceback.print_exc()
             return
 
