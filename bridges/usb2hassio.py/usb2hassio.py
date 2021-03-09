@@ -13,7 +13,7 @@ if len(sys.argv) < 3:
 
 path = os.path.join(os.path.dirname(__file__), '../../imports/usb')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/websockets')
+path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/maps/key2hassioMap')
 sys.path.append(path)
@@ -38,27 +38,43 @@ _outputOptions = {
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue,
-    "onEvent": None
+    "queue": _ioQueue
    }
  
 def onInputEvent(eventType='key', eventData=''):
-    #print(f' \nonInput Event, eventType: {eventType}')
+    print(f' \n*************************************************************************')
     print(f'***INPUT: {eventData}')
+    global _ioQueue, _sessionId
+    
+    if(eventData.get('command', None) == 'Echo'): print('ignore Echo'); return
     
     key = usb2keyMap.translateKey(eventData)
     if(key == None): return
-    print(f'***TRANSLATE: {key}')
+    print(f' \n***TRANSLATE: {key}')
     
     hassioSequence = key2hassioMap.translateKey(key)
     if(hassioSequence == None): return
     
     for task in hassioSequence:
-        print(f'***OUTPUT: {task}')
-        _ioQueue.put(task)
+        print(f'***QUEUE: {task}')
         
-    #print(' \n***Queue: ', hassioSequence)
-    
+        key = list(task.keys())[0]
+        data = task[key]
+        command = key.split('/')
+        if(command[0] == 'sleep'): time.sleep(int(data)); continue
+        
+        _sessionId += 1
+        
+        payload = {
+            "id": _sessionId, 
+            "type": "call_service",	
+            "domain": command[0],
+            "service": command[1],
+            "service_data": data
+        }
+        
+        _ioQueue.put(payload)
+"""    
 def onOutputEvent(eventType='post', eventData=''):
     print(f' \n*************************************************************************')
     print(f'***REPLY: {eventData}')
@@ -93,9 +109,7 @@ def onOutputEvent(eventType='post', eventData=''):
         
         #print(' \n***Output: ', payload)
         return json.dumps(payload)
-        
-def reply(content):
-    print(f'reply: {content}')
+"""        
     
 #############################################
 ##                MAIN
@@ -113,7 +127,7 @@ try:
 
     # Start wsClient Module
     try:
-        _outputOptions['onEvent'] = onOutputEvent
+        #_outputOptions['onEvent'] = onOutputEvent
         #wsClient = Process(target=wsClient.start, args=(_outputOptions, _inputOptions))
         wsClient = threading.Thread(target=wsClient.start, args=(_outputOptions,))
         wsClient.start()
