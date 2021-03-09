@@ -9,17 +9,13 @@ _options = None
 _connection = None
 
 ##########################
-def pname(name):
-##########################
-    print(name)
-
-##########################
-def getInput():
+def getGuestPost(hostPost):
 ##########################
     try:
-        print(' \n***WAIT for Output')
-        print(f'*************************************************************************\n \n')
+        print(' \n***WAIT for GUEST post')
 
+        if(_options['guestEvent'] != None): return _options['guestEvent'](hostPost)
+            
         while True:
             if(_options['queue'].empty()): continue
 
@@ -33,15 +29,21 @@ def getInput():
 ##########################
 async def onConnect(connection):
 ##########################
+    loop = asyncio.get_running_loop()
+
     while True:
         try:    
-            reply = await connection.recv()
-            print(f' \n***REPLY: {reply}')
+            print(f' \n*************************************************************************')
+            print('***WAIT for HOST post')
+            post = await connection.recv()
+            print(f' \n***HOST: {post}')
+            if(_options['hostEvent'] != None): await loop.run_in_executor(None, _options['hostEvent'], post)
             
-            loop = asyncio.get_running_loop()
-            payload = await loop.run_in_executor(None, getInput)
-            print(f' \n***OUTPUT payload: {payload}')
-            await connection.send(payload)
+            payload = await loop.run_in_executor(None, getGuestPost, post)
+            print(f' \n***TRANSFER GUEST post: {payload}')
+
+            if(payload != 'NOPOST'): await connection.send(payload)
+            print(f'*************************************************************************\n \n')
         except:
             print('Abort onConnect', sys.exc_info()[0])
             traceback.print_exc()
@@ -52,22 +54,24 @@ async def connect():
 ##########################
     global _connection
     
-    print(f'connect to endpoint: {_options["endpoint"]}')
+    print(f'connect to host: {_options["endpoint"]}')
         
     async with websockets.client.connect(_options["endpoint"]) as connection:
         print(f'connected to endpoint: {_options["endpoint"]}')
-            
+        """
+        print(f' \n*************************************************************************')
+        print('***WAIT for HOST post')
         post = await connection.recv()
-        print(f'POST: {post}')
+        print(f' \n***HOST: {post}')
         content = json.loads(post)
 
-        if(content['type'] == "auth_required"): print('auth_required')
-        await connection.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}')       
-        print('auth_sent')
-
+        if(content['type'] == "auth_required"):
+            print(' \n***POST Authorization'); await connection.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}')       
+        
+        """
         await onConnect(connection)
         
-    print('Disconnected')
+    print(' \n***DISCONNECTED')
         
 ##########################
 def start(options):

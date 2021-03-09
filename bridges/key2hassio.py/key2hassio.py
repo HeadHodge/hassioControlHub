@@ -23,10 +23,7 @@ import httpServer, wsClient, wsioServer, key2hassioMap
 _ioQueue = queue.Queue()
 _sessionId = 0
 
-
-#_ioQueue.put('jello')
-
-# keyCode formatted Input
+# keyCode Input
 _inputOptions = {
     #"zone": sys.argv[1],
     #"channels": sys.argv[2].split(','),
@@ -80,46 +77,6 @@ def onInputEvent(eventType='key', eventData=''):
         
         _ioQueue.put(payload)
 
-"""    
-#############################################
-def onOutputEvent(eventType='post', eventData=''):
-#############################################
-    print(f' \n*************************************************************************')
-    print(f'***REPLY: {eventData}')
-    global _ioQueue, _sessionId
-    
-    content = json.loads(eventData)
-    if(content['type'] == "auth_required"): print('auth_required'); return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'       
-
-    print(f'Wait for Output ')
-    
-    while True:
-        if(_ioQueue.empty()): continue #await asyncio.sleep(.1);
-        
-        #send payload to hassio server
-        task = _ioQueue.get()
-        print(f'deQueue task: {task}')
-        
-        key = list(task.keys())[0]
-        data = task[key]
-        command = key.split('/')
-        if(command[0] == 'sleep'): time.sleep(int(data)); continue
-        
-        _sessionId += 1
-        
-        payload = {
-            "id": _sessionId, 
-            "type": "call_service",	
-            "domain": command[0],
-            "service": command[1],
-            "service_data": data
-        }
-        
-        print(' \n***Output: ', payload)
-        return payload
-        return json.dumps(payload)
-"""
-            
 #############################################
 ##                MAIN
 #############################################
