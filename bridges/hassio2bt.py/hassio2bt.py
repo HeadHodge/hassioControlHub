@@ -1,11 +1,10 @@
 #############################################
 ##            MODULE VARIABLES
 #############################################
-print('Load key2bt')
+print('Load hassio2bt')
 
-from gi.repository import GLib
-from dbus.mainloop.glib import DBusGMainLoop
 from multiprocessing import Process
+from dbus.mainloop.glib import DBusGMainLoop
 import os, sys, time, json, asyncio, traceback, queue, threading
 
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
@@ -15,17 +14,12 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/dbus')
 sys.path.append(path)
 
-import wsClient, btServer, dbus
+import wsClient, btServer
 
-DBusGMainLoop(set_as_default=True)
 _ioQueue = queue.Queue()
 _sessionId = 0
-_bluetoothState = 0
-_bluetoothAddress = '0:0:0:0:0:0'
-_system_bus = dbus.SystemBus()
 
-# keyCode Input
-_inputOptions = {
+_inOptions = {
     "endpoint": "ws://192.168.0.160:8123/api/websocket",
     "address": "192.168.0.160",
     "port": "8123",
@@ -35,13 +29,16 @@ _inputOptions = {
     "hostEvent" : None
 }
 
-#############################################
-def onSignal(sender1=None, sender2=None, sender3=None):
-#############################################
-    dBusProperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0/dev_80_FD_7A_4A_DB_39'), 'org.freedesktop.DBus.Properties')
-    _bluetoothState = dBusProperty.Get('org.bluez.Device1', 'Connected')
-    print(f'****onSignal called from: {sender1}, isConnected: {_bluetoothState}****')
-         
+_outOptions = {
+    "endpoint": "ws://192.168.0.160:8123/api/websocket",
+    "address": "192.168.0.160",
+    "port": "8123",
+    "path": "/api/websocket",
+    "queue": _ioQueue,
+    "guestEvent" : None,
+    "hostEvent" : None
+}
+"""         
 #############################################
 def ipInput():
 #############################################
@@ -75,11 +72,12 @@ def btOutput():
     except:
         print('Abort btOutput: ', sys.exc_info()[0])
         traceback.print_exc()
+"""
         
 #############################################
-def inputGuestEvent(hostPost):
+def inGuestEvent(hostPost):
 #############################################
-    #print(f'***inputGuestEvent for hostPost: {hostPost}')
+    #print(f'***inGuestEvent for hostPost: {hostPost}')
     global _ioQueue, _sessionId
     
     post = json.loads(hostPost)
@@ -97,27 +95,53 @@ def inputGuestEvent(hostPost):
         return json.dumps(payload)
     
     return 'NOPOST'
-
-#############################################
-def inputHostEvent(post):
-#############################################
-    #print(f'***inputHostEvent post: {post}')
-    global _ioQueue, _sessionId
         
+#############################################
+def outGuestEvent(hostPost):
+#############################################
+    #print(f'***inGuestEvent for hostPost: {hostPost}')
+    pass
     
+#############################################
+def start():
+#############################################
+    print('Start hassio2bt')
+    
+    try:
+        # Start input module
+        try:
+            _inOptions['guestEvent'] = inGuestEvent
+            threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
+        except:
+            print('Abort wsClient: ', sys.exc_info()[0])
+            traceback.print_exc()
+
+        # Start output module
+        try:
+            _outOptions['guestEvent'] = outGuestEvent
+            threading.Thread(target=btServer.start, args=(_outOptions,)).start()
+        except:
+            print('Abort btServer: ', sys.exc_info()[0])
+            traceback.print_exc()
+    except:
+        print('Abort hassio2bt: ', sys.exc_info()[0])
+        traceback.print_exc()
+  
 #############################################
 ##                MAIN
 #############################################   
-try:
-    # Start wsClient Module
-    try:
-        #_inputOptions['hostEvent'] = inputHostEvent
-        _inputOptions['guestEvent'] = inputGuestEvent
-        wsClient = threading.Thread(target=wsClient.start, args=(_inputOptions,))
-        wsClient.start()
-    except:
-        print('Abort run wsClient: ', sys.exc_info()[0])
-        traceback.print_exc()
+
+# Run this module on main thread to unit test with following code
+if __name__ == '__main__':
+
+    start()
+    """        
+    # Start event loop
+    print('Start ip2btBridge eventLoop')
+    eventloop = GLib.MainLoop()
+    eventloop.run()
+    """        
+
     """
     state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
     print('send string: ', state)
@@ -135,28 +159,3 @@ try:
         print('Abort start btOutput: ', sys.exc_info()[0])
         traceback.print_exc()
     """        
-    # Connect to dbus
-    try:
-        dBusProperty = dbus.Interface(_system_bus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
-        _bluetoothAddress = dBusProperty.Get('org.bluez.Adapter1', 'Address')
-        print(f'bluetooth address: {_bluetoothAddress}')
-        
-        _system_bus.add_signal_receiver(onSignal, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
-        print(f'enabled bluetooth PropertiesChanged signal')
-        
-    except:
-        print('Abort start btOutput: ', sys.exc_info()[0])
-        traceback.print_exc()
-
-
-
-    """        
-    # Start event loop
-    print('Start ip2btBridge eventLoop')
-    eventloop = GLib.MainLoop()
-    eventloop.run()
-    """        
-    
-except:
-    print('Abort key2bt', sys.exc_info()[0])
-    traceback.print_exc()
