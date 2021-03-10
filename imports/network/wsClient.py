@@ -43,7 +43,7 @@ async def onConnect(connection):
             
             payload = await loop.run_in_executor(None, getGuestPost, post)
             print(f' \n***TRANSFER GUEST post: {payload}')
-            await connection.send(payload)
+            if(payload != 'NOPOST'): await connection.send(payload)
             print(f'*************************************************************************\n \n')
         except:
             print('Abort onConnect', sys.exc_info()[0])

@@ -111,7 +111,7 @@ def inputHostEvent(post):
 try:
     # Start wsClient Module
     try:
-        _inputOptions['hostEvent'] = inputHostEvent
+        #_inputOptions['hostEvent'] = inputHostEvent
         _inputOptions['guestEvent'] = inputGuestEvent
         wsClient = threading.Thread(target=wsClient.start, args=(_inputOptions,))
         wsClient.start()
