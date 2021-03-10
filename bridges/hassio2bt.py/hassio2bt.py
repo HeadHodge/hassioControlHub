@@ -14,7 +14,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/dbus')
 sys.path.append(path)
 
-import wsClient, btServer
+import wsClient, abtServer
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -111,7 +111,7 @@ def start():
         # Start input module
         try:
             _inOptions['guestEvent'] = inGuestEvent
-            threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
+            #threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
         except:
             print('Abort wsClient: ', sys.exc_info()[0])
             traceback.print_exc()
@@ -119,7 +119,8 @@ def start():
         # Start output module
         try:
             _outOptions['guestEvent'] = outGuestEvent
-            threading.Thread(target=btServer.start, args=(_outOptions,)).start()
+            threading.Thread(target=abtServer.start, args=(17, _outOptions)).start()
+            threading.Thread(target=abtServer.start, args=(19, _outOptions)).start()
         except:
             print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()
