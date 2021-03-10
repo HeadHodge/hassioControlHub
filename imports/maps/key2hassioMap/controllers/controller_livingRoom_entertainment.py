@@ -74,7 +74,7 @@ tasks = {
 	],
     
 	"SoundToggle": [
-		{"media_player/volume_mute": {"entity_id": "rmedia_player.living_room", "is_volume_muted": True}}
+		{"media_player/volume_mute": {"entity_id": "media_player.living_room", "is_volume_muted": True}}
 	],
 			
 	"Sound": [
