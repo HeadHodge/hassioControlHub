@@ -29,7 +29,8 @@ _inputOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
     "queue": _ioQueue,
-    "onEvent": None
+    "hostEvent": None,
+    "guestEvent": None
    }
 
 # hassio service events Output
@@ -38,26 +39,26 @@ _outputOptions = {
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue
+    "queue": _ioQueue,
+    "hostEvent": None,
+    "guestEvent": None
    }
  
-def onInputEvent(eventType='key', eventData=''):
+def inHostEvent(hostPost):
     print(f' \n*************************************************************************')
-    print(f'***INPUT: {eventData}')
+    print(f'***INPUT: {hostPost}')
     global _ioQueue, _sessionId
     
-    if(eventData.get('command', None) == 'Echo'): print('ignore Echo'); return
+    if(hostPost.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    key = usb2keyMap.translateKey(eventData)
+    key = usb2keyMap.translateKey(hostPost)
     if(key == None): return
-    print(f' \n***TRANSLATE: {key}')
+    #print(f' \n***TRANSLATE: {key}')
     
     hassioSequence = key2hassioMap.translateKey(key)
     if(hassioSequence == None): return
     
     for task in hassioSequence:
-        print(f' \n***QUEUE: {task}')
-        
         key = list(task.keys())[0]
         data = task[key]
         command = key.split('/')
@@ -73,43 +74,18 @@ def onInputEvent(eventType='key', eventData=''):
             "service_data": data
         }
         
+        print(f' \n***QUEUE: {task}')
         _ioQueue.put(payload)
-"""    
-def onOutputEvent(eventType='post', eventData=''):
-    print(f' \n*************************************************************************')
-    print(f'***REPLY: {eventData}')
+ 
+def outGuestEvent(hostPost):
     global _ioQueue, _sessionId
     
-    content = json.loads(eventData)
-    if(content['type'] == "auth_required"): print('auth_required'); return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'       
-
-    print(f'Wait for Output ')
+    post = json.loads(hostPost)
+    if(post['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
     
-    while True:
-        if(_ioQueue.empty()): continue #await asyncio.sleep(.1);
-        
-        #send payload to hassio server
-        task = _ioQueue.get()
-        #print(f'deQueue task: {task}')
-        
-        key = list(task.keys())[0]
-        data = task[key]
-        command = key.split('/')
-        if(command[0] == 'sleep'): time.sleep(int(data)); continue
-        
-        _sessionId += 1
-        
-        payload = {
-            "id": _sessionId, 
-            "type": "call_service",	
-            "domain": command[0],
-            "service": command[1],
-            "service_data": data
-        }
-        
-        #print(' \n***Output: ', payload)
-        return json.dumps(payload)
-"""        
+    return None
+
+indent = None    
     
 #############################################
 ##                MAIN
@@ -117,7 +93,7 @@ def onOutputEvent(eventType='post', eventData=''):
 try:
     # Start wsServer Module
     try:
-        _inputOptions['onEvent'] = onInputEvent
+        _inputOptions['hostEvent'] = inHostEvent
         #usbServer = Process(target=usbServer.start, args=(_inputOptions,))
         usbServer = threading.Thread(target=usbServer.start, args=(_inputOptions,))
         usbServer.start()
@@ -127,7 +103,7 @@ try:
 
     # Start wsClient Module
     try:
-        #_outputOptions['onEvent'] = onOutputEvent
+        _outputOptions['guestEvent'] = outGuestEvent
         #wsClient = Process(target=wsClient.start, args=(_outputOptions, _inputOptions))
         wsClient = threading.Thread(target=wsClient.start, args=(_outputOptions,))
         wsClient.start()

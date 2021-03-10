@@ -9,7 +9,7 @@ import sys, time, json, threading, traceback
 from evdev import InputDevice, categorize, ecodes
 
 _zone = None
-_onInput = None
+_hostEvent = None
 _queue = None
                
 ############################
@@ -47,7 +47,7 @@ def captureInput(channel, options):
                 "time"    : time.time()
             }
 
-            _onInput('key', eventData)
+            _hostEvent(eventData)
     except:
         print(f'Abort captureInput: {sys.exc_info()[0]}')
         traceback.print_exc()
@@ -57,12 +57,12 @@ def captureInput(channel, options):
 ###################
 def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
     print('Start usbServer')
-    global _zone, _onInput, _queue
+    global _zone, _hostEvent, _queue
 
     try:
         _queue = options['queue']
         _zone = options['zone']
-        _onInput = options['onEvent']
+        _hostEvent = options['hostEvent']
        
         for channel in options['channels']:
             threading.Thread(target=captureInput, args=(channel, options)).start()

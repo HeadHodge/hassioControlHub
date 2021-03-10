@@ -81,13 +81,13 @@ def translateKey(key):
       
         if(key["code"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
 
-        if(key["code"] == 'Silence/Sound'):
-            if(_zones[key["zone"]].isSilent):
+        if(key["code"] == 'SoundToggle'):
+            if(_zones[key["zone"]].isSilent == True):
                 key["code"] = 'Sound'
-                _zones[key["zone"]].isSilent=null
+                _zones[key["zone"]].isSilent = None
             else:
                 key["code"] = 'Silence'
-                _zones[key["zone"]].isSilent=True
+                _zones[key["zone"]].isSilent = True
     
         return getCommand(key["zone"], key["code"])
     except:

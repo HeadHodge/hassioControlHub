@@ -30,7 +30,9 @@ _inputOptions = {
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue
+    "queue": _ioQueue,
+    "guestEvent" : None,
+    "hostEvent" : None
 }
 
 #############################################
@@ -82,6 +84,17 @@ def inputGuestEvent(hostPost):
     
     post = json.loads(hostPost)
     if(post['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
+
+    if(post['type'] == "auth_ok"):
+        _sessionId += 1
+        
+        payload = {
+            "id": _sessionId, 
+            "type": "subscribe_events",	
+            "event_type": "state_changed"
+        }
+    
+        return json.dumps(payload)
     
     return 'NOPOST'
 

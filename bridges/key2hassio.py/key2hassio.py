@@ -29,7 +29,8 @@ _inputOptions = {
     #"channels": sys.argv[2].split(','),
     "port": "8080",
     "queue": _ioQueue,
-    "onEvent": None
+    "guestEvent" : None,
+    "hostEvent" : None
    }
 
 # hassio service events Output
@@ -38,28 +39,23 @@ _outputOptions = {
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue
+    "queue": _ioQueue,
+    "guestEvent" : None,
+    "hostEvent" : None
 }
  
 #############################################
-def onInputEvent(eventType='key', eventData=''):
+def inHostEvent(hostPost):
 #############################################
-    print(f' \n*************************************************************************')
-    print(f'***INPUT: {eventData}')
+    print(f' \n***INPUT: {hostPost}')
     global _ioQueue, _sessionId
     
-    if(eventData.get('command', None) == 'Echo'): print('ignore Echo'); return
+    if(hostPost.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    #key = usb2keyMap.translateKey(eventData)
-    #if(key == None): return
-    #print(f'***TRANSLATE: {key}')
-    
-    hassioSequence = key2hassioMap.translateKey(eventData)
-    if(hassioSequence == None): return
+    hassioSequence = key2hassioMap.translateKey(hostPost)
+    if(hassioSequence == None): print(f'Abort inHostEvent, invalid keyCode: "{hostPost["code"]}"'); return
     
     for task in hassioSequence:
-        print(f' \n***QUEUE: {task}')
-        
         key = list(task.keys())[0]
         data = task[key]
         command = key.split('/')
@@ -75,7 +71,19 @@ def onInputEvent(eventType='key', eventData=''):
             "service_data": data
         }
         
+        print(f' \n***QUEUE: {task}')
         _ioQueue.put(payload)
+        
+#############################################
+def outGuestEvent(hostPost):
+#############################################
+    #print(f'***inputGuestEvent for hostPost: {hostPost}')
+    global _ioQueue, _sessionId
+    
+    post = json.loads(hostPost)
+    if(post['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
+    
+    return None
 
 #############################################
 ##                MAIN
@@ -91,7 +99,7 @@ try:
 
     # Start wsServer Module
     try:
-        _inputOptions['onEvent'] = onInputEvent
+        _inputOptions['hostEvent'] = inHostEvent
         wsServer = threading.Thread(target=wsioServer.start, args=(_inputOptions,))
         wsServer.start()
     except:
@@ -101,6 +109,7 @@ try:
     # Start wsClient Module
     try:
         #_outputOptions['onEvent'] = onOutputEvent
+        _outputOptions['guestEvent'] = outGuestEvent
         wsClient = threading.Thread(target=wsClient.start, args=(_outputOptions,))
         wsClient.start()
     except:

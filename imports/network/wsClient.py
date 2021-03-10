@@ -14,13 +14,15 @@ def getGuestPost(hostPost):
     try:
         print(' \n***WAIT for GUEST post')
 
-        if(_options['guestEvent'] != None): return _options['guestEvent'](hostPost)
+        if(_options.get('guestEvent', None) != None):
+            post = _options['guestEvent'](hostPost)
+            if(post != None): return post
             
         while True:
             if(_options['queue'].empty()): continue
 
-            task = _options['queue'].get()
-            return json.dumps(task)
+            post = _options['queue'].get()
+            return json.dumps(post)
             
     except:
         print('Abort getPayload', sys.exc_info()[0])
@@ -37,12 +39,11 @@ async def onConnect(connection):
             print('***WAIT for HOST post')
             post = await connection.recv()
             print(f' \n***HOST: {post}')
-            if(_options['hostEvent'] != None): await loop.run_in_executor(None, _options['hostEvent'], post)
+            if(_options.get('hostEvent', None) != None): await loop.run_in_executor(None, _options['hostEvent'], post)
             
             payload = await loop.run_in_executor(None, getGuestPost, post)
             print(f' \n***TRANSFER GUEST post: {payload}')
-
-            if(payload != 'NOPOST'): await connection.send(payload)
+            await connection.send(payload)
             print(f'*************************************************************************\n \n')
         except:
             print('Abort onConnect', sys.exc_info()[0])
@@ -58,17 +59,6 @@ async def connect():
         
     async with websockets.client.connect(_options["endpoint"]) as connection:
         print(f'connected to endpoint: {_options["endpoint"]}')
-        """
-        print(f' \n*************************************************************************')
-        print('***WAIT for HOST post')
-        post = await connection.recv()
-        print(f' \n***HOST: {post}')
-        content = json.loads(post)
-
-        if(content['type'] == "auth_required"):
-            print(' \n***POST Authorization'); await connection.send('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}')       
-        
-        """
         await onConnect(connection)
         
     print(' \n***DISCONNECTED')
