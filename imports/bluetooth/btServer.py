@@ -67,9 +67,6 @@ def start(channel, options={}): # Note: standard hid channels > "controlPort": 1
 
         asyncio.set_event_loop(asyncio.new_event_loop())
         loop = asyncio.get_event_loop()
-
-        loop.run_in_executor(None, btDevice.onSignal())
-
         loop.run_until_complete(connect(server, loop, options))
         #_loop.run_forever()
     except:

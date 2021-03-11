@@ -14,7 +14,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/dbus')
 sys.path.append(path)
 
-import wsClient, btServer
+import wsClient, btServer, btDevice
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -101,13 +101,23 @@ def getAgentPost():
         print('Abort getAgentPost', sys.exc_info()[0])
         traceback.print_exc()
         return None
-    
+  
+#############################################
+def onConnectSignal(interface, changed, path):
+#############################################
+    print(f'****CONNECTION ALERT****, interface: {interface}, connected: {changed["Connected"]}')
+   
 #############################################
 def start(options={"controlPort": 17, "interruptPort": 19}):
 #############################################
     print('Start hassio2bt')
     
     try:
+        # Start connection signal
+        #loop = asyncio.get_event_loop()
+        #loop.run_in_executor(None, btDevice.enableConnectSignal())
+        threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
+
         # Start input module
         try:
             _inOptions['guestEvent'] = inGuestEvent

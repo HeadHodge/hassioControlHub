@@ -78,20 +78,16 @@ def setDiscoveryFlg(new_state):
 def loadProfile(UUID, options):
 #############################################
     device_manager.RegisterProfile('/org/bluez/hidProfile', UUID, options)
-
-#############################################
-def changed(interface, changed, path):
-#############################################
-    print(f'interface: {interface}, connected: {changed["Connected"]}')
     
 #############################################
-def onSignal():
+def enableConnectSignal(notify):
 #############################################
-    systemBus.add_signal_receiver(changed, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
-    print(f'enabled PropertiesChanged signal')
+    print(f'enableConnectSignal')
+
+    systemBus.add_signal_receiver(notify, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
         
     # Start btOutput event loop
-    print('start btServer eventLoop')
+    print('start connectSignal eventLoop')
     eventloop = GLib.MainLoop()
     eventloop.run()
 
@@ -101,4 +97,12 @@ def onSignal():
 
 # Run this module on main thread to unit test with following code
 if __name__ == '__main__':
+    import threading
+  
+    #############################################
+    def onConnectSignal(interface, changed, path):
+    #############################################
+        print(f'****CONNECTION ALERT****, interface: {interface}, connected: {changed["Connected"]}')
+    
     print(f'device address: {getAddress()}')
+    threading.Thread(target=enableConnectSignal, args=(onConnectSignal,)).start()
