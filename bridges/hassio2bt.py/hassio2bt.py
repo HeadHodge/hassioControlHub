@@ -29,7 +29,7 @@ _inOptions = {
     "hostEvent" : None
 }
 
-_outOptions = {
+_outAgentOptions = {
     "endpoint": "ws://192.168.0.160:8123/api/websocket",
     "address": "192.168.0.160",
     "port": "8123",
@@ -38,6 +38,17 @@ _outOptions = {
     "guestEvent" : None,
     "hostEvent" : None
 }
+
+_outControlOptions = {
+    "endpoint": "ws://192.168.0.160:8123/api/websocket",
+    "address": "192.168.0.160",
+    "port": "8123",
+    "path": "/api/websocket",
+    "queue": _ioQueue,
+    "guestEvent" : None,
+    "hostEvent" : None
+}
+
 """         
 #############################################
 def ipInput():
@@ -96,14 +107,39 @@ def inGuestEvent(hostPost):
     
     return 'NOPOST'
         
-#############################################
-def outGuestEvent(hostPost):
-#############################################
-    #print(f'***inGuestEvent for hostPost: {hostPost}')
-    pass
+
+##########################
+def getControlPost():
+##########################
+    try:
+        print(' \n***WAIT for Control post')
+
+        while True:
+            pass
+            #print('sleep')
+            #time.sleep(30)
+    except:
+        print('Abort getControlPost', sys.exc_info()[0])
+        traceback.print_exc()
+        return None
+ 
+##########################
+def getAgentPost():
+##########################
+    try:
+        print(' \n***WAIT for Agent post')
+        time.sleep(5)
+
+        return bytes([ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ])
+        #return bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ])
+            
+    except:
+        print('Abort getAgentPost', sys.exc_info()[0])
+        traceback.print_exc()
+        return None
     
 #############################################
-def start():
+def start(options={"controlPort": 17, "interruptPort": 19}):
 #############################################
     print('Start hassio2bt')
     
@@ -118,9 +154,11 @@ def start():
 
         # Start output module
         try:
-            _outOptions['guestEvent'] = outGuestEvent
-            threading.Thread(target=abtServer.start, args=(17, _outOptions)).start()
-            threading.Thread(target=abtServer.start, args=(19, _outOptions)).start()
+            _outControlOptions['agentEvent'] = getControlPost
+            threading.Thread(target=abtServer.start, args=(options["controlPort"], _outControlOptions)).start()
+
+            _outAgentOptions['agentEvent'] = getAgentPost
+            threading.Thread(target=abtServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
         except:
             print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()
