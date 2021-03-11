@@ -9,13 +9,13 @@ _options = None
 _connection = None
 
 ##########################
-def getGuestPost(hostPost):
+def getAgentPost(userPost):
 ##########################
     try:
-        print(' \n***WAIT for GUEST post')
+        print(' \n***WAIT for AGENT post')
 
-        if(_options.get('guestEvent', None) != None):
-            post = _options['guestEvent'](hostPost)
+        if(_options.get('agentEvent', None) != None):
+            post = _options['agentEvent'](userPost)
             if(post != None): return post
             
         while True:
@@ -36,13 +36,13 @@ async def onConnect(connection):
     while True:
         try:    
             print(f' \n*************************************************************************')
-            print('***WAIT for HOST post')
+            print('***WAIT for USER post')
             post = await connection.recv()
-            print(f' \n***HOST: {post}')
-            if(_options.get('hostEvent', None) != None): await loop.run_in_executor(None, _options['hostEvent'], post)
+            print(f' \n***USER: {post}')
+            if(_options.get('userEvent', None) != None): await loop.run_in_executor(None, _options['userEvent'], post)
             
-            payload = await loop.run_in_executor(None, getGuestPost, post)
-            print(f' \n***TRANSFER GUEST post: {payload}')
+            payload = await loop.run_in_executor(None, getAgentPost, post)
+            print(f' \n***TRANSFER AGENT post: {payload}')
             if(payload != 'NOPOST'): await connection.send(payload)
             print(f'*************************************************************************\n \n')
         except:

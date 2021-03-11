@@ -13,8 +13,7 @@ print('Load btDevice')
 
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
-import os, sys, time, asyncio
-import dbus, dbus.service
+import os, sys, time, dbus
 
 #Connect to Bluez5 API on the dbus system bus
 DBusGMainLoop(set_as_default=True)

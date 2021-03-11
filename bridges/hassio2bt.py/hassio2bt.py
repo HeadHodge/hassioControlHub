@@ -25,8 +25,8 @@ _inOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "queue": _ioQueue,
-    "guestEvent" : None,
-    "hostEvent" : None
+    "userEvent" : None,
+    "agentEvent" : None
 }
 
 _outAgentOptions = {
@@ -35,8 +35,8 @@ _outAgentOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "queue": _ioQueue,
-    "guestEvent" : None,
-    "hostEvent" : None
+    "userEvent" : None,
+    "agentEvent" : None
 }
 
 _outControlOptions = {
@@ -45,20 +45,20 @@ _outControlOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "queue": _ioQueue,
-    "guestEvent" : None,
-    "hostEvent" : None
+    "userEvent" : None,
+    "agentEvent" : None
 }
         
 #############################################
-def inGuestEvent(hostPost):
+def inAgentEvent(userPost):
 #############################################
-    #print(f'***inGuestEvent for hostPost: {hostPost}')
+    #print(f'***inUserPost for post: {userPost}')
     global _ioQueue, _sessionId
     
-    post = json.loads(hostPost)
-    if(post['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
+    content = json.loads(userPost)
+    if(content['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
 
-    if(post['type'] == "auth_ok"):
+    if(content['type'] == "auth_ok"):
         _sessionId += 1
         
         payload = {
@@ -71,24 +71,23 @@ def inGuestEvent(hostPost):
     
     return 'NOPOST'
         
-
 ##########################
-def getControlPost():
+def outControlPost():
 ##########################
     try:
         print(' \n***WAIT for Control post')
 
+        #infinite wait to block control channel thread
         while True:
             pass
-            #print('sleep')
-            #time.sleep(30)
+
     except:
         print('Abort getControlPost', sys.exc_info()[0])
         traceback.print_exc()
         return None
  
 ##########################
-def getAgentPost():
+def outAgentPost():
 ##########################
     try:
         print(' \n***WAIT for Agent post')
@@ -113,14 +112,16 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
     print('Start hassio2bt')
     
     try:
-        # Start connection signal
-        #loop = asyncio.get_event_loop()
-        #loop.run_in_executor(None, btDevice.enableConnectSignal())
-        threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
+        # Enable ConnectSignal
+        try:
+            threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
+        except:
+            print('Abort enableConnectSignal: ', sys.exc_info()[0])
+            traceback.print_exc()
 
         # Start input module
         try:
-            _inOptions['guestEvent'] = inGuestEvent
+            _inOptions['agentEvent'] = inAgentEvent
             threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
         except:
             print('Abort wsClient: ', sys.exc_info()[0])
@@ -128,10 +129,10 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
 
         # Start output module
         try:
-            _outControlOptions['agentEvent'] = getControlPost
+            _outControlOptions['agentEvent'] = outControlPost
             threading.Thread(target=btServer.start, args=(options["controlPort"], _outControlOptions)).start()
 
-            _outAgentOptions['agentEvent'] = getAgentPost
+            _outAgentOptions['agentEvent'] = outAgentPost
             threading.Thread(target=btServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
         except:
             print('Abort btServer: ', sys.exc_info()[0])
