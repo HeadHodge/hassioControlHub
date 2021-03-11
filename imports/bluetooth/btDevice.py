@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 """
 Bluetooth HID keyboard emulator DBUS Service
 
@@ -7,72 +6,73 @@ http://yetanotherpointlesstechblog.blogspot.com/2016/04/emulating-bluetooth-keyb
 
 Moved to Python 3 and tested with BlueZ 5.43
 """
+#############################################
+##            MODULE VARIABLES
+#############################################
+print('Load btDevice')
+
 import os, sys, time
 import dbus, dbus.service
 
-class btDevice:
-    DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
-    ADAPTER_IFACE = 'org.bluez.Adapter1'
+#DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
+ADAPTER_IFACE = 'org.bluez.Adapter1'
 
-    def __init__(self):
-        print("Start btDevice")
+systemBus = dbus.SystemBus()
+device_property = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
+device_manager = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez'), 'org.bluez.ProfileManager1')
 
-        self.bus = dbus.SystemBus()
-        self.device_property = dbus.Interface(self.bus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
-        self.device_manager = dbus.Interface(self.bus.get_object('org.bluez', '/org/bluez'), 'org.bluez.ProfileManager1')
+    
+#@property
+def getAddress():
+    print('address property')
+    """Return the device MAC address."""
+    return device_property.Get(ADAPTER_IFACE, 'Address')
+    
+@property
+def powered():
+    """
+    power state of the device.
+    """
+    return device_property.Get(ADAPTER_IFACE, 'Powered')
 
-    @property
-    def address(self):
-        """Return the device MAC address."""
-        return self.device_property.Get(self.ADAPTER_IFACE,
-                                         'Address')
+@powered.setter
+def powered(new_state):
+    device_property.Set(ADAPTER_IFACE, 'Powered', new_state)
 
-    @property
-    def powered(self):
-        """
-        power state of the device.
-        """
-        return self.device_property.Get(self.ADAPTER_IFACE, 'Powered')
+#@property
+def getAlias():
+    return device_property.Get(ADAPTER_IFACE,
+                               'Alias')
 
-    @powered.setter
-    def powered(self, new_state):
-        self.device_property.Set(self.ADAPTER_IFACE, 'Powered', new_state)
+#@alias.setter
+def setAlias(new_alias):
+    device_property.Set(ADAPTER_IFACE,
+                        'Alias',
+                        new_alias)
 
-    @property
-    def alias(self):
-        return self.device_property.Get(self.ADAPTER_IFACE,
-                                         'Alias')
+@property
+def discoverabletimeout():
+    """Discoverable timeout of the Adapter."""
+    return device_props.Get(ADAPTER_IFACE,
+                            'DiscoverableTimeout')
 
-    @alias.setter
-    def alias(self, new_alias):
-        self.device_property.Set(self.ADAPTER_IFACE,
-                                  'Alias',
-                                  new_alias)
+@discoverabletimeout.setter
+def discoverabletimeout(new_timeout):
+    device_property.Set(ADAPTER_IFACE,
+                        'DiscoverableTimeout',
+                        dbus.UInt32(new_timeout))
 
-    @property
-    def discoverabletimeout(self):
-        """Discoverable timeout of the Adapter."""
-        return self.device_props.Get(self.ADAPTER_IFACE,
-                                      'DiscoverableTimeout')
+@property
+def discoverable():
+    """Discoverable state of the Adapter."""
+    return device_property.Get(
+        ADAPTER_IFACE, 'Discoverable')
 
-    @discoverabletimeout.setter
-    def discoverabletimeout(self, new_timeout):
-        self.device_property.Set(self.ADAPTER_IFACE,
-                                  'DiscoverableTimeout',
-                                  dbus.UInt32(new_timeout))
+@discoverable.setter
+def discoverable(new_state):
+    device_property.Set(ADAPTER_IFACE,
+                        'Discoverable',
+                        new_state)
 
-    @property
-    def discoverable(self):
-        """Discoverable state of the Adapter."""
-        return self.device_property.Get(
-            self.ADAPTER_INTERFACE, 'Discoverable')
-
-    @discoverable.setter
-    def discoverable(self, new_state):
-        self.device_property.Set(self.ADAPTER_IFACE,
-                                  'Discoverable',
-                                  new_state)
-
-    def register_profile(self, UUID, options):
-        self.device_manager.RegisterProfile('/org/bluez/hidProfile', UUID, options)
-
+def register_profile(UUID, options):
+    device_manager.RegisterProfile('/org/bluez/hidProfile', UUID, options)

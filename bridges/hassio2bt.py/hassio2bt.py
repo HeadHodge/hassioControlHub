@@ -14,7 +14,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/dbus')
 sys.path.append(path)
 
-import wsClient, abtServer
+import wsClient, btServer
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -48,42 +48,6 @@ _outControlOptions = {
     "guestEvent" : None,
     "hostEvent" : None
 }
-
-"""         
-#############################################
-def ipInput():
-#############################################
-    print('Start ipInput')
-
-    try:
-        # Start wsServer
-        wsServer.start()
-       
-        # Start event loop
-        print('start ipInput eventLoop')
-        eventloop = asyncio.get_event_loop()
-        eventloop.run_forever()
-    except:
-        print('Abort ipInput', sys.exc_info()[0])
-        traceback.print_exc()
-
-#############################################
-def btOutput():
-#############################################
-    print('Start btOutput')
-    
-    try:
-        # Start btServer
-        btServer.start(_ioQueue, _bluetoothState)
-
-        # Start btOutput event loop
-        print('start btOutput eventLoop')
-        eventloop = GLib.MainLoop()
-        eventloop.run()
-    except:
-        print('Abort btOutput: ', sys.exc_info()[0])
-        traceback.print_exc()
-"""
         
 #############################################
 def inGuestEvent(hostPost):
@@ -147,7 +111,7 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
         # Start input module
         try:
             _inOptions['guestEvent'] = inGuestEvent
-            #threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
+            threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
         except:
             print('Abort wsClient: ', sys.exc_info()[0])
             traceback.print_exc()
@@ -155,10 +119,10 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
         # Start output module
         try:
             _outControlOptions['agentEvent'] = getControlPost
-            threading.Thread(target=abtServer.start, args=(options["controlPort"], _outControlOptions)).start()
+            threading.Thread(target=btServer.start, args=(options["controlPort"], _outControlOptions)).start()
 
             _outAgentOptions['agentEvent'] = getAgentPost
-            threading.Thread(target=abtServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
+            threading.Thread(target=btServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
         except:
             print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()
