@@ -29,8 +29,8 @@ _inputOptions = {
     #"channels": sys.argv[2].split(','),
     "port": "8080",
     "queue": _ioQueue,
-    "guestEvent" : None,
-    "hostEvent" : None
+    "userEvent" : None,
+    "agentEvent" : None
    }
 
 # hassio service events Output
@@ -40,20 +40,20 @@ _outputOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "queue": _ioQueue,
-    "guestEvent" : None,
-    "hostEvent" : None
+    "userEvent" : None,
+    "agentEvent" : None
 }
  
 #############################################
-def inHostEvent(hostPost):
+def inUserEvent(post):
 #############################################
-    print(f' \n***INPUT: {hostPost}')
+    print(f' \n***INPUT: {post}')
     global _ioQueue, _sessionId
     
-    if(hostPost.get('command', None) == 'Echo'): print('ignore Echo'); return
+    if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    hassioSequence = key2hassioMap.translateKey(hostPost)
-    if(hassioSequence == None): print(f'Abort inHostEvent, invalid keyCode: "{hostPost["code"]}"'); return
+    hassioSequence = key2hassioMap.translateKey(post)
+    if(hassioSequence == None): print(f'Abort inHostEvent, invalid keyCode: "{post["code"]}"'); return
     
     for task in hassioSequence:
         key = list(task.keys())[0]
@@ -75,12 +75,12 @@ def inHostEvent(hostPost):
         _ioQueue.put(payload)
         
 #############################################
-def outGuestEvent(hostPost):
+def outAgentEvent(userPost):
 #############################################
-    #print(f'***inputGuestEvent for hostPost: {hostPost}')
+    #print(f'***inputGuestEvent for userPost: {userPost}')
     global _ioQueue, _sessionId
     
-    post = json.loads(hostPost)
+    post = json.loads(userPost)
     if(post['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
     
     return None
@@ -99,7 +99,7 @@ try:
 
     # Start wsServer Module
     try:
-        _inputOptions['hostEvent'] = inHostEvent
+        _inputOptions['userEvent'] = inUserEvent
         wsServer = threading.Thread(target=wsioServer.start, args=(_inputOptions,))
         wsServer.start()
     except:
@@ -108,8 +108,7 @@ try:
         
     # Start wsClient Module
     try:
-        #_outputOptions['onEvent'] = onOutputEvent
-        _outputOptions['guestEvent'] = outGuestEvent
+        _outputOptions['agentEvent'] = outAgentEvent
         wsClient = threading.Thread(target=wsClient.start, args=(_outputOptions,))
         wsClient.start()
     except:
@@ -119,9 +118,3 @@ try:
 except:
     print('Abort key2hassio', sys.exc_info()[0])
     traceback.print_exc()
-
-#_ioQueue.put('jello')
-
-
-#eventData='{"type": "command", "command": "Louder", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
-#print(f'key2hassio translation: {key2hassioMap.translateKey(json.loads(eventData), reply)}')

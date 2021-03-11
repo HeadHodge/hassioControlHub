@@ -17,9 +17,9 @@ async def websocket_handler(request):
     await ws.prepare(request)
     print(f'Connected to wsServer on port: {_options["port"]}')
 
-    async for hostPost in ws:
-        if(_options.get('hostEvent', None) != None): _options['hostEvent'](json.loads(hostPost[1])); continue
-        print(f'wsServer received hostPost: {hostPost}')
+    async for userPost in ws:
+        if(_options.get('userEvent', None) != None): _options['userEvent'](json.loads(userPost[1])); continue
+        print(f'wsServer received userPost: {userPost}')
 
     print('wsServer connection closed')
     return ws

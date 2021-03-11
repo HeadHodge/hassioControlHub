@@ -29,8 +29,8 @@ _inputOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
     "queue": _ioQueue,
-    "hostEvent": None,
-    "guestEvent": None
+    "userEvent": None,
+    "agentEvent": None
    }
 
 # hassio service events Output
@@ -40,18 +40,18 @@ _outputOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "queue": _ioQueue,
-    "hostEvent": None,
-    "guestEvent": None
+    "userEvent": None,
+    "agentEvent": None
    }
  
-def inHostEvent(hostPost):
+def inUserEvent(post):
     print(f' \n*************************************************************************')
-    print(f'***INPUT: {hostPost}')
+    print(f'***INPUT: {post}')
     global _ioQueue, _sessionId
     
-    if(hostPost.get('command', None) == 'Echo'): print('ignore Echo'); return
+    if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    key = usb2keyMap.translateKey(hostPost)
+    key = usb2keyMap.translateKey(post)
     if(key == None): return
     #print(f' \n***TRANSLATE: {key}')
     
@@ -77,15 +77,13 @@ def inHostEvent(hostPost):
         print(f' \n***QUEUE: {task}')
         _ioQueue.put(payload)
  
-def outGuestEvent(hostPost):
+def outAgentEvent(userPost):
     global _ioQueue, _sessionId
     
-    post = json.loads(hostPost)
+    post = json.loads(userPost)
     if(post['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
     
     return None
-
-indent = None    
     
 #############################################
 ##                MAIN
@@ -93,8 +91,7 @@ indent = None
 try:
     # Start wsServer Module
     try:
-        _inputOptions['hostEvent'] = inHostEvent
-        #usbServer = Process(target=usbServer.start, args=(_inputOptions,))
+        _inputOptions['userEvent'] = inUserEvent
         usbServer = threading.Thread(target=usbServer.start, args=(_inputOptions,))
         usbServer.start()
     except:
@@ -103,8 +100,7 @@ try:
 
     # Start wsClient Module
     try:
-        _outputOptions['guestEvent'] = outGuestEvent
-        #wsClient = Process(target=wsClient.start, args=(_outputOptions, _inputOptions))
+        _outputOptions['agentEvent'] = outAgentEvent
         wsClient = threading.Thread(target=wsClient.start, args=(_outputOptions,))
         wsClient.start()
     except:

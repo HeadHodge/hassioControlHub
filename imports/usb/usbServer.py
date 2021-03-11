@@ -7,11 +7,7 @@ print('Load usbServer')
 import websocket
 import sys, time, json, threading, traceback
 from evdev import InputDevice, categorize, ecodes
-
-_zone = None
-_hostEvent = None
-_queue = None
-               
+              
 ############################
 def captureInput(channel, options):
 ############################
@@ -22,7 +18,7 @@ def captureInput(channel, options):
         lastTime = time.time()
         device = InputDevice(f'/dev/input/event{channel}')
         device.grab()
-        print(f'grabbed: {device} in zone: {_zone}')
+        print(f'grabbed: {device} in zone: {options["zone"]}')
     
         for event in device.async_read_loop():
             if event.type != 1 : continue
@@ -43,11 +39,11 @@ def captureInput(channel, options):
                 "keyState": inputEvent.keystate,
                 "channel" : channel,
                 "device"  : device.name,
-                "zone"    : _zone,
+                "zone"    : options['zone'],
                 "time"    : time.time()
             }
 
-            _hostEvent(eventData)
+            options['userEvent'](eventData)
     except:
         print(f'Abort captureInput: {sys.exc_info()[0]}')
         traceback.print_exc()
@@ -57,12 +53,12 @@ def captureInput(channel, options):
 ###################
 def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
     print('Start usbServer')
-    global _zone, _hostEvent, _queue
 
     try:
-        _queue = options['queue']
-        _zone = options['zone']
-        _hostEvent = options['hostEvent']
+        if(options.get('userEvent', None) == None): print('Abort usbServer, no "userEvent" method provided in options'); return
+        if(options.get('queue', None) == None): print('Abort usbServer, no "queue" object provided in options'); return
+        if(options.get('zone', None) == None): print('Abort usbServer, no "zone" value provided in options'); return
+        #_options = options
        
         for channel in options['channels']:
             threading.Thread(target=captureInput, args=(channel, options)).start()
@@ -70,18 +66,6 @@ def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
     except:
         print('Abort usbServer', sys.exc_info()[0])
         traceback.print_exc()
-
-    """
-    websocket.enableTrace(True)
-
-    _webSocket = websocket.WebSocketApp(endpoint,
-        on_message = onMessage,
-        on_error = onError,
-        on_close = onClose,
-        on_open = onOpen) 
-
-    _webSocket.run_forever()
-    """
     
 #############################################
 ##                MAIN
