@@ -58,7 +58,7 @@ def start(channel, options={}): # Note: standard hid channels > "controlPort": 1
         #deviceAddress = dBusProperty.Get('org.bluez.Adapter1', 'Address')
         deviceAddress = btDevice.getAddress()
         print(f'create server at deviceAddress: {deviceAddress} on hdiChannel: {channel}')
-
+        
         server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind((deviceAddress, channel))
@@ -67,6 +67,9 @@ def start(channel, options={}): # Note: standard hid channels > "controlPort": 1
 
         asyncio.set_event_loop(asyncio.new_event_loop())
         loop = asyncio.get_event_loop()
+
+        loop.run_in_executor(None, btDevice.onSignal())
+
         loop.run_until_complete(connect(server, loop, options))
         #_loop.run_forever()
     except:

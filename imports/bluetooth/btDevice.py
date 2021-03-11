@@ -11,9 +11,13 @@ Moved to Python 3 and tested with BlueZ 5.43
 #############################################
 print('Load btDevice')
 
-import os, sys, time
+from gi.repository import GLib
+from dbus.mainloop.glib import DBusGMainLoop
+import os, sys, time, asyncio
 import dbus, dbus.service
 
+#Connect to Bluez5 API on the dbus system bus
+DBusGMainLoop(set_as_default=True)
 systemBus = dbus.SystemBus()
 device_property = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
 device_manager = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez'), 'org.bluez.ProfileManager1')
@@ -75,6 +79,21 @@ def loadProfile(UUID, options):
 #############################################
     device_manager.RegisterProfile('/org/bluez/hidProfile', UUID, options)
 
+#############################################
+def changed(interface, changed, path):
+#############################################
+    print(f'interface: {interface}, connected: {changed["Connected"]}')
+    
+#############################################
+def onSignal():
+#############################################
+    systemBus.add_signal_receiver(changed, signal_name='PropertiesChanged', path='/org/bluez/hci0/dev_80_FD_7A_4A_DB_39')
+    print(f'enabled PropertiesChanged signal')
+        
+    # Start btOutput event loop
+    print('start btServer eventLoop')
+    eventloop = GLib.MainLoop()
+    eventloop.run()
 
 #############################################
 ##                MAIN
