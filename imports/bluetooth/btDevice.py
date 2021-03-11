@@ -14,65 +14,72 @@ print('Load btDevice')
 import os, sys, time
 import dbus, dbus.service
 
-#DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
-ADAPTER_IFACE = 'org.bluez.Adapter1'
-
 systemBus = dbus.SystemBus()
 device_property = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
 device_manager = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez'), 'org.bluez.ProfileManager1')
+ADAPTER_IFACE = 'org.bluez.Adapter1'
 
-    
-#@property
+#############################################
 def getAddress():
-    print('address property')
+#############################################
     """Return the device MAC address."""
     return device_property.Get(ADAPTER_IFACE, 'Address')
     
-@property
-def powered():
+#############################################
+def getPowered():
+#############################################
     """
     power state of the device.
     """
     return device_property.Get(ADAPTER_IFACE, 'Powered')
 
-@powered.setter
-def powered(new_state):
+#############################################
+def setPowered(new_state):
+#############################################
     device_property.Set(ADAPTER_IFACE, 'Powered', new_state)
 
-#@property
+#############################################
 def getAlias():
-    return device_property.Get(ADAPTER_IFACE,
-                               'Alias')
+#############################################
+    return device_property.Get(ADAPTER_IFACE, 'Alias')
 
-#@alias.setter
+#############################################
 def setAlias(new_alias):
-    device_property.Set(ADAPTER_IFACE,
-                        'Alias',
-                        new_alias)
+#############################################
+    device_property.Set(ADAPTER_IFACE, 'Alias', new_alias)
 
-@property
-def discoverabletimeout():
+#############################################
+def getDiscoveryTime():
+#############################################
     """Discoverable timeout of the Adapter."""
-    return device_props.Get(ADAPTER_IFACE,
-                            'DiscoverableTimeout')
+    return device_props.Get(ADAPTER_IFACE, 'DiscoverableTimeout')
 
-@discoverabletimeout.setter
-def discoverabletimeout(new_timeout):
-    device_property.Set(ADAPTER_IFACE,
-                        'DiscoverableTimeout',
-                        dbus.UInt32(new_timeout))
+#############################################
+def setDiscoveryTime(new_timeout):
+#############################################
+    device_property.Set(ADAPTER_IFACE, 'DiscoverableTimeout', dbus.UInt32(new_timeout))
 
-@property
-def discoverable():
+#############################################
+def getDiscoveryFlq():
+#############################################
     """Discoverable state of the Adapter."""
-    return device_property.Get(
-        ADAPTER_IFACE, 'Discoverable')
+    return device_property.Get(ADAPTER_IFACE, 'Discoverable')
 
-@discoverable.setter
-def discoverable(new_state):
-    device_property.Set(ADAPTER_IFACE,
-                        'Discoverable',
-                        new_state)
+#############################################
+def setDiscoveryFlg(new_state):
+#############################################
+    device_property.Set(ADAPTER_IFACE, 'Discoverable', new_state)
 
-def register_profile(UUID, options):
+#############################################
+def loadProfile(UUID, options):
+#############################################
     device_manager.RegisterProfile('/org/bluez/hidProfile', UUID, options)
+
+
+#############################################
+##                MAIN
+#############################################   
+
+# Run this module on main thread to unit test with following code
+if __name__ == '__main__':
+    print(f'device address: {getAddress()}')
