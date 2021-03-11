@@ -23,21 +23,6 @@ import os, sys, time, json, socket
 import asyncio, queue, dbus
 
 _deviceAddress = 'DC:A6:32:65:8A:AB'
-
-##########################
-def getControlPost():
-##########################
-    try:
-        print(' \n***WAIT for Control post')
-
-        while True:
-            pass
-            #print('sleep')
-            #time.sleep(1)
-    except:
-        print('Abort getAgentPost', sys.exc_info()[0])
-        traceback.print_exc()
-        return None
           
 #############################################
 async def connect(server, loop, options):
@@ -62,7 +47,6 @@ async def connect(server, loop, options):
 def start(channel, options={}): # Note: standard hid channels > "controlPort": 17, "interruptPort": 19
 ####################################################################################################
     print("Start btServer")
-    #global _options, _loop, _server
     systemBus = dbus.SystemBus()
     
     try:
@@ -100,28 +84,3 @@ if __name__ == '__main__':
 
     start(P_CTRL)
     start(P_INTR)
-    
-"""
-
-from gi.repository import GLib
-from dbus.mainloop.glib import DBusGMainLoop
-    # The sockets require root permission
-    if not os.geteuid() == 0:
-        sys.exit('Only root can run this script')
-
-    try:
-        device = btServer()
-    
-        time.sleep(10)
-        state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
-        device.send_string(state)
-    
-        time.sleep(.35)
-        state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        device.send_string(state)
-
-        mainloop = GLib.MainLoop()
-        mainloop.run()
-    except:
-        print('\n! Received keyboard interrupt, quitting threads.\n')
-"""
