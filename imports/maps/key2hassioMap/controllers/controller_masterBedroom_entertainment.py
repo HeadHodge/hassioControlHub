@@ -116,9 +116,9 @@ tasks = {
 		#Turn off TV
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "HOME"}},
 		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}},
-	    {"sleep": 3},
+	    {"sleep": 2},
 		{"remote/send_command" : {"entity_id": "remote.broadlink_ir_hub_upstairs_remote", "device": "Vizio", "command": "On/Off"}},
-	    #{"sleep": 2},
+	    {"sleep": 2},
 
 		#Turn on Sleep Timer with Music
 		{"sonos/unjoin": {"entity_id": "media_player.bathroom"}},
