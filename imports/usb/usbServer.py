@@ -42,7 +42,8 @@ def captureInput(channel, options):
                 "zone"    : options['zone'],
                 "time"    : time.time()
             }
-
+                        
+            #print(f'\n***usbUSER: {eventData}')
             options['userEvent'](eventData)
     except:
         print(f'Abort captureInput: {sys.exc_info()[0]}')

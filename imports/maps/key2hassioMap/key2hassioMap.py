@@ -62,7 +62,7 @@ def setFocus(zone, code):
     print(f'new controller selected: {_zones[zone].primaryModule}')
 
 #############################################
-def translateKey(key):
+def translate(key):
 #############################################
     try:
         #print(f'translate keycode: {key}')

@@ -45,17 +45,16 @@ _outOptions = {
    }
  
 def inUserEvent(post):
-    print(f' \n*************************************************************************')
-    print(f'***INPUT: {post}')
+    print(f' \n***usbUSER: {post}')
     global _ioQueue, _sessionId
     
     if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    key = usb2keyMap.translateKey(post)
+    key = usb2keyMap.translate(post)
+    print(f' \n***TRANSLATE: {key}')
     if(key == None): return
-    #print(f' \n***TRANSLATE: {key}')
     
-    hassioSequence = key2hassioMap.translateKey(key)
+    hassioSequence = key2hassioMap.translate(key)
     if(hassioSequence == None): return
     
     for task in hassioSequence:
@@ -74,25 +73,31 @@ def inUserEvent(post):
             "service_data": data
         }
         
-        print(f' \n***QUEUE: {task}')
+        #print(f' \n***QUEUE: {task}')
         _ioQueue.put(payload)
  
  
 def outUserEvent(post):
-    print(f'outUserEvent: {post}')
+    print(f' \n***wsUSER: {post}')
 
     content = json.loads(post)
-    if(content['type'] == "auth_required"):
-        _ioQueue.put('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}')
+    if(content['type'] != "auth_required"): return
+    
+    post = {
+        "type": "auth",
+        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
+    }
+    
+    #print(f' \n***QUEUE: {post}')
+    _ioQueue.put(post)
     
 def outAgentEvent():
-    print(f'outAgentEvent')
+    print('***wsAGENT WAIT')    
     
     while True:
         if(_ioQueue.empty()): continue
 
         post = _ioQueue.get()
-        #print(f'\n***DEQUEUE: {post}')
         return post
     
     return None

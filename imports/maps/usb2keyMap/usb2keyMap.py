@@ -41,7 +41,7 @@ scan2key = {
 }
 
 #############################################
-def translateKey(input):
+def translate(input):
 #############################################
     #print(f'translate keycode: {input}')
 
