@@ -14,7 +14,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/dbus')
 sys.path.append(path)
 
-import wsClient, btServer, btDevice
+import wsClient, btServer, btDevice, btProfile
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -64,7 +64,7 @@ def inAgentEvent(userPost):
         payload = {
             "id": _sessionId, 
             "type": "subscribe_events",	
-            "event_type": "state_changed"
+            "event_type": "scripts_keyCode"
         }
     
         return json.dumps(payload)
@@ -115,8 +115,24 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
         # Enable ConnectSignal
         try:
             threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
+            threading.Thread(target=btProfile.start).start()
+            time.sleep(1)
         except:
             print('Abort enableConnectSignal: ', sys.exc_info()[0])
+            traceback.print_exc()
+
+        # Start output module
+        try:
+            
+            _outControlOptions['agentEvent'] = outControlPost
+            threading.Thread(target=btServer.start, args=(options["controlPort"], _outControlOptions)).start()
+
+            _outAgentOptions['agentEvent'] = outAgentPost
+            threading.Thread(target=btServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
+
+            time.sleep(1)
+        except:
+            print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()
 
         # Start input module
@@ -125,17 +141,6 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
             threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
         except:
             print('Abort wsClient: ', sys.exc_info()[0])
-            traceback.print_exc()
-
-        # Start output module
-        try:
-            _outControlOptions['agentEvent'] = outControlPost
-            threading.Thread(target=btServer.start, args=(options["controlPort"], _outControlOptions)).start()
-
-            _outAgentOptions['agentEvent'] = outAgentPost
-            threading.Thread(target=btServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
-        except:
-            print('Abort btServer: ', sys.exc_info()[0])
             traceback.print_exc()
     except:
         print('Abort hassio2bt: ', sys.exc_info()[0])
@@ -149,27 +154,3 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
 if __name__ == '__main__':
 
     start()
-    """        
-    # Start event loop
-    print('Start ip2btBridge eventLoop')
-    eventloop = GLib.MainLoop()
-    eventloop.run()
-    """        
-
-    """
-    state = [ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ]
-    print('send string: ', state)
-    _ioQueue.put([ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ])
-    
-    state = [ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]            
-    print('send string: ', state)
-    _ioQueue.put([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ])
-      
-    # Start btOutput Module
-    try:
-        p = Process(target=btOutput)
-        p.start()
-    except:
-        print('Abort start btOutput: ', sys.exc_info()[0])
-        traceback.print_exc()
-    """        
