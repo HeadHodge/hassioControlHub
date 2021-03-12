@@ -25,7 +25,7 @@ _ioQueue = queue.Queue()
 _sessionId = 0
 
 # keyCode formatted Input
-_inputOptions = {
+_inOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
     "queue": _ioQueue,
@@ -34,7 +34,7 @@ _inputOptions = {
    }
 
 # hassio service events Output
-_outputOptions = {
+_outOptions = {
     "endpoint": "ws://192.168.0.160:8123/api/websocket",
     "address": "192.168.0.160",
     "port": "8123",
@@ -77,11 +77,23 @@ def inUserEvent(post):
         print(f' \n***QUEUE: {task}')
         _ioQueue.put(payload)
  
-def outAgentEvent(userPost):
-    global _ioQueue, _sessionId
+ 
+def outUserEvent(post):
+    print(f'outUserEvent: {post}')
+
+    content = json.loads(post)
+    if(content['type'] == "auth_required"):
+        _ioQueue.put('{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}')
     
-    post = json.loads(userPost)
-    if(post['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
+def outAgentEvent():
+    print(f'outAgentEvent')
+    
+    while True:
+        if(_ioQueue.empty()): continue
+
+        post = _ioQueue.get()
+        #print(f'\n***DEQUEUE: {post}')
+        return post
     
     return None
     
@@ -91,8 +103,8 @@ def outAgentEvent(userPost):
 try:
     # Start wsServer Module
     try:
-        _inputOptions['userEvent'] = inUserEvent
-        usbServer = threading.Thread(target=usbServer.start, args=(_inputOptions,))
+        _inOptions['userEvent'] = inUserEvent
+        usbServer = threading.Thread(target=usbServer.start, args=(_inOptions,))
         usbServer.start()
     except:
         print('Abort run usbServer: ', sys.exc_info()[0])
@@ -100,8 +112,9 @@ try:
 
     # Start wsClient Module
     try:
-        _outputOptions['agentEvent'] = outAgentEvent
-        wsClient = threading.Thread(target=wsClient.start, args=(_outputOptions,))
+        _outOptions['userEvent'] = outUserEvent
+        _outOptions['agentEvent'] = outAgentEvent
+        wsClient = threading.Thread(target=wsClient.start, args=(_outOptions,))
         wsClient.start()
     except:
         print('Abort run wsClient: ', sys.exc_info()[0])
