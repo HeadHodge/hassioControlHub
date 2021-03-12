@@ -15,6 +15,7 @@ from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
 import os, sys, time, dbus
 
+
 #Connect to Bluez5 API on the dbus system bus
 DBusGMainLoop(set_as_default=True)
 systemBus = dbus.SystemBus()
@@ -37,9 +38,10 @@ def getPowered():
     return device_property.Get(ADAPTER_IFACE, 'Powered')
 
 #############################################
-def setPowered(new_state):
+def setPowered(state=True):
 #############################################
-    device_property.Set(ADAPTER_IFACE, 'Powered', new_state)
+    value = dbus.Boolean(state)
+    device_property.Set(ADAPTER_IFACE, 'Powered', value)
 
 #############################################
 def getAlias():
@@ -47,36 +49,38 @@ def getAlias():
     return device_property.Get(ADAPTER_IFACE, 'Alias')
 
 #############################################
-def setAlias(new_alias):
+def setAlias(alias):
 #############################################
-    device_property.Set(ADAPTER_IFACE, 'Alias', new_alias)
+    device_property.Set(ADAPTER_IFACE, 'Alias', alias)
 
 #############################################
-def getDiscoveryTime():
+def getDiscoverableTime():
 #############################################
     """Discoverable timeout of the Adapter."""
-    return device_props.Get(ADAPTER_IFACE, 'DiscoverableTimeout')
+    return device_property.Get(ADAPTER_IFACE, 'DiscoverableTimeout')
 
 #############################################
-def setDiscoveryTime(new_timeout):
+def setDiscoverableTime(timeout=300):
 #############################################
-    device_property.Set(ADAPTER_IFACE, 'DiscoverableTimeout', dbus.UInt32(new_timeout))
+    duration = dbus.UInt32(timeout)
+    device_property.Set(ADAPTER_IFACE, 'DiscoverableTimeout', duration)
 
 #############################################
-def getDiscoveryFlq():
+def getDiscoverable():
 #############################################
     """Discoverable state of the Adapter."""
     return device_property.Get(ADAPTER_IFACE, 'Discoverable')
 
 #############################################
-def setDiscoveryFlg(new_state):
+def setDiscoverable(new_state):
 #############################################
     device_property.Set(ADAPTER_IFACE, 'Discoverable', new_state)
 
 #############################################
-def loadProfile(UUID, options):
+def registerProfile(uuid, options):
 #############################################
-    device_manager.RegisterProfile('/org/bluez/hidProfile', UUID, options)
+    print(f'Register bluetooth profile, uuid: {uuid}')
+    device_manager.RegisterProfile('/org/bluez/hidProfile', uuid, options)
     
 #############################################
 def enableConnectSignal(notify):
