@@ -29,6 +29,7 @@ _inOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
     "queue": _ioQueue,
+    "firstPost": "User",
     "userEvent": None,
     "agentEvent": None
    }
@@ -40,12 +41,13 @@ _outOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "queue": _ioQueue,
+    "firstPost": "User",
     "userEvent": None,
     "agentEvent": None
    }
  
-def inUserEvent(post):
-    print(f' \n***usbUSER: {post}')
+def inPosts(post):
+    print(f' \n***inUSER: {post}')
     global _ioQueue, _sessionId
     
     if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
@@ -77,20 +79,32 @@ def inUserEvent(post):
         _ioQueue.put(payload)
  
  
-def outUserEvent(post):
-    print(f' \n***wsUSER: {post}')
+def outPosts(post):
+    print(f' \n***outUSER: {post}')
 
     content = json.loads(post)
-    if(content['type'] != "auth_required"): return
+    if(content['type'] == "auth_required"):
+        post = {
+            "type": "auth",
+            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
+        }
+        
+        print(f' \n***outTRANSFER: {post}')
+        print(f' \n***outUser WAIT')
+        return post
     
-    post = {
-        "type": "auth",
-        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
-    }
+    print(' \n***outAGENT WAIT')    
+    while True:
+        if(_ioQueue.empty()): continue
+        post = _ioQueue.get()
+        
+        print(f' \n***outTRANSFER: {post}')
+        print(f' \n***outUser WAIT')
+        return post
     
-    #print(f' \n***QUEUE: {post}')
-    _ioQueue.put(post)
+    return None
     
+"""    
 def outAgentEvent():
     print('***wsAGENT WAIT')    
     
@@ -101,6 +115,7 @@ def outAgentEvent():
         return post
     
     return None
+"""
     
 #############################################
 ##                MAIN
@@ -108,7 +123,7 @@ def outAgentEvent():
 try:
     # Start wsServer Module
     try:
-        _inOptions['userEvent'] = inUserEvent
+        _inOptions['userEvent'] = inPosts
         usbServer = threading.Thread(target=usbServer.start, args=(_inOptions,))
         usbServer.start()
     except:
@@ -117,8 +132,8 @@ try:
 
     # Start wsClient Module
     try:
-        _outOptions['userEvent'] = outUserEvent
-        _outOptions['agentEvent'] = outAgentEvent
+        _outOptions['userEvent'] = outPosts
+        #_outOptions['agentEvent'] = outAgentEvent
         wsClient = threading.Thread(target=wsClient.start, args=(_outOptions,))
         wsClient.start()
     except:

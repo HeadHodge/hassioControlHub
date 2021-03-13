@@ -21,6 +21,8 @@ def captureInput(channel, options):
         print(f'grabbed: {device} in zone: {options["zone"]}')
     
         for event in device.async_read_loop():
+            #print(event)
+            
             if event.type != 1 : continue
             
             inputEvent = categorize(event)

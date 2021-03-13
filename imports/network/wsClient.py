@@ -6,17 +6,26 @@ import asyncio
 import sys, time, json, websockets, traceback
 
 ##########################
-async def userPosts(connection, options):
+async def onConnection(connection, options):
 ##########################
-    if(options.get('userEvent', None) == None): print(f'***DISABLE userPosts'); return
+    #if(options.get('userEvent', None) == None): print(f'***DISABLE userPosts'); return
     loop = asyncio.get_running_loop()
+
+    if(options['firstPost'] == "Agent"):
+        post = await loop.run_in_executor(None, options['userEvent'], None)
+        if(post == None): return
+        await connection.send(json.dumps(post))
     
     while True:
-        print('\n***wsUSER WAIT')
+        #print('\n***wsUSER WAIT')
+        
         post = await connection.recv()
         #print(f'\n***wsUSER: {post}')
-        await loop.run_in_executor(None, options['userEvent'], post)
-        continue
+        post = await loop.run_in_executor(None, options['userEvent'], post)
+        
+        if(post == None): continue
+        #print(f'\n***wsTRANSFER POST: {post}')
+        await connection.send(json.dumps(post))
         
 ##########################
 async def agentPosts(connection, options):
@@ -39,8 +48,8 @@ async def connect(options):
         async with websockets.client.connect(options["endpoint"]) as connection:
             print(f'***USER CONNECTED, endpoint: {options["endpoint"]}')
             await asyncio.gather(
-                agentPosts(connection, options),
-                userPosts(connection, options)
+                #agentPosts(connection, options),
+                onConnection(connection, options)
             )
         
         print(' \n***DISCONNECTED')
