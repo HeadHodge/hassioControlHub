@@ -5,91 +5,94 @@ print('Load key2hassio')
     
 import os, sys, time, json, traceback
 
-keyCode = {
-    "a" 			: {"name": "numeric 1", "keyNum":4, "keyMod": 0},
-    "b" 			: {"name": "numeric 1", "keyNum":5, "keyMod": 0},
-    "c" 			: {"name": "numeric 1", "keyNum":6, "keyMod": 0},
-    "d" 			: {"name": "numeric 1", "keyNum":7, "keyMod": 0},
-    "e" 			: {"name": "numeric 1", "keyNum":8, "keyMod": 0},
-    "f" 			: {"name": "numeric 1", "keyNum":9, "keyMod": 0},
-    "g" 			: {"name": "numeric 1", "keyNum":10, "keyMod": 0},
-    "h" 			: {"name": "numeric 1", "keyNum":11, "keyMod": 0},
-    "i" 			: {"name": "numeric 1", "keyNum":12, "keyMod": 0},
-    "j" 			: {"name": "numeric 1", "keyNum":13, "keyMod": 0},
-    "k" 			: {"name": "numeric 1", "keyNum":14, "keyMod": 0},
-    "l" 			: {"name": "numeric 1", "keyNum":15, "keyMod": 0},
-    "m" 			: {"name": "numeric 1", "keyNum":16, "keyMod": 0},
-    "n" 			: {"name": "numeric 1", "keyNum":17, "keyMod": 0},
-    "o" 			: {"name": "numeric 1", "keyNum":18, "keyMod": 0},
-    "p" 			: {"name": "numeric 1", "keyNum":19, "keyMod": 0},
-    "q" 			: {"name": "numeric 1", "keyNum":20, "keyMod": 0},
-    "r" 			: {"name": "numeric 1", "keyNum":21, "keyMod": 0},
-    "s" 			: {"name": "numeric 1", "keyNum":22, "keyMod": 0},
-    "t" 			: {"name": "numeric 1", "keyNum":23, "keyMod": 0},
-    "u" 			: {"name": "numeric 1", "keyNum":24, "keyMod": 0},
-    "v" 			: {"name": "numeric 1", "keyNum":25, "keyMod": 0},
-    "w" 			: {"name": "numeric 1", "keyNum":26, "keyMod": 0},
-    "x" 			: {"name": "numeric 1", "keyNum":27, "keyMod": 0},
-    "y" 			: {"name": "numeric 1", "keyNum":28, "keyMod": 0},
-    "z" 			: {"name": "numeric 1", "keyNum":29, "keyMod": 0},
-    "1" 			: {"name": "numeric 1", "keyNum":30, "keyMod": 0},
-    "2" 			: {"name": "numeric 2", "keyNum":31, "keyMod": 0},
-    "3" 			: {"name": "numeric 3", "keyNum":32, "keyMod": 0},
-    "4" 			: {"name": "numeric 4", "keyNum":33, "keyMod": 0},
-    "5" 			: {"name": "numeric 5", "keyNum":34, "keyMod": 0},
-    "6" 			: {"name": "numeric 6", "keyNum":35, "keyMod": 0},
-    "7" 			: {"name": "numeric 7", "keyNum":36, "keyMod": 0},
-    "8" 			: {"name": "numeric 8", "keyNum":37, "keyMod": 0},
-    "9" 			: {"name": "numeric 9", "keyNum":38, "keyMod": 0},
-    "0" 			: {"name": "numeric 0", "keyNum":39, "keyMod": 0},
-    "Ok" 			: {"name": "dpad select", "keyNum":40, "keyMod": 0},
-    "Back" 			: {"name": "previos page", "keyNum":41, "keyMod": 0},
-    "Home" 			: {"name": "home page", "keyNum":41, "keyMod": 4},
-    "Focus" 		: {"name": "set context", "keyNum":74, "keyMod": 0},
-    "Less" 			: {"name": "media skip backward", "keyNum":75, "keyMod": 0},
-    "More" 			: {"name": "media skip forward", "keyNum":78, "keyMod": 0},
-    "Right" 		: {"name": "dpad right", "keyNum":79, "keyMod": 0},
-    "Left" 			: {"name": "dpad left", "keyNum":80, "keyMod": 0},
-    "Down" 			: {"name": "dpad down", "keyNum":81, "keyMod": 0},
-    "Up" 			: {"name": "dpad up", "keyNum":82, "keyMod": 0},
-    "Set" 			: {"name": "set options", "keyNum":88, "keyMod": 0},
-    "Menu" 			: {"name": "options menu", "keyNum":101, "keyMod": 0},
-    "OnToggle" 		: {"name": "power toggle", "keyNum":102, "keyMod": 0},
-    "SoundToggle" 	: {"name": "volume mute", "keyNum":127, "keyMod": 0},
-    "Louder" 		: {"name": "volume up", "keyNum":128, "keyMod": 0},
-    "Softer" 		: {"name": "volume down", "keyNum":129, "keyMod": 0},
-    "PlayToggle" 	: {"name": "media play", "keyNum":232, "keyMod": 0},
-    "Backward" 		: {"name": "media rewind", "keyNum":234, "keyMod": 0},
-    "Forward" 		: {"name": "media fast forward", "keyNum":235, "keyMod": 0},
+_zone = 'home'
+_keyDuration = .35
+
+_key = {
+    "a" 			: {"name": "alpha letter",       "keyNum":4,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "b" 			: {"name": "alpha letter",       "keyNum":5,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "c" 			: {"name": "alpha letter",       "keyNum":6,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "d" 			: {"name": "alpha letter",       "keyNum":7,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "e" 			: {"name": "alpha letter",       "keyNum":8,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "f" 			: {"name": "alpha letter",       "keyNum":9,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "g" 			: {"name": "alpha letter",       "keyNum":10,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "h" 			: {"name": "alpha letter",       "keyNum":11,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "i" 			: {"name": "alpha letter",       "keyNum":12,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "j" 			: {"name": "alpha letter",       "keyNum":13,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "k" 			: {"name": "alpha letter",       "keyNum":14,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "l" 			: {"name": "alpha letter",       "keyNum":15,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "m" 			: {"name": "alpha letter",       "keyNum":16,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "n" 			: {"name": "alpha letter",       "keyNum":17,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "o" 			: {"name": "alpha letter",       "keyNum":18,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "p" 			: {"name": "alpha letter",       "keyNum":19,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "q" 			: {"name": "alpha letter",       "keyNum":20,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "r" 			: {"name": "alpha letter",       "keyNum":21,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "s" 			: {"name": "alpha letter",       "keyNum":22,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "t" 			: {"name": "alpha letter",       "keyNum":23,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "u" 			: {"name": "alpha letter",       "keyNum":24,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "v" 			: {"name": "alpha letter",       "keyNum":25,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "w" 			: {"name": "alpha letter",       "keyNum":26,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "x" 			: {"name": "alpha letter",       "keyNum":27,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "y" 			: {"name": "alpha letter",       "keyNum":28,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "z" 			: {"name": "alpha letter",       "keyNum":29,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "1" 			: {"name": "alpha number",       "keyNum":30,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "2" 			: {"name": "alpha number",       "keyNum":31,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "3" 			: {"name": "alpha number",       "keyNum":32,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "4" 			: {"name": "alpha number",       "keyNum":33,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "5" 			: {"name": "alpha number",       "keyNum":34,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "6" 			: {"name": "alpha number",       "keyNum":35,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "7" 			: {"name": "alpha number",       "keyNum":36,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "8" 			: {"name": "alpha number",       "keyNum":37,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "9" 			: {"name": "alpha number",       "keyNum":38,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "0" 			: {"name": "alpha number",       "keyNum":39,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Ok" 			: {"name": "dpad select",        "keyNum":40,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Back" 			: {"name": "previos page",       "keyNum":41,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Home" 			: {"name": "home page",          "keyNum":41,  "keyMod": 4, "keyDuration": _keyDuration, "zone": _zone},
+    "Focus" 		: {"name": "set context",        "keyNum":74,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Less" 			: {"name": "page backward",      "keyNum":75,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "More" 			: {"name": "page forward",       "keyNum":78,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Right" 		: {"name": "dpad right",         "keyNum":79,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Left" 			: {"name": "dpad left",          "keyNum":80,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Down" 			: {"name": "dpad down",          "keyNum":81,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Up" 			: {"name": "dpad up",            "keyNum":82,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Set" 			: {"name": "set options",        "keyNum":88,  "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Menu" 			: {"name": "options menu",       "keyNum":101, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "OnToggle" 		: {"name": "power toggle",       "keyNum":102, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "SoundToggle" 	: {"name": "volume mute",        "keyNum":127, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Louder" 		: {"name": "volume up",          "keyNum":128, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Softer" 		: {"name": "volume down",        "keyNum":129, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "PlayToggle" 	: {"name": "play/pause",         "keyNum":232, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Backward" 		: {"name": "skip back",          "keyNum":234, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "Forward" 		: {"name": "skip forward",       "keyNum":235, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
 }
 
-usbNum = {
-    1: {"keyCode": "Back"},
-    28: {"keyCode": "Ok"},
-    59: {"keyCode": "SoundToggle"},
-    103: {"keyCode": "Up"},
-    104: {"keyCode": "Less"},
-    105: {"keyCode": "Left"},
-    106: {"keyCode": "Right"},
-    108: {"keyCode": "Down"},
-    109: {"keyCode": "More"},
-    113: {"keyCode": "SoundToggle"},
-    114: {"keyCode": "Softer"},
-    115: {"keyCode": "Louder"},
-    116: {"keyCode": "PowerToggle"},
-    127: {"keyCode": "Menu"},
-    158: {"keyCode": "Exit"},
-    163: {"keyCode": "Forward"},
-    164: {"keyCode": "PlayToggle"},
-    165: {"keyCode": "Backward"},
-    172: {"keyCode": "Home"},
-    191: {"keyCode": "Set"},
-    240: {"keyCode": "Focus"},
-    272: {"keyCode": "Ok"},
-    273: {"keyCode": "Back"},
+_keyCode = {
+    1: "Back",
+    28: "Ok",
+    59: "SoundToggle",
+    103: "Up",
+    104: "Less",
+    105: "Left",
+    106: "Right",
+    108: "Down",
+    109: "More",
+    113: "SoundToggle",
+    114: "Softer",
+    115: "Louder",
+    116: "PowerToggle",
+    127: "Menu",
+    158: "Exit",
+    163: "Forward",
+    164: "PlayToggle",
+    165: "Backward",
+    172: "Home",
+    191: "Set",
+    240: "Focus",
+    272: "Ok",
+    273: "Back",
 }
 
-keyMod = {
+_keyMod = {
     "1":   {"name": "leftShift"},
     "2":   {"name": "leftCtrl"},
     "4":   {"name": "leftAlt"},
@@ -99,3 +102,25 @@ keyMod = {
     "64":  {"name": "rightAlt"},
     "128": {"name": "rightCmd"},
 }
+
+#############################################
+def getKey(code, duration=.35, zone='home'):
+#############################################
+    print(f'getKey, code:{code}, duration:{duration}, zone:{zone}')
+    key = _key.get(code, None)
+    if(key == None): return None
+    key['keyCode'] = code
+    key['keyDuration'] = duration
+    key['zone'] = zone
+    return key
+
+#############################################
+def getKeyCode(scanCode):
+#############################################
+    print(f'getKeyCode, scanCode:{scanCode}')
+    return _keyCode.get(scanCode, None)
+    
+#############################################
+##               MAIN
+#############################################
+    

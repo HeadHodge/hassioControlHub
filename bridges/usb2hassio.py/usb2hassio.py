@@ -52,9 +52,10 @@ def inPosts(post):
     
     #if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    key = keyMaps.usbNum.get(post['scanCode'], None)
-    if(key == None): print(f'Abort inPosts, invalid keyNum: {post["keyNum"]}'); return
-    key['zone'] = post['zone']
+    keyCode = keyMaps.getKeyCode(post['scanCode'])
+    if(keyCode == None): print(f'Abort inPosts, invalid scanCode: {post["scanCode"]}'); return
+    key = keyMaps.getKey(code=keyCode, zone=post['zone'])
+    if(key == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
 
     print(f' \n***TRANSLATE: {key}')
     hassioSequence = translate2hassio.translate(key)
