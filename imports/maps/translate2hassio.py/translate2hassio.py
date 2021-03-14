@@ -70,26 +70,26 @@ def translate(key):
     
         _zones[key["zone"]] = importlib.import_module('zones.zone_' + key["zone"])
         
-        if(key["code"] == 'Set'): key["code"] = 'OnToggle'
+        if(key["keyCode"] == 'Set'): key["keyCode"] = 'OnToggle'
     
-        if(_zones[key["zone"]].isFocusSet == True and key["code"] == 'OnToggle'): 
-            key["code"] = 'Open'
+        if(_zones[key["zone"]].isFocusSet == True and key["keyCode"] == 'OnToggle'): 
+            key["keyCode"] = 'Open'
             _zones[key["zone"]].isFocusSet = None
         
-        if(_zones[key["zone"]].isFocusSet): return setFocus(key["zone"], key["code"])
-        if(_zones[key["zone"]].isTaskSet): return getTask(key["zone"], key["code"])
+        if(_zones[key["zone"]].isFocusSet): return setFocus(key["zone"], key["keyCode"])
+        if(_zones[key["zone"]].isTaskSet): return getTask(key["zone"], key["keyCode"])
       
-        if(key["code"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
+        if(key["keyCode"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
 
-        if(key["code"] == 'SoundToggle'):
+        if(key["keyCode"] == 'SoundToggle'):
             if(_zones[key["zone"]].isSilent == True):
-                key["code"] = 'Sound'
+                key["keyCode"] = 'Sound'
                 _zones[key["zone"]].isSilent = None
             else:
-                key["code"] = 'Silence'
+                key["keyCode"] = 'Silence'
                 _zones[key["zone"]].isSilent = True
     
-        return getCommand(key["zone"], key["code"])
+        return getCommand(key["zone"], key["keyCode"])
     except:
         print('Abort translateKey: ', sys.exc_info()[0])
         traceback.print_exc()

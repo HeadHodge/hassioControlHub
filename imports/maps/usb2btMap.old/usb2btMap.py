@@ -39,16 +39,22 @@ scan2key = {
     272: "Ok",
     273: "Exit"
 }
-seqNum = 0
+
+seqNum = 3
 
 #############################################
 def translate(input):
 #############################################
     #print(f'translate keycode: {input}')
     global seqNum
-    seqNum += 1
-    print(f'seqNum: {seqNum}')
-    key =  [ 0xA1, 1, 0, 0, seqNum, 0, 0, 0, 0, 0 ]
+    
+    if(input['scanCode'] == 1):   code = 1 #back
+    if(input['scanCode'] == 105): seqNum -= 1;  code = seqNum  #left
+    if(input['scanCode'] == 106): seqNum += 1;  code = seqNum  #right
+    if(input['scanCode'] == 28):  code = seqNum  #ok
+        
+    print(f'code: {code}')
+    key =  [ 0xA1, 1, 12, 0, code, 0, 0, 0, 0, 0 ]
 
     return key
 

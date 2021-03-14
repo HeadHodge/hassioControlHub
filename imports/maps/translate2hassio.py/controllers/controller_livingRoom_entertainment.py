@@ -112,4 +112,3 @@ tasks = {
 ###########################################
 #                MAIN
 ###########################################
-print('Loaded controller.livingRoom.entertainment.py');

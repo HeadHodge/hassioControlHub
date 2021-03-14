@@ -1,10 +1,8 @@
 #############################################
 ##            MODULE VARIABLES
 #############################################
-print('Load key2hassio')
+print('Load usb2hassio')
     
-from gi.repository import GLib
-from multiprocessing import Process
 import os, sys, time, json, traceback, queue, threading, asyncio
 if len(sys.argv) < 3: 
     print('Terminate usb2hassio, missing required zone name and/or event list arguments')
@@ -15,11 +13,11 @@ path = os.path.join(os.path.dirname(__file__), '../../imports/usb')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/key2hassioMap')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/usb2keyMap')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps/translate2hassio.py')
 sys.path.append(path)
-import wsClient, usbServer, usb2keyMap, key2hassioMap
+import wsClient, usbServer, keyMaps, translate2hassio
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -46,17 +44,20 @@ _outOptions = {
     "agentEvent": None
    }
  
+#############################################
 def inPosts(post):
-    print(f' \n***inUSER: {post}')
+#############################################
+    print(f' \n***inPosts: {post}')
     global _ioQueue, _sessionId
     
-    if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
+    #if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    key = usb2keyMap.translate(post)
+    key = keyMaps.usbNum.get(post['scanCode'], None)
+    if(key == None): print(f'Abort inPosts, invalid keyNum: {post["keyNum"]}'); return
+    key['zone'] = post['zone']
+
     print(f' \n***TRANSLATE: {key}')
-    if(key == None): return
-    
-    hassioSequence = key2hassioMap.translate(key)
+    hassioSequence = translate2hassio.translate(key)
     if(hassioSequence == None): return
     
     for task in hassioSequence:
@@ -78,9 +79,10 @@ def inPosts(post):
         #print(f' \n***QUEUE: {task}')
         _ioQueue.put(payload)
  
- 
+#############################################
 def outPosts(post):
-    print(f' \n***outUSER: {post}')
+#############################################
+    print(f' \n***outPosts: {post}')
 
     content = json.loads(post)
     if(content['type'] == "auth_required"):
@@ -103,19 +105,6 @@ def outPosts(post):
         return post
     
     return None
-    
-"""    
-def outAgentEvent():
-    print('***wsAGENT WAIT')    
-    
-    while True:
-        if(_ioQueue.empty()): continue
-
-        post = _ioQueue.get()
-        return post
-    
-    return None
-"""
     
 #############################################
 ##                MAIN
@@ -143,7 +132,3 @@ except:
     print('Abort key2hassio', sys.exc_info()[0])
     traceback.print_exc()
 
-
-
-#eventData='{"type": "command", "command": "Louder", "id": "webClient", "zone": "livingRoom", "device": "webBrowser"}'
-#print(f'key2hassio translation: {key2hassioMap.translateKey(json.loads(eventData), reply)}')
