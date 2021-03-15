@@ -9,19 +9,20 @@ from aiohttp import web
 _options = {}
 
 #############################################
-async def websocket_handler(request):
+async def connect(request):
 #############################################
     global _options
-    
+    if(_options.get('userEvent', None) == None): print('Abort connect, userEvent method missing in options'); return
+
     ws = web.WebSocketResponse()
     await ws.prepare(request)
-    print(f'Connected to wsServer on port: {_options["port"]}')
+    print(f' \n***wssCONNECTED on port: {_options["port"]}')
 
     async for userPost in ws:
-        if(_options.get('userEvent', None) != None): _options['userEvent'](json.loads(userPost[1])); continue
-        print(f'wsServer received userPost: {userPost}')
+        #print(f'wsServer received userPost: {userPost}')
+        await _options['userEvent'](json.loads(userPost[1])); continue
 
-    print('wsServer connection closed')
+    print(' \n***wssCLOSED')
     return ws
     
 #############################################
@@ -32,7 +33,7 @@ def start(options={"port": 8080}):
     _options = options
     asyncio.set_event_loop(asyncio.new_event_loop())
     app = web.Application()
-    app.add_routes([web.get('/', websocket_handler)])
+    app.add_routes([web.get('/', connect)])
     web.run_app(app, port=options['port'], handle_signals=False)
     
 #######################################

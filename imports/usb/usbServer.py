@@ -7,7 +7,7 @@ print('Load usbServer')
 import websocket
 import sys, time, json, threading, traceback, asyncio
 from evdev import InputDevice, categorize, ecodes
-
+"""
 ############################
 def monitor(keyData):
 ############################
@@ -35,12 +35,14 @@ def monitor(keyData):
             #print(f'\n***usbUSER: {eventData}')
             #print(f'****Dump {keyData["scanCode"]} Duration: {time.time() - startTime}*******')
             keyData['userEvent'](eventData)
-                
+            time.sleep(.5)
+            
             startTime = keyData["scanTime"];
             lastCode = keyData["scanCode"]
 
         #print(keyData["scanTime"] - lastTime, keyData["scanTime"] - startTime)
         lastTime = keyData["scanTime"]
+"""
         
 ############################
 def captureInput(channel, options):
@@ -52,6 +54,8 @@ def captureInput(channel, options):
         lastTime = time.time()
         device = InputDevice(f'/dev/input/event{channel}')
         device.grab()
+        postTime = 0
+        
         print(f'grabbed: {device} in zone: {options["zone"]}')
 
         keyData = {
@@ -64,22 +68,31 @@ def captureInput(channel, options):
             "userEvent": options['userEvent']
         }
         
-        threading.Thread(target=monitor, args=(keyData,)).start()    
-        
         for event in device.async_read_loop():
             if event.type != 1 : continue
-            
+            if(postTime != 0 and time.time()-postTime < .3): continue
+            postTime = time.time()
+
             inputEvent = categorize(event)
-            #print(f'keyState: {inputEvent.keystate}')
-            
-            
+
+            eventData = {
+                "keyCode" : inputEvent.keycode,
+                "scanCode": inputEvent.scancode,
+                "channel" : channel,
+                "device"  : device.name,
+                "zone"    : options['zone'],
+                "time"    : time.time()
+            }
+                        
+            asyncio.run(options['userEvent'](eventData))
+
+            """
             #print(event, time.time() - lastTime)
             keyData['scanTime'] = time.time()
             keyData['scanCode'] = inputEvent.scancode
             keyData['keyCode']  = inputEvent.keycode
             continue
             
-            """
             lastTime = time.time()
             if(inputEvent.keystate != 0): continue
             if(inputEvent.scancode == lastCode and time.time() - lastTime < 0.80): continue

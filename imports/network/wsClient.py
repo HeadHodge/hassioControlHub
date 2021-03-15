@@ -2,9 +2,10 @@
 ##            MODULES VARIABLES
 #############################################
 print('Load wsClient')
-import asyncio
+import asyncio, threading
 import sys, time, json, websockets, traceback
 
+"""        
 ##########################
 async def onConnection(connection, options):
 ##########################
@@ -26,7 +27,6 @@ async def onConnection(connection, options):
         if(post == None): continue
         #print(f'\n***wsTRANSFER POST: {post}')
         await connection.send(json.dumps(post))
-"""        
 ##########################
 async def agentPosts(connection, options):
 ##########################
@@ -42,15 +42,22 @@ async def agentPosts(connection, options):
         await connection.send(json.dumps(post))
 """
 ##########################
+async def transfer(post, options):
+##########################
+    #print(f' \n***TRANSFER {post}')
+    await options["connection"].send(json.dumps(post))
+    
+##########################
 async def connect(options):
 ##########################
     try:            
         async with websockets.client.connect(options["endpoint"]) as connection:
             print(f'***USER CONNECTED, endpoint: {options["endpoint"]}')
-            await asyncio.gather(
-                #agentPosts(connection, options),
-                onConnection(connection, options)
-            )
+            loop = asyncio.get_running_loop()
+            options['transfer'] = transfer
+            options['connection'] = connection
+    
+            async for post in connection: await options['userEvent'](post, options)
         
         print(' \n***DISCONNECTED')
     except:

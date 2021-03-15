@@ -11,10 +11,10 @@ path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/maps')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/translate2hassio.py')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps/map2hassio.py')
 sys.path.append(path)
 
-import httpServer, wsClient, wsioServer, keyMaps, translate2hassio
+import httpServer, wsClient, wsioServer, keyMaps, map2hassio
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -41,7 +41,7 @@ _outOptions = {
 }
  
 #############################################
-def inPosts(post):
+async def inPosts(post):
 #############################################
     print(f' \n***inUSER: {post}')
     global _ioQueue, _sessionId
@@ -50,7 +50,7 @@ def inPosts(post):
     zone = post.get('zone', 'home')
     if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
     
-    hassioSequence = translate2hassio.keyCode2hassio(keyCode, zone)
+    hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
     if(hassioSequence == None): print(f'Abort inUserEvent, invalid keyCode: "{keyCode}"'); return
     
     for task in hassioSequence:
@@ -61,7 +61,7 @@ def inPosts(post):
         
         _sessionId += 1
         
-        post = {
+        payload = {
             "id": _sessionId, 
             "type": "call_service",	
             "domain": command[0],
@@ -70,24 +70,35 @@ def inPosts(post):
         }
         
         #print(f' \n***QUEUE: {post}')
-        _ioQueue.put(post)
+        #_ioQueue.put(post)
+
+        print(f' \n***outTRANSFER: {payload}')
+        await _outOptions['transfer'](payload, _outOptions)
         
 #############################################
-def outPosts(post):
+async def outPosts(post, options):
 #############################################
     print(f' \n***outUSER: {post}')
+    print(f' \n***********************************************************************')
+    print(f'***inUSER WAIT')
 
     content = json.loads(post)
+    
     if(content['type'] == "auth_required"):
         payload = {
             "type": "auth",
             "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
         }
+                      
+        print(f' \n***outTRANSFER: {post}')
+        #asyncio.run(options['transfer'](post, options))
+        await options['transfer'](payload, options)
+
         
-        print(f' \n***outTRANSFER: {payload}')
-        print(f' \n***outUser WAIT')
-        return payload
-    
+        #print(f' \n***outTRANSFER: {payload}')
+        #print(f' \n***outUser WAIT')
+        #return payload
+    """
     print(' \n***outAGENT WAIT')    
     while True:
         if(_ioQueue.empty()): continue
@@ -99,7 +110,7 @@ def outPosts(post):
     
     return None
     
-"""        
+       
 #############################################
 def outAgentEvent():
 #############################################

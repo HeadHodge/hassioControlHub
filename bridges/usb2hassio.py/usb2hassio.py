@@ -15,9 +15,9 @@ path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/maps')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/translate2hassio.py')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps/map2hassio.py')
 sys.path.append(path)
-import wsClient, usbServer, keyMaps, translate2hassio
+import wsClient, usbServer, keyMaps, map2hassio
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -45,22 +45,18 @@ _outOptions = {
    }
  
 #############################################
-def inPosts(post):
+async def inPosts(post):
 #############################################
     print(f' \n***inPosts: {post}')
     global _ioQueue, _sessionId
     
-    #if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
-    
     usbNum = post.get('scanCode', 0)
     zone = post.get('zone', 'home')
     keyCode = keyMaps.usbNum2keyCode(usbNum)
-    #if(keyCode == None): print(f'Abort inPosts, invalid scanCode: {post["scanCode"]}'); return
-    #key = keyMaps.keyCode2key(code=keyCode, zone=post['zone'])
     if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
 
     print(f' \n***TRANSLATE: {keyCode}')
-    hassioSequence = translate2hassio.keyCode2hassio(keyCode, zone)
+    hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
     if(hassioSequence == None): return
     
     for task in hassioSequence:
@@ -89,23 +85,34 @@ def inPosts(post):
         }
         
         #print(f' \n***QUEUE: {task}')
-        _ioQueue.put(payload)
- 
+        #_ioQueue.put(payload)
+
+        print(f' \n***outTRANSFER: {payload}')
+        await _outOptions['transfer'](payload, _outOptions)
+        #print(f' \n***inUSER WAIT')
+        
 #############################################
-def outPosts(post):
+async def outPosts(post, options):
 #############################################
     print(f' \n***outUSER: {post}')
+    print(f' \n***********************************************************************')
+    print(f'***inUSER WAIT')
 
     content = json.loads(post)
     if(content['type'] == "auth_required"):
-        post = {
+        payload = {
             "type": "auth",
             "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
         }
         
-        print(f' \n***outTRANSFER: {post}')
-        print(f' \n***outUser WAIT')
-        return post
+        print(f' \n***outTRANSFER: {payload}')
+        #asyncio.run(options['transfer'](payload, options))
+        await options['transfer'](payload, options)
+    """
+        return None
+    
+    return None
+    
     
     print(' \n***outAGENT WAIT')    
     while True:
@@ -118,6 +125,7 @@ def outPosts(post):
         return payload
     
     return None
+    """
     
 #############################################
 ##                MAIN
