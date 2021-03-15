@@ -106,7 +106,7 @@ _keyMod = {
 #############################################
 def getKey(code, duration=.35, zone='home'):
 #############################################
-    print(f'getKey, code:{code}, duration:{duration}, zone:{zone}')
+    #print(f'getKey, code:{code}, duration:{duration}, zone:{zone}')
     key = _key.get(code, None)
     if(key == None): return None
     key['keyCode'] = code
@@ -117,7 +117,7 @@ def getKey(code, duration=.35, zone='home'):
 #############################################
 def getKeyCode(scanCode):
 #############################################
-    print(f'getKeyCode, scanCode:{scanCode}')
+    #print(f'getKeyCode, scanCode:{scanCode}')
     return _keyCode.get(scanCode, None)
     
 #############################################
