@@ -84,12 +84,8 @@ async def inPosts(post):
             "service_data": data
         }
         
-        #print(f' \n***QUEUE: {task}')
-        #_ioQueue.put(payload)
-
         print(f' \n***outTRANSFER: {payload}')
         await _outOptions['transfer'](payload, _outOptions)
-        #print(f' \n***inUSER WAIT')
         
 #############################################
 async def outPosts(post, options):
@@ -108,24 +104,6 @@ async def outPosts(post, options):
         print(f' \n***outTRANSFER: {payload}')
         #asyncio.run(options['transfer'](payload, options))
         await options['transfer'](payload, options)
-    """
-        return None
-    
-    return None
-    
-    
-    print(' \n***outAGENT WAIT')    
-    while True:
-        if(_ioQueue.empty()): continue
-        payload = _ioQueue.get()
-        if(payload['type'] == 'sleep'): time.sleep(int(payload['data'])); continue
-        
-        print(f' \n***outPOST: {payload}')
-        print(f' \n***outUSER WAIT')
-        return payload
-    
-    return None
-    """
     
 #############################################
 ##                MAIN
