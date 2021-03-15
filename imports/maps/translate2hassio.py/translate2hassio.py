@@ -7,34 +7,34 @@ import os, sys, importlib, json, traceback
 _zones = {}
 
 ##########################################
-def getCommand(zone, code):
+def getCommand(keyCode, zone):
 ##########################################
-    #print(f'Enter getCommand, code: {code}, zone: {zone}')
+    #print(f'Enter getCommand, keyCode: {keyCode}, zone: {zone}')
     controller = None; task = None
 
     _zones[zone].primaryController = importlib.import_module('controllers.' + _zones[zone].primaryModule)
     controller = _zones[zone].primaryController
     
-    #print(f'output task: {json.dumps(controller.tasks[code])}')
-    return controller.tasks.get(code, None)
+    #print(f'output task: {json.dumps(controller.tasks[keyCode])}')
+    return controller.tasks.get(keyCode, None)
     
 ##########################################
-def getTask(zone, code):
+def getTask(keyCode, zone):
 ##########################################
-    #print(f'Enter onSelectTask with {code} in zone: {zone}')
+    #print(f'Enter onSelectTask with {keyCode} in zone: {zone}')
     task = None
 
     _zones[zone].isTaskSet = None
-    return _zones[zone].tasks.get(code, None)
+    return _zones[zone].tasks.get(keyCode, None)
     
 ##########################################
-def setFocus(zone, code):
+def setFocus(keyCode, zone):
 ##########################################
-    #print(f'Enter onSelectFocus with {code} in zone {zone}')
+    #print(f'Enter onSelectFocus with {keyCode} in zone {zone}')
 
     _zones[zone].isFocusSet = None
     
-    if(code == 'Menu'):
+    if(keyCode == 'Menu'):
         _zones[zone].isTaskSet = True
         print(f'select task for {zone}');return
 
@@ -56,40 +56,40 @@ def setFocus(zone, code):
         'Forward'    : Forward
     }
     
-    selection = case.get(code, None)
+    selection = case.get(keyCode, None)
     if(selection == None): return
     _zones[zone].primaryModule = selection()
     print(f'new controller selected: {_zones[zone].primaryModule}')
 
 #############################################
-def translate(key):
+def keyCode2hassio(keyCode, zone='home'):
 #############################################
     try:
         #print(f'translate keycode: {key}')
         global _zone
     
-        _zones[key["zone"]] = importlib.import_module('zones.zone_' + key["zone"])
+        _zones[zone] = importlib.import_module('zones.zone_' + zone)
         
-        if(key["keyCode"] == 'Set'): key["keyCode"] = 'OnToggle'
+        if(keyCode == 'Set'): keyCode = 'OnToggle'
     
-        if(_zones[key["zone"]].isFocusSet == True and key["keyCode"] == 'OnToggle'): 
-            key["keyCode"] = 'Open'
-            _zones[key["zone"]].isFocusSet = None
+        if(_zones[zone].isFocusSet == True and keyCode == 'OnToggle'): 
+            keyCode = 'Open'
+            _zones[zone].isFocusSet = None
         
-        if(_zones[key["zone"]].isFocusSet): return setFocus(key["zone"], key["keyCode"])
-        if(_zones[key["zone"]].isTaskSet): return getTask(key["zone"], key["keyCode"])
+        if(_zones[zone].isFocusSet): return setFocus(keyCode, zone)
+        if(_zones[zone].isTaskSet): return getTask(keyCode, zone)
       
-        if(key["keyCode"] == 'Focus'): _zones[key["zone"]].isFocusSet = True; return print('Set Focus Flag')
+        if(keyCode == 'Focus'): _zones[zone].isFocusSet = True; return print('Set Focus Flag')
 
-        if(key["keyCode"] == 'SoundToggle'):
-            if(_zones[key["zone"]].isSilent == True):
-                key["keyCode"] = 'Sound'
-                _zones[key["zone"]].isSilent = None
+        if(keyCode == 'SoundToggle'):
+            if(_zones[zone].isSilent == True):
+                keyCode = 'Sound'
+                _zones[zone].isSilent = None
             else:
-                key["keyCode"] = 'Silence'
-                _zones[key["zone"]].isSilent = True
+                keyCode = 'Silence'
+                _zones[zone].isSilent = True
     
-        return getCommand(key["zone"], key["keyCode"])
+        return getCommand(keyCode, zone)
     except:
         print('Abort translateKey: ', sys.exc_info()[0])
         traceback.print_exc()

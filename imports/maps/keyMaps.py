@@ -8,7 +8,7 @@ import os, sys, time, json, traceback
 _zone = 'home'
 _keyDuration = .35
 
-_key = {
+_keyCode = {
     "a" 			: {"name": "alpha letter",       "keyNum":4,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
     "b" 			: {"name": "alpha letter",       "keyNum":5,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
     "c" 			: {"name": "alpha letter",       "keyNum":6,   "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
@@ -66,7 +66,7 @@ _key = {
     "Forward" 		: {"name": "skip forward",       "keyNum":235, "keyMod": 0, "keyDuration": _keyDuration, "zone": _zone},
 }
 
-_keyCode = {
+_usbNum = {
     1: "Back",
     28: "Ok",
     59: "SoundToggle",
@@ -104,21 +104,22 @@ _keyMod = {
 }
 
 #############################################
-def getKey(code, duration=.35, zone='home'):
+def keyNum2key(keyCode, zone='home', duration=.35):
 #############################################
-    #print(f'getKey, code:{code}, duration:{duration}, zone:{zone}')
-    key = _key.get(code, None)
+    #print(f'getKey, keyCode:{keyCode}, duration:{duration}, zone:{zone}')
+    key = _keyCode.get(keyCode, None)
     if(key == None): return None
-    key['keyCode'] = code
-    key['keyDuration'] = duration
+    
+    key['keyCode'] = keyCode
     key['zone'] = zone
+    key['keyDuration'] = duration
     return key
 
 #############################################
-def getKeyCode(scanCode):
+def usbNum2keyCode(usbNum):
 #############################################
-    #print(f'getKeyCode, scanCode:{scanCode}')
-    return _keyCode.get(scanCode, None)
+    #print(f'getKeyCode, usbNum:{usbNum}')
+    return _usbNum.get(usbNum, None)
     
 #############################################
 ##               MAIN

@@ -77,7 +77,7 @@ console.log(`Enter sendCommand, code: ${code}`);
 
 	if(!_isConnected) return;
 	
-	_socket.send(`{"context": "html", "code": "${code}", "zone": "`+_zone.getAttribute('value')+`", "device": "webBrowser"}`);
+	_socket.send(`{"context": "html", "keyCode": "${code}", "zone": "`+_zone.getAttribute('value')+`", "device": "webBrowser"}`);
 };
 
 //################

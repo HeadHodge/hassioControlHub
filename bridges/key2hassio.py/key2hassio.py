@@ -9,9 +9,12 @@ import os, sys, time, json, traceback, queue, threading, asyncio
 
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/key2hassioMap')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps')
 sys.path.append(path)
-import httpServer, wsClient, wsioServer, key2hassioMap
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps/translate2hassio.py')
+sys.path.append(path)
+
+import httpServer, wsClient, wsioServer, keyMaps, translate2hassio
 
 _ioQueue = queue.Queue()
 _sessionId = 0
@@ -43,10 +46,12 @@ def inPosts(post):
     print(f' \n***inUSER: {post}')
     global _ioQueue, _sessionId
     
-    #if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
+    keyCode = post.get('keyCode', None)
+    zone = post.get('zone', 'home')
+    if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
     
-    hassioSequence = key2hassioMap.translate(post)
-    if(hassioSequence == None): print(f'Abort inUserEvent, invalid keyCode: "{post["code"]}"'); return
+    hassioSequence = translate2hassio.keyCode2hassio(keyCode, zone)
+    if(hassioSequence == None): print(f'Abort inUserEvent, invalid keyCode: "{keyCode}"'); return
     
     for task in hassioSequence:
         key = list(task.keys())[0]
@@ -74,22 +79,22 @@ def outPosts(post):
 
     content = json.loads(post)
     if(content['type'] == "auth_required"):
-        post = {
+        payload = {
             "type": "auth",
             "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
         }
         
-        print(f' \n***outTRANSFER: {post}')
+        print(f' \n***outTRANSFER: {payload}')
         print(f' \n***outUser WAIT')
-        return post
+        return payload
     
     print(' \n***outAGENT WAIT')    
     while True:
         if(_ioQueue.empty()): continue
         post = _ioQueue.get()
         
-        print(f' \n***outTRANSFER: {post}')
-        print(f' \n***outUser WAIT')
+        print(f' \n***outPOST: {post}')
+        print(f' \n***inUSER WAIT')
         return post
     
     return None

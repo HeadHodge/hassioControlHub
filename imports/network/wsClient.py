@@ -26,7 +26,7 @@ async def onConnection(connection, options):
         if(post == None): continue
         #print(f'\n***wsTRANSFER POST: {post}')
         await connection.send(json.dumps(post))
-        
+"""        
 ##########################
 async def agentPosts(connection, options):
 ##########################
@@ -40,7 +40,7 @@ async def agentPosts(connection, options):
         if(post == None): await asyncio.sleep(0); continue
         print(f'\n***wsTRANSFER POST: {post}')
         await connection.send(json.dumps(post))
-
+"""
 ##########################
 async def connect(options):
 ##########################

@@ -52,21 +52,32 @@ def inPosts(post):
     
     #if(post.get('command', None) == 'Echo'): print('ignore Echo'); return
     
-    keyCode = keyMaps.getKeyCode(post['scanCode'])
-    if(keyCode == None): print(f'Abort inPosts, invalid scanCode: {post["scanCode"]}'); return
-    key = keyMaps.getKey(code=keyCode, zone=post['zone'])
-    if(key == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
+    usbNum = post.get('scanCode', 0)
+    zone = post.get('zone', 'home')
+    keyCode = keyMaps.usbNum2keyCode(usbNum)
+    #if(keyCode == None): print(f'Abort inPosts, invalid scanCode: {post["scanCode"]}'); return
+    #key = keyMaps.keyCode2key(code=keyCode, zone=post['zone'])
+    if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
 
-    print(f' \n***TRANSLATE: {key}')
-    hassioSequence = translate2hassio.translate(key)
+    print(f' \n***TRANSLATE: {keyCode}')
+    hassioSequence = translate2hassio.keyCode2hassio(keyCode, zone)
     if(hassioSequence == None): return
     
     for task in hassioSequence:
         key = list(task.keys())[0]
         data = task[key]
         command = key.split('/')
-        if(command[0] == 'sleep'): time.sleep(int(data)); continue
         
+        if(command[0] == 'sleep'):
+            payload = {
+                "id": 0, 
+                "type": "sleep",	
+                "service_data": data
+            }
+            
+            _ioQueue.put(payload)
+            continue
+            
         _sessionId += 1
         
         payload = {
@@ -83,7 +94,7 @@ def inPosts(post):
 #############################################
 def outPosts(post):
 #############################################
-    print(f' \n***outPosts: {post}')
+    print(f' \n***outUSER: {post}')
 
     content = json.loads(post)
     if(content['type'] == "auth_required"):
@@ -99,11 +110,12 @@ def outPosts(post):
     print(' \n***outAGENT WAIT')    
     while True:
         if(_ioQueue.empty()): continue
-        post = _ioQueue.get()
+        payload = _ioQueue.get()
+        if(payload['type'] == 'sleep'): time.sleep(int(payload['data'])); continue
         
-        print(f' \n***outTRANSFER: {post}')
-        print(f' \n***outUser WAIT')
-        return post
+        print(f' \n***outPOST: {payload}')
+        print(f' \n***outUSER WAIT')
+        return payload
     
     return None
     

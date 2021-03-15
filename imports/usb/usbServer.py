@@ -9,7 +9,7 @@ import sys, time, json, threading, traceback, asyncio
 from evdev import InputDevice, categorize, ecodes
 
 ############################
-def monitor(keyData,):
+def monitor(keyData):
 ############################
     print('***********monitor**********')
     lastCode = 0
@@ -19,7 +19,6 @@ def monitor(keyData,):
     while True:
         if(keyData["scanTime"] == lastTime):
             if(lastCode == 0 or time.time() - keyData["scanTime"] < .3): continue
-            #print(f'****Dump {keyData["scanCode"]} Duration: {time.time() - startTime}*******')
             lastCode = 0
             continue
        
@@ -34,6 +33,7 @@ def monitor(keyData,):
             }
                         
             #print(f'\n***usbUSER: {eventData}')
+            #print(f'****Dump {keyData["scanCode"]} Duration: {time.time() - startTime}*******')
             keyData['userEvent'](eventData)
                 
             startTime = keyData["scanTime"];
