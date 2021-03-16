@@ -33,9 +33,9 @@ _outDataOptions = {
 #############################################
 async def inUserEvent(post, options):
 #############################################
-    print(f' \n***inUSER: {post}')
-    global _sessionId
     content = json.loads(post)
+    print(f' \n***inUSER: {post}, {content["type"]}')
+    global _sessionId
 
     if(content['type'] == "auth_required"):
         payload = {
@@ -50,11 +50,17 @@ async def inUserEvent(post, options):
         payload = {
             "id": 1, 
             "type": "subscribe_events",	
-            "event_type": "scripts_keyCode"
+            "event_type": "postPublished"
         }
         
         print(f' \n***inTRANSFER: {payload}')
         await options['transfer'](payload, options)
+
+    elif(content['type'] == "event" and content['event']['event_type'] == 'postPublished'):
+        payload = content['event']['data']['post']
+        
+        print(f' \n***inTRANSFER: {payload}')
+        await _outDataOptions['transfer'](payload, _outDataOptions)
    
     print(f'************************************************************************* \n')
     print(f' \n*************************************************************************')
