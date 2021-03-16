@@ -59,7 +59,7 @@ async def inUserEvent(post, options):
     elif(content['type'] == "event" and content['event']['event_type'] == 'postPublished'):
         payload = content['event']['data']['post']
         
-        print(f' \n***inTRANSFER: {payload}')
+        print(f' \n***outTRANSFER: {payload}')
         await _outDataOptions['transfer'](payload, _outDataOptions)
    
     print(f'************************************************************************* \n')

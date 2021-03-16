@@ -25,11 +25,11 @@ async def transfer(post, options):
     #print(f' \n***TRANSFER {post}')
     if(options.get('connection', None) == None): print('Abort transfer, no active connecton available'); return
     if(post.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
-    if(post.get('keyNum', None) == None): print('Abort transfer, "keyNum" missing'); return
-    if(post.get('keyMod', None) == None): print('Abort transfer, "keyMod" missing'); return
+    if(post.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
+    if(post.get('hidMod', None) == None): print('Abort transfer, "hidMod" missing'); return
     
     loop = asyncio.get_event_loop()
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['keyMod'], 0, post['keyNum'], 0, 0, 0, 0, 0 ]))
+    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['hidMod'], 0, post['hidCode'], 0, 0, 0, 0, 0 ]))
     await asyncio.sleep(.1)
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
           
