@@ -17,99 +17,61 @@ path = os.path.join(os.path.dirname(__file__), '../../imports/bluetooth')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/dbus')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/usb2keyMap')
-sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/maps/usb2btMap')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps')
 sys.path.append(path)
 
-import usbServer, btServer, btDevice, btProfile, usb2keyMap, usb2btMap
+import usbServer, btServer, btDevice, btProfile, keyMaps
 
 _ioQueue = queue.Queue()
 
 _inOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
-    "queue": _ioQueue,
     "userEvent": None,
-    "agentEvent": None
-}
-
-_outAgentOptions = {
-    "endpoint": "ws://192.168.0.160:8123/api/websocket",
-    "address": "192.168.0.160",
-    "port": "8123",
-    "path": "/api/websocket",
-    "queue": _ioQueue,
-    "userEvent" : None,
-    "agentEvent" : None
 }
 
 _outControlOptions = {
-    "endpoint": "ws://192.168.0.160:8123/api/websocket",
-    "address": "192.168.0.160",
-    "port": "8123",
-    "path": "/api/websocket",
-    "queue": _ioQueue,
     "userEvent" : None,
-    "agentEvent" : None
+}
+
+_outDataOptions = {
+    "userEvent" : None,
 }
         
 #############################################
-def inUserEvent(post):
+async def inUserEvent(post):
 #############################################
-    print(f'***USB: {post}')
+    print(f'***inUSER: {post}')
     global _ioQueue, _sessionId
+    usbNum = post.get('scanCode', 0)
+    zone = post.get('zone', 'home')
+
+    keyCode = keyMaps.usbNum2keyCode(usbNum)
+    print(f'***TRANSLATE: usbNum: {usbNum} == keyCode: {keyCode}')
+
+    key = keyMaps.keyNum2key(keyCode, zone)
+    if(key == None): print(f'Abort inUserEvent, invalid keyCode {keyCode}'); return
     
-    key = usb2btMap.translate(post)
-    if(key == None): return
-    print(f'***KEY: {key}')
-    _ioQueue.put(key)   
-    
-    return
+    print(f'***TRANSFER: {key}')
+    await _outDataOptions['transfer'](key, _outDataOptions)
+
+    print(f'************************************************************************* \n')
+    print(f' \n*************************************************************************')
+    print('******inUSER: WAIT')
 
 ##########################
-def outAgentPost():
+async def outDataEvent(post, options):
 ##########################
-    print('***WAIT for BT post')
-
-    while True:
-        if(_ioQueue.empty()): continue
-        key = _ioQueue.get()
-        print(f'***DEQUEUE: {key}')
-        print(f'************************************************************************* \n')
-        print(f' \n*************************************************************************')
-        print('***WAIT for USB USER post')
-
-        return bytes(key)
-        
-    """
-    try:
-        print(' \n***WAIT for Agent post')
-        time.sleep(5)
-
-        return bytes([ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ])
-        #return bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ])
-            
-    except:
-        print('Abort getAgentPost', sys.exc_info()[0])
-        traceback.print_exc()
-        return None
-    """
+    print(f' \n*************************************************************************')
+    print(f' \n***dataUSER: RECEIVED POST: {post}')
+    print(f' \n***dataUSER: WAIT')
     
 ##########################
-def outControlPost():
+async def outControlEvent(post, options):
 ##########################
-    try:
-        print(' \n***WAIT for Control post')
-
-        #infinite wait to block control channel thread
-        while True:
-            pass
-
-    except:
-        print('Abort getControlPost', sys.exc_info()[0])
-        traceback.print_exc()
-        return None
+    print(f' \n*************************************************************************')
+    print(f' \n***controlUSER: RECEIVED POST: {post}')
+    print(f' \n***controlUSER: WAIT')
    
 #############################################
 def onConnectSignal(interface, changed, path):
@@ -120,7 +82,7 @@ def onConnectSignal(interface, changed, path):
 def start(options={"controlPort": 17, "interruptPort": 19}):
 #############################################
     print('Start usb2bt')
-    
+
     try:
         # Enable ConnectSignal
         try:
@@ -132,13 +94,14 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
             traceback.print_exc()
 
         # Start output module
-        try:
-            
-            _outControlOptions['agentEvent'] = outControlPost
-            threading.Thread(target=btServer.start, args=(options["controlPort"], _outControlOptions)).start()
+        try:            
+            _outControlOptions['userEvent'] = outControlEvent
+            _outControlOptions['channel'] = options["controlPort"]
+            threading.Thread(target=btServer.start, args=(_outControlOptions,)).start()
 
-            _outAgentOptions['agentEvent'] = outAgentPost
-            threading.Thread(target=btServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
+            _outDataOptions['userEvent'] = outDataEvent
+            _outDataOptions['channel'] = options["interruptPort"]
+            threading.Thread(target=btServer.start, args=(_outDataOptions,)).start()
 
             time.sleep(1)
         except:
@@ -151,7 +114,7 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
             threading.Thread(target=usbServer.start, args=(_inOptions,)).start()
             time.sleep(1)
             print(f' \n*************************************************************************')
-            print('***WAIT for USB USER post')
+            print('***WAIT usbUSER')
         except:
             print('Abort wsClient: ', sys.exc_info()[0])
             traceback.print_exc()

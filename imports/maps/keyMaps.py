@@ -104,7 +104,7 @@ _keyMod = {
 }
 
 #############################################
-def keyNum2key(keyCode, zone='home', duration=.35):
+def keyNum2key(keyCode, zone='home'):
 #############################################
     #print(f'getKey, keyCode:{keyCode}, duration:{duration}, zone:{zone}')
     key = _keyCode.get(keyCode, None)
@@ -112,7 +112,6 @@ def keyNum2key(keyCode, zone='home', duration=.35):
     
     key['keyCode'] = keyCode
     key['zone'] = zone
-    key['keyDuration'] = duration
     return key
 
 #############################################

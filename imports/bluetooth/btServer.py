@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 """
 Bluetooth HID keyboard emulator DBUS Service
 
@@ -15,13 +14,23 @@ create a bluetooth device to emulate a HID keyboard
 #############################################
 print("Load btServer")
 
-#from gi.repository import GLib
-#from dbus.mainloop.glib import DBusGMainLoop
-#DBusGMainLoop(set_as_default=True)
 import os, sys, time, traceback, json, socket, threading, asyncio
 import btDevice
 
-_deviceAddress = 'DC:A6:32:65:8A:AB'
+#myDeviceAddress = 'DC:A6:32:65:8A:AB'
+
+##########################
+async def transfer(post, options):
+##########################
+    #print(f' \n***TRANSFER {post}')
+    if(options.get('connection', None) == None): print('Abort transfer, no active connecton available'); return
+    if(post.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
+    if(post.get('keyNum', None) == None): print('Abort transfer, "keyNum" missing'); return
+    if(post.get('keyMod', None) == None): print('Abort transfer, "keyMod" missing'); return
+    
+    loop = asyncio.get_event_loop()
+    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['keyMod'], 0, post['keyNum'], 0, 0, 0, 0, 0 ]))
+    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
           
 #############################################
 async def connect(server, loop, options):
@@ -30,38 +39,42 @@ async def connect(server, loop, options):
         try:
             print("***WAIT for a connection")
             connection,  address = await loop.sock_accept(server)
+            options['connection'] = connection
             print(f'***CONNECTED at address: {address}\n')
             
             while True:
-                post = await loop.run_in_executor(None, options['agentEvent'])
-                print(f'***TRANSFER: {post}')
-                await loop.sock_sendall(connection, post)
-                await loop.sock_sendall(connection, bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
+                print(f'***WAIT btPOST')
+                post = await loop.sock_recv(connection, 2048)
+                if(options.get('userEvent', None) != None): await options['userEvent'](post, options); continue
+                print(f' \n***RECEIVED POST: {post}')
+                
         except:
             print('***ABORT Connection: ', sys.exc_info()[0])
-            #traceback.print_exc()
+            traceback.print_exc()
             print(' \n \n')
         
 ####################################################################################################
-def start(channel, options={}): # Note: standard hid channels > "controlPort": 17, "interruptPort": 19
+def start(options={}): # Note: standard hid channels > "controlPort": 17, "interruptPort": 19
 ####################################################################################################
     print("Start btServer")
     #systemBus = dbus.SystemBus()
 
     try:
-        if(options.get('agentEvent', None) == None):
-            print('Abort btServer, option for "agentEvent" missing')
-            return
+        if(options.get('channel', None) == None): print('Abort btServer: "channel" option missing'); return
+        if(options.get('userEvent', None) == None): print('Abort btServer: "userEvent" option missing'); return
             
-        #_options = options
-        #dBusProperty = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
-        #deviceAddress = dBusProperty.Get('org.bluez.Adapter1', 'Address')
-        deviceAddress = btDevice.getAddress()
-        print(f'create server at deviceAddress: {deviceAddress} on hdiChannel: {channel}')
+        options['address'] = btDevice.getAddress()
+        options['transfer'] = transfer
+        options['connection'] = None
+        
+        if(options.get('address', None) == None): print('Abort btServer: "address" option missing'); return
+       
+        #btAddress = btDevice.getAddress()
+        print(f'create server at btAddress: {options["address"]} on hdiChannel: {options["channel"]}')
         
         server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.bind((deviceAddress, channel))
+        server.bind((options['address'], options['channel']))
         server.setblocking(False)
         server.listen(1)
 
