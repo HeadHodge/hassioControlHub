@@ -60,7 +60,7 @@ def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
 
     try:
         if(options.get('userEvent', None) == None): print('Abort usbServer, no "userEvent" method provided in options'); return
-        if(options.get('queue', None) == None): print('Abort usbServer, no "queue" object provided in options'); return
+        #if(options.get('queue', None) == None): print('Abort usbServer, no "queue" object provided in options'); return
         if(options.get('zone', None) == None): print('Abort usbServer, no "zone" value provided in options'); return
         #_options = options
        

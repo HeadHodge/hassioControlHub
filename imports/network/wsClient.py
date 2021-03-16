@@ -16,7 +16,7 @@ async def connect(options):
 ##########################
     try:            
         async with websockets.client.connect(options["endpoint"]) as connection:
-            print(f'***USER CONNECTED, endpoint: {options["endpoint"]}')
+            print(f' \n***USER CONNECTED, endpoint: {options["endpoint"]}')
             loop = asyncio.get_running_loop()
             options['transfer'] = transfer
             options['connection'] = connection

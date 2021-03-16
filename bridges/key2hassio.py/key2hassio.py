@@ -16,13 +16,11 @@ sys.path.append(path)
 
 import httpServer, wsClient, wsioServer, keyMaps, map2hassio
 
-_ioQueue = queue.Queue()
 _sessionId = 0
 
 # keyCode Input
 _inOptions = {
     "port": "8080",
-    "queue": _ioQueue,
     "firstPost": "User",
     "userEvent" : None,
     "agentEvent" : None
@@ -34,7 +32,6 @@ _outOptions = {
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue,
     "firstPost": "User",
     "userEvent" : None,
     "agentEvent" : None
@@ -68,9 +65,6 @@ async def inPosts(post):
             "service": command[1],
             "service_data": data
         }
-        
-        #print(f' \n***QUEUE: {post}')
-        #_ioQueue.put(post)
 
         print(f' \n***outTRANSFER: {payload}')
         await _outOptions['transfer'](payload, _outOptions)
@@ -79,8 +73,6 @@ async def inPosts(post):
 async def outPosts(post, options):
 #############################################
     print(f' \n***outUSER: {post}')
-    print(f' \n***********************************************************************')
-    print(f'***inUSER WAIT')
 
     content = json.loads(post)
     
@@ -93,37 +85,9 @@ async def outPosts(post, options):
         print(f' \n***outTRANSFER: {post}')
         #asyncio.run(options['transfer'](post, options))
         await options['transfer'](payload, options)
-
-        
-        #print(f' \n***outTRANSFER: {payload}')
-        #print(f' \n***outUser WAIT')
-        #return payload
-    """
-    print(' \n***outAGENT WAIT')    
-    while True:
-        if(_ioQueue.empty()): continue
-        post = _ioQueue.get()
-        
-        print(f' \n***outPOST: {post}')
-        print(f' \n***inUSER WAIT')
-        return post
     
-    return None
-    
-       
-#############################################
-def outAgentEvent():
-#############################################
-    print('***wsAGENT WAIT')    
-    
-    while True:
-        if(_ioQueue.empty()): continue
-
-        post = _ioQueue.get()
-        return post
-    
-    return None
-"""
+    print(f' \n***********************************************************************')
+    print(f'***inUSER WAIT')
 
 #############################################
 ##                MAIN

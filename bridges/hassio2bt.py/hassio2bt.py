@@ -3,104 +3,77 @@
 #############################################
 print('Load hassio2bt')
 
-from multiprocessing import Process
-from dbus.mainloop.glib import DBusGMainLoop
 import os, sys, time, json, asyncio, traceback, queue, threading
 
 path = os.path.join(os.path.dirname(__file__), '../../imports/network')
 sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/bluetooth')
 sys.path.append(path)
-path = os.path.join(os.path.dirname(__file__), '../../imports/dbus')
+path = os.path.join(os.path.dirname(__file__), '../../imports/maps')
 sys.path.append(path)
 
-import wsClient, btServer, btDevice, btProfile
-
-_ioQueue = queue.Queue()
-_sessionId = 0
+import wsClient, btServer, btDevice, btProfile, keyMaps
 
 _inOptions = {
     "endpoint": "ws://192.168.0.160:8123/api/websocket",
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue,
-    "userEvent" : None,
-    "agentEvent" : None
-}
-
-_outAgentOptions = {
-    "endpoint": "ws://192.168.0.160:8123/api/websocket",
-    "address": "192.168.0.160",
-    "port": "8123",
-    "path": "/api/websocket",
-    "queue": _ioQueue,
-    "userEvent" : None,
-    "agentEvent" : None
+    "userEvent": None,
 }
 
 _outControlOptions = {
-    "endpoint": "ws://192.168.0.160:8123/api/websocket",
-    "address": "192.168.0.160",
-    "port": "8123",
-    "path": "/api/websocket",
-    "queue": _ioQueue,
     "userEvent" : None,
-    "agentEvent" : None
+}
+
+_outDataOptions = {
+    "userEvent" : None,
 }
         
 #############################################
-def inAgentEvent(userPost):
+async def inUserEvent(post, options):
 #############################################
-    #print(f'***inUserPost for post: {userPost}')
-    global _ioQueue, _sessionId
-    
-    content = json.loads(userPost)
-    if(content['type'] == "auth_required"): return '{"type": "auth", "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"}'    
+    print(f' \n***inUSER: {post}')
+    global _sessionId
+    content = json.loads(post)
 
-    if(content['type'] == "auth_ok"):
-        _sessionId += 1
-        
+    if(content['type'] == "auth_required"):
         payload = {
-            "id": _sessionId, 
+            "type": "auth",
+            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
+        }
+        
+        print(f' \n***inTRANSFER: {payload}')
+        await options['transfer'](payload, options)
+
+    elif(content['type'] == "auth_ok"):
+        payload = {
+            "id": 1, 
             "type": "subscribe_events",	
             "event_type": "scripts_keyCode"
         }
-    
-        return json.dumps(payload)
-    
-    return 'NOPOST'
         
-##########################
-def outControlPost():
-##########################
-    try:
-        print(' \n***WAIT for Control post')
+        print(f' \n***inTRANSFER: {payload}')
+        await options['transfer'](payload, options)
+   
+    print(f'************************************************************************* \n')
+    print(f' \n*************************************************************************')
+    print('******inUSER: WAIT')
 
-        #infinite wait to block control channel thread
-        while True:
-            pass
-
-    except:
-        print('Abort getControlPost', sys.exc_info()[0])
-        traceback.print_exc()
-        return None
- 
 ##########################
-def outAgentPost():
+async def outDataEvent(post, options):
 ##########################
-    try:
-        print(' \n***WAIT for Agent post')
-        time.sleep(5)
-
-        return bytes([ 0xA1, 1, 0, 0, 11, 0, 0, 0, 0, 0 ])
-        #return bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ])
-            
-    except:
-        print('Abort getAgentPost', sys.exc_info()[0])
-        traceback.print_exc()
-        return None
-  
+    print(f' \n*************************************************************************')
+    print(f' \n***dataUSER: RECEIVED POST: {post}')
+    print(f' \n***dataUSER: WAIT')
+    
+##########################
+async def outControlEvent(post, options):
+##########################
+    print(f' \n*************************************************************************')
+    print(f' \n***controlUSER: RECEIVED POST: {post}')
+    print(f' \n***controlUSER: WAIT')
+   
 #############################################
 def onConnectSignal(interface, changed, path):
 #############################################
@@ -110,7 +83,7 @@ def onConnectSignal(interface, changed, path):
 def start(options={"controlPort": 17, "interruptPort": 19}):
 #############################################
     print('Start hassio2bt')
-    
+
     try:
         # Enable ConnectSignal
         try:
@@ -122,13 +95,14 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
             traceback.print_exc()
 
         # Start output module
-        try:
-            
-            _outControlOptions['agentEvent'] = outControlPost
-            threading.Thread(target=btServer.start, args=(options["controlPort"], _outControlOptions)).start()
+        try:            
+            _outControlOptions['userEvent'] = outControlEvent
+            _outControlOptions['channel'] = options["controlPort"]
+            threading.Thread(target=btServer.start, args=(_outControlOptions,)).start()
 
-            _outAgentOptions['agentEvent'] = outAgentPost
-            threading.Thread(target=btServer.start, args=(options["interruptPort"], _outAgentOptions)).start()
+            _outDataOptions['userEvent'] = outDataEvent
+            _outDataOptions['channel'] = options["interruptPort"]
+            threading.Thread(target=btServer.start, args=(_outDataOptions,)).start()
 
             time.sleep(1)
         except:
@@ -137,13 +111,16 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
 
         # Start input module
         try:
-            _inOptions['agentEvent'] = inAgentEvent
+            print(f' \n*************************************************************************')
+            print('***inUSER: WAIT')
+            _inOptions['userEvent'] = inUserEvent
             threading.Thread(target=wsClient.start, args=(_inOptions,)).start()
+            time.sleep(1)
         except:
             print('Abort wsClient: ', sys.exc_info()[0])
             traceback.print_exc()
     except:
-        print('Abort hassio2bt: ', sys.exc_info()[0])
+        print('Abort usb2bt: ', sys.exc_info()[0])
         traceback.print_exc()
   
 #############################################

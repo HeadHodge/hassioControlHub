@@ -30,6 +30,7 @@ async def transfer(post, options):
     
     loop = asyncio.get_event_loop()
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['keyMod'], 0, post['keyNum'], 0, 0, 0, 0, 0 ]))
+    await asyncio.sleep(.1)
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
           
 #############################################
@@ -40,7 +41,7 @@ async def connect(server, loop, options):
             print("***WAIT for a connection")
             connection,  address = await loop.sock_accept(server)
             options['connection'] = connection
-            print(f'***CONNECTED at address: {address}\n')
+            print(f' \n***CONNECTED at address: {address}\n')
             
             while True:
                 print(f'***WAIT btPOST')
@@ -57,7 +58,6 @@ async def connect(server, loop, options):
 def start(options={}): # Note: standard hid channels > "controlPort": 17, "interruptPort": 19
 ####################################################################################################
     print("Start btServer")
-    #systemBus = dbus.SystemBus()
 
     try:
         if(options.get('channel', None) == None): print('Abort btServer: "channel" option missing'); return
@@ -69,8 +69,7 @@ def start(options={}): # Note: standard hid channels > "controlPort": 17, "inter
         
         if(options.get('address', None) == None): print('Abort btServer: "address" option missing'); return
        
-        #btAddress = btDevice.getAddress()
-        print(f'create server at btAddress: {options["address"]} on hdiChannel: {options["channel"]}')
+        print(f'create server at btAddress: {options["address"]} on hidChannel: {options["channel"]}')
         
         server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -81,7 +80,6 @@ def start(options={}): # Note: standard hid channels > "controlPort": 17, "inter
         asyncio.set_event_loop(asyncio.new_event_loop())
         loop = asyncio.get_event_loop()
         loop.run_until_complete(connect(server, loop, options))
-        #_loop.run_forever()
     except:
         print('Abort btServer: ', sys.exc_info()[0])
         traceback.print_exc()
