@@ -32,8 +32,7 @@ def captureInput(channel, options):
         
         for event in device.async_read_loop():
             if event.type != 1 : continue
-            if(postTime != 0 and time.time()-postTime < .3): continue
-            postTime = time.time()
+            if(postTime != 0 and time.time()-postTime < .25): continue
 
             inputEvent = categorize(event)
 
@@ -47,6 +46,7 @@ def captureInput(channel, options):
             }
                         
             asyncio.run(options['userEvent'](eventData))
+            postTime = time.time()
 
     except:
         print(f'Abort captureInput: {sys.exc_info()[0]}')

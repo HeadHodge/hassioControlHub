@@ -28,10 +28,18 @@ async def transfer(post, options):
     if(post.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
     if(post.get('hidMod', None) == None): print('Abort transfer, "hidMod" missing'); return
     
+    repeat = post.get('hidRepeat', 0)    
+    wait = post.get('hidWait', .75)
     loop = asyncio.get_event_loop()
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['hidMod'], 0, post['hidCode'], 0, 0, 0, 0, 0 ]))
-    await asyncio.sleep(.1)
+    
+    for x in range(repeat): 
+        #print(x)
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['hidMod'], 0, post['hidCode'], 0, 0, 0, 0, 0 ]))
+        await asyncio.sleep(wait)
+  
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
+        
           
 #############################################
 async def connect(server, loop, options):
