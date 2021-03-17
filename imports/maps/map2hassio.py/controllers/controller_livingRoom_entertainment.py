@@ -99,7 +99,7 @@ tasks = {
 	"Backward": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent --longpress 89"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Backward"]}}
-		{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 234, "hidMod": 0, "hidTime": "long"}}}
+		{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 234, "hidMod": 0, "hidRepeat": 1}}}
 	],
 	
 	"PlayToggle": [
@@ -111,7 +111,7 @@ tasks = {
 	"Forward": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent --longpress 90"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Forward"]}}
-		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 235, "hidMod": 0, "hidTime": "long"}}}
+		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 235, "hidMod": 0, "hidRepeat": 1}}}
 	],
 	
 	"Open": [
