@@ -28,7 +28,7 @@ import usbServer, btServer, httpServer, wsioServer, wsClient, btDevice, btProfil
 
 _transferNum = 0
 
-_inOptions = {
+_usbInputOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
     "userEvent": None,
@@ -103,12 +103,12 @@ async def translateInput(keyCode, zone):
     
         print(f'************************************************************************* \n')
         print(f' \n*************************************************************************')
-        print('******inUSER: WAIT')
+        print('******INPUT: WAIT')
         
 #############################################
-async def inUserEvent(post):
+async def usbInputEvent(post):
 #############################################
-    print(f'***inUSER: {post}')
+    print(f'***usbIN: {post}')
     global _transferNum
     
     usbNum = post.get('scanCode', 0)
@@ -117,53 +117,11 @@ async def inUserEvent(post):
     if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
 
     await translateInput(keyCode, zone)
-    return
-    
-    print(f' \n***TRANSLATE: {keyCode}')
-    hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
-    if(hassioSequence == None): return
-    
-    for task in hassioSequence:
-        key = list(task.keys())[0]
-        data = task[key]
-        command = key.split('/')
-        
-        if(command[0] == 'sleep'):
-            payload = {
-                "id": 0, 
-                "type": "sleep",	
-                "service_data": data
-            }
-            
-            _ioQueue.put(payload)
-            continue
-            
-        _transferNum += 1
-        
-        payload = {
-            "id": _transferNum, 
-            "type": "call_service",	
-            "domain": command[0],
-            "service": command[1],
-            "service_data": data
-        }
-        
-        #Route Payload to proper destination
-        if(payload['domain'] == 'script'):
-            print(f' \n***btTRANSFER: {payload}')
-            await _btTransferOptions['transfer'](payload, _btTransferOptions)
-        else:
-            print(f' \n***wsTRANSFER: {payload}')
-            await _wsTransferOptions['transfer'](payload, _wsTransferOptions)
-    
-        print(f'************************************************************************* \n')
-        print(f' \n*************************************************************************')
-        print('******inUSER: WAIT')
  
 #############################################
 async def wssInputEvent(post):
 #############################################
-    print(f' \n***inUSER: {post}')
+    print(f' \n***wssIN: {post}')
     global _ioQueue, _sessionId
     
     keyCode = post.get('keyCode', None)
@@ -171,29 +129,6 @@ async def wssInputEvent(post):
     if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
     
     await translateInput(keyCode, zone)
-    return
-
-    hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
-    if(hassioSequence == None): print(f'Abort inUserEvent, invalid keyCode: "{keyCode}"'); return
-    
-    for task in hassioSequence:
-        key = list(task.keys())[0]
-        data = task[key]
-        command = key.split('/')
-        if(command[0] == 'sleep'): time.sleep(int(data)); continue
-        
-        _sessionId += 1
-        
-        payload = {
-            "id": _sessionId, 
-            "type": "call_service",	
-            "domain": command[0],
-            "service": command[1],
-            "service_data": data
-        }
-
-        print(f' \n***wsTRANSFER: {payload}')
-        await _wsTransferOptions['transfer'](payload, _wsTransferOptions)
        
 ##########################
 async def btControlEvent(post, options):
@@ -206,15 +141,13 @@ async def btControlEvent(post, options):
 async def btTransferEvent(post, options):
 ##########################
     print(f' \n*************************************************************************')
-    print(f' \n***btUSER: RECEIVED POST: {post}')
-    print(f' \n***btUSER: WAIT')
+    print(f' \n***btOUT: RECEIVED POST: {post}')
+    print(f' \n***btOUT: WAIT')
         
 #############################################
 async def wsTransferEvent(post, options):
 #############################################
-    print(f' \n***wsUSER: {post}')
-    print(f' \n***********************************************************************')
-    print(f'***wsUSER WAIT')
+    print(f' \n***wsOUT: {post}')
 
     content = json.loads(post)
     if(content['type'] == "auth_required"):
@@ -223,9 +156,11 @@ async def wsTransferEvent(post, options):
             "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1NmVhNzU3ODkzMDE0MTMzOTJhOTZiYmY3MTZiOWYyOCIsImlhdCI6MTYxNDc1NzQ2OSwiZXhwIjoxOTMwMTE3NDY5fQ.K2WwAh_9OjXZP5ciIcJ4lXYiLcSgLGrC6AgTPeIp8BY"
         }
         
-        print(f' \n***outTRANSFER: {payload}')
+        print(f' \n***wsTRANSFER: {payload}')
         #asyncio.run(options['transfer'](payload, options))
         await options['transfer'](payload, options)
+        print(f' \n***********************************************************************')
+        print(f'***wsOUT: WAIT')
    
 #############################################
 def onConnectSignal(interface, changed, path):
@@ -291,11 +226,11 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
 
         # Start input module
         try:
-            _inOptions['userEvent'] = inUserEvent
-            threading.Thread(target=usbServer.start, args=(_inOptions,)).start()
+            _usbInputOptions['userEvent'] = usbInputEvent
+            threading.Thread(target=usbServer.start, args=(_usbInputOptions,)).start()
             time.sleep(1)
             print(f' \n***********************************************************************')
-            print(f'***inUSER WAIT')
+            print(f'***INPUT: WAIT')
         except:
             print('Abort wsClient: ', sys.exc_info()[0])
             traceback.print_exc()
