@@ -41,27 +41,28 @@ async def transfer(post, options):
   
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
             
-#############################################
+#############################            print(" \n==============================================================")
+################
 async def connect(server, loop, options):
 #############################################
     while True:
         try:
-            print("***WAIT for a connection")
-            connection,  address = await loop.sock_accept(server)
+            print(" \n==============================================================")
+            print("***CONNECT")
+            connection, device = await loop.sock_accept(server)
             options['connection'] = connection
-            print(f' \n***CONNECTED at address: {address}\n')
+            print(f' \n***CONNECTED to device: {device}\n')
             
             while True:
                 print(f'***WAIT btPOST')
                 post = await loop.sock_recv(connection, 2048)
+                if(len(post) == 0): raise Exception("****DISCONNECTED****")
                 if(options.get('userEvent', None) != None): await options['userEvent'](post, options); continue
                 print(f' \n***RECEIVED POST: {post}')
-                
         except:
-            print('***ABORT Connection: ', sys.exc_info()[0])
-            traceback.print_exc()
-            print(' \n \n')
-        
+            print(' \n***ABORT CONNECTION: ', sys.exc_info()[1])
+            #connection.close()
+            
 ####################################################################################################
 def start(options={}): # Note: standard hid channels > "controlPort": 17, "interruptPort": 19
 ####################################################################################################
