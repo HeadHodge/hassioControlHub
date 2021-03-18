@@ -36,7 +36,7 @@ def captureInput(channel, options):
         for event in device.async_read_loop():
             if(event.type != 1 or event.value != 1): continue
             currentTime = event.sec + event.usec/1000000            
-            if(currentTime - startTime < .75): continue
+            if(currentTime - startTime < .4): continue
             print(event, startTime, currentTime)
             startTime = currentTime
 

@@ -22,25 +22,25 @@ import btDevice
 ##########################
 async def transfer(post, options):
 ##########################
-    #print(f' \n***TRANSFER {post}')
-    if(options.get('connection', None) == None): print('Abort transfer, no active connecton available'); return
-    if(post.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
-    if(post.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
-    if(post.get('hidMod', None) == None): print('Abort transfer, "hidMod" missing'); return
-    
-    repeat = post.get('hidRepeat', 0)    
-    wait = post.get('hidWait', .75)
     loop = asyncio.get_event_loop()
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['hidMod'], 0, post['hidCode'], 0, 0, 0, 0, 0 ]))
+    key = post['service_data']['post']
+    
+    if(options.get('connection', None) == None): print('Abort transfer, no active connecton available'); return
+    if(key.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
+    if(key.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
+    if(key.get('hidMod', None) == None): print('Abort transfer, "hidMod" missing'); return
+    
+    repeat = key.get('hidRepeat', 0)    
+    wait = key.get('hidWait', .75)
+    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
     
     for x in range(repeat): 
         #print(x)
-        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, post['hidMod'], 0, post['hidCode'], 0, 0, 0, 0, 0 ]))
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
         await asyncio.sleep(wait)
   
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
-        
-          
+            
 #############################################
 async def connect(server, loop, options):
 #############################################

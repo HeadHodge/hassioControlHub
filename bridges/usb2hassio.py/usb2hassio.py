@@ -26,7 +26,6 @@ _sessionId = 0
 _inOptions = {
     "zone": sys.argv[1],
     "channels": sys.argv[2].split(','),
-    "queue": _ioQueue,
     "firstPost": "User",
     "userEvent": None,
     "agentEvent": None
@@ -38,7 +37,6 @@ _outOptions = {
     "address": "192.168.0.160",
     "port": "8123",
     "path": "/api/websocket",
-    "queue": _ioQueue,
     "firstPost": "User",
     "userEvent": None,
     "agentEvent": None
