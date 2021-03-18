@@ -11,29 +11,29 @@ def captureInput(channel, options):
 ############################
     #print(f'captureInput on channel: {channel}')
     
-    try:
-        lastCode = 0
-        lastTime = time.time()
-        device = InputDevice(f'/dev/input/event{channel}')
-        device.grab()
-        postTime = 0
+    lastCode = 0
+    lastTime = time.time()
+    device = InputDevice(f'/dev/input/event{channel}')
+    device.grab()
+    postTime = 0
         
-        print(f'grabbed: {device} in zone: {options["zone"]}')
+    print(f'grabbed: {device} in zone: {options["zone"]}')
 
-        keyData = {
-            "scanTime" : 0,
-            "scanCode" : 0,
-            "keyCode"  : 0,
-            "channel"  : channel,
-            "device"   : device.name,
-            "zone"     : options['zone'],
-            "userEvent": options['userEvent']
-        }
+    keyData = {
+        "scanTime" : 0,
+        "scanCode" : 0,
+        "keyCode"  : 0,
+        "channel"  : channel,
+        "device"   : device.name,
+        "zone"     : options['zone'],
+        "userEvent": options['userEvent']
+    }
         
-        startTime = 0 
+    startTime = 0 
         
         
-        for event in device.async_read_loop():
+    for event in device.async_read_loop():
+        try:
             if(event.type != 1 or event.value != 1): continue
             currentTime = event.sec + event.usec/1000000            
             if(currentTime - startTime < .4): continue
@@ -52,9 +52,9 @@ def captureInput(channel, options):
             }
                         
             asyncio.run(options['userEvent'](payload))
-    except:
-        print(f'Abort captureInput: {sys.exc_info()[0]}')
-        traceback.print_exc()
+        except:
+            print(f'Abort captureInput: {sys.exc_info()[0]}')
+            traceback.print_exc()
 
 ###################
 # start

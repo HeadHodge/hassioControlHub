@@ -10,6 +10,8 @@ async def transfer(post, options):
 ##########################
     #print(f' \n***TRANSFER {post}')
     await options["connection"].send(json.dumps(post))
+
+    while(options['ack'] == False): await asyncio.sleep(0)
     
 ##########################
 async def connect(options):

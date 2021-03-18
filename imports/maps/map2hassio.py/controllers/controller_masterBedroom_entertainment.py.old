@@ -26,66 +26,52 @@ focus = 'Up'
 tasks = {
 	"Home": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "HOME"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 40, "hidMod": 12}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Home"]}}
 	],
 	
 	"Menu": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "MENU"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Menu"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 101, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Menu"]}}
 	],
 		
 	"Back": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "BACK"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Back"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 41, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Back"]}}
 	],
 	
 	"Up": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "UP"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Up"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 82, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Up"]}}
 	],
 	
 	"Down": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "DOWN"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Down"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 81, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Down"]}}
 	],
 	
 	"Left": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "LEFT"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Left"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 80, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Left"]}}
 	],
 	
 	"Right": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "RIGHT"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Right"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 79, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Right"]}}
 	],
 	
 	"Ok": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "CENTER"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Ok"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 40, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Ok"]}}
 	],
 	
 	"Louder": [
-		#{"media_player/volume_up"  : {"entity_id": "media_player.master_bedroom"}},
-		#{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": False}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 128, "hidMod": 0}}}
+		{"media_player/volume_up"  : {"entity_id": "media_player.master_bedroom"}},
+		{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": False}}
 	],
 	
 	"Softer": [
-		#{"media_player/volume_down": {"entity_id": "media_player.master_bedroom"}},
-		#{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": False}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 129, "hidMod": 0}}}
-	],
-			
-	"SoundToggle": [
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 127, "hidMod": 0}}}
+		{"media_player/volume_down": {"entity_id": "media_player.master_bedroom"}},
+		{"media_player/volume_mute": {"entity_id": "media_player.master_bedroom", "is_volume_muted": False}}
 	],
 			
 	"Sound": [
@@ -97,21 +83,18 @@ tasks = {
 	],
 	
 	"Backward": [
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 89"}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 89"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Backward"]}}
-		{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 234, "hidMod": 0, "hidRepeat": 1}}}
 	],
 	
 	"PlayToggle": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent 85"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["PlayToggle"]}}
-		{"script/publish_post": {"post": {"keyCode": "PlayToggle", "hidCode": 232, "hidMod": 0}}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["PlayToggle"]}}
 	],
 	
 	"Forward": [
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 90"}}
+		{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": "input keyevent --longpress 90"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_masterbedroom", "command": adbEvents["Forward"]}}
-		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 235, "hidMod": 0, "hidRepeat": 1}}}
 	],
 	
 	"Open": [
@@ -127,7 +110,6 @@ tasks = {
 		{"sonos/clear_sleep_timer": {"entity_id": "media_player.master_bedroom"}},
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "TV"}},
 		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.45}}
-		#{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 102, "hidMod": 0}}}
 	],
 		
 	"OnToggle": [
@@ -143,7 +125,6 @@ tasks = {
 		{"media_player/select_source": {"entity_id": "media_player.master_bedroom", "source": "Blues"}},
 		{"media_player/volume_set": {"entity_id": "media_player.master_bedroom", "volume_level": 0.18}},
 		{"sonos/set_sleep_timer": {"entity_id": "media_player.master_bedroom", "sleep_time": 3600}}
-		#{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 102, "hidMod": 0}}}
 	]
 }
 

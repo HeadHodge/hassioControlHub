@@ -55,6 +55,7 @@ _wsTransferOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "firstPost": "User",
+    "ack": True,
     "userEvent": None,
     "agentEvent": None
    }
@@ -73,15 +74,7 @@ async def translateInput(keyCode, zone):
         data = task[key]
         command = key.split('/')
         
-        if(command[0] == 'sleep'):
-            payload = {
-                "id": 0, 
-                "type": "sleep",	
-                "service_data": data
-            }
-            
-            _ioQueue.put(payload)
-            continue
+        if(command[0] == 'sleep'): print(f' \n***SLEEP: {data} seconds'); await asyncio.sleep(data); continue
             
         _transferNum += 1
         
@@ -99,6 +92,7 @@ async def translateInput(keyCode, zone):
             await _btTransferOptions['transfer'](payload, _btTransferOptions)
         else:
             print(f' \n***wsTRANSFER: {payload}')
+            _wsTransferOptions['ack'] = False
             await _wsTransferOptions['transfer'](payload, _wsTransferOptions)
     
         print(f'************************************************************************* \n')
@@ -148,7 +142,8 @@ async def btTransferEvent(post, options):
 async def wsTransferEvent(post, options):
 #############################################
     print(f' \n***wsOUT: {post}')
-
+    options['ack'] = True
+    
     content = json.loads(post)
     if(content['type'] == "auth_required"):
         payload = {
