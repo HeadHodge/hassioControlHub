@@ -330,7 +330,7 @@ var params = new URLSearchParams(window.location.search);
 	window.addEventListener("keydown", keyDown);
 	window.addEventListener("keyup", keyUp);
 	
-	openMenu();
+	openConnection(openMenu);
 };
 
 //################
@@ -372,9 +372,7 @@ console.log(`Enter loadCase, filePath: ${filePath}`);
 //debugger;
 
 	window.addEventListener("load", function(){
-		openConnection(loadCase);
-		//connectBroker();
-		//loadCase();
+		loadCase();
 	});
 
 /////////////////////////// END PRIVATE NAMESPACE //////////////////////	

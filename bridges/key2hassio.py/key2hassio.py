@@ -95,8 +95,7 @@ async def outPosts(post, options):
 try:
     # Start httpServer Module
     try:
-        httpServer = threading.Thread(target=httpServer.start)
-        httpServer.start()
+        threading.Thread(target=httpServer.start).start()
     except:
         print('Abort httpServer: ', sys.exc_info()[0])
         traceback.print_exc()

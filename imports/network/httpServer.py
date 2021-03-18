@@ -6,10 +6,15 @@ import sys, time, json, traceback, asyncio
 from aiohttp import web
 
 def start(port=80):
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    app = web.Application()
-    app.add_routes([web.static('/', '/smartRemotes/bridges/html2key.html')])
-    web.run_app(app, port=port, handle_signals=False)
+    print('Start httpServer')
+    
+    try:
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        app = web.Application()
+        app.add_routes([web.static('/', '/smartRemotes/bridges/html2key.html')])
+        web.run_app(app, port=port, handle_signals=False)
+    except:
+        print('Abort httpServer: ', sys.exc_info()[0])
   
 #######################################
 #              MAIN

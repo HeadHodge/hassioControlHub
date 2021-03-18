@@ -24,7 +24,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/maps/map2hassio.py')
 sys.path.append(path)
 
-import usbServer, btServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
+import usbServer, btServer, httpServer, wsioServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
 
 _transferNum = 0
 
@@ -103,32 +103,7 @@ async def inUserEvent(post):
         print(f'************************************************************************* \n')
         print(f' \n*************************************************************************')
         print('******inUSER: WAIT')
-   
-    
-    
-    
-    
-    
-    
-    
-    """
-    usbNum = post.get('scanCode', 0)
-    zone = post.get('zone', 'home')
-
-    keyCode = keyMaps.usbNum2keyCode(usbNum)
-    print(f'***TRANSLATE: usbNum: {usbNum} == keyCode: {keyCode}')
-
-    key = keyMaps.keyNum2key(keyCode, zone)
-    if(key == None): print(f'Abort inUserEvent, invalid keyCode {keyCode}'); return
-    
-    print(f'***TRANSFER: {key}')
-    await _outDataOptions['transfer'](key, _outDataOptions)
-
-    print(f'************************************************************************* \n')
-    print(f' \n*************************************************************************')
-    print('******inUSER: WAIT')
-    """
-    
+       
 ##########################
 async def btControlEvent(post, options):
 ##########################
@@ -172,6 +147,14 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
     print('Start usb2bt')
 
     try:
+        # Start httpServer Module
+        try:
+            threading.Thread(target=httpServer.start).start()
+            time.sleep(1)
+        except:
+            print('Abort httpServer: ', sys.exc_info()[0])
+            traceback.print_exc()
+
         # Enable ConnectSignal
         try:
             threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
