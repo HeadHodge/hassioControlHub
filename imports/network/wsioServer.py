@@ -28,6 +28,7 @@ async def connect(request):
 #############################################
 def start(options={"port": 8080}):
 #############################################
+    print('Start wsServer')
     global _options
     
     _options = options

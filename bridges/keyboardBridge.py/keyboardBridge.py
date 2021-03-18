@@ -34,6 +34,13 @@ _inOptions = {
     "userEvent": None,
 }
 
+_wssInputOptions = {
+    "port": "8080",
+    "firstPost": "User",
+    "userEvent" : None,
+    "agentEvent" : None
+   }
+
 _btControlOptions = {
     "userEvent" : None,
 }
@@ -51,6 +58,52 @@ _wsTransferOptions = {
     "userEvent": None,
     "agentEvent": None
    }
+   
+#############################################
+async def translateInput(keyCode, zone):
+#############################################
+    print(f' \n***TRANSLATE: {keyCode}, {zone}')
+    global _transferNum
+
+    hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
+    if(hassioSequence == None): return
+    
+    for task in hassioSequence:
+        key = list(task.keys())[0]
+        data = task[key]
+        command = key.split('/')
+        
+        if(command[0] == 'sleep'):
+            payload = {
+                "id": 0, 
+                "type": "sleep",	
+                "service_data": data
+            }
+            
+            _ioQueue.put(payload)
+            continue
+            
+        _transferNum += 1
+        
+        payload = {
+            "id": _transferNum, 
+            "type": "call_service",	
+            "domain": command[0],
+            "service": command[1],
+            "service_data": data
+        }
+        
+        #Route Payload to proper destination
+        if(payload['domain'] == 'script'):
+            print(f' \n***btTRANSFER: {payload}')
+            await _btTransferOptions['transfer'](payload, _btTransferOptions)
+        else:
+            print(f' \n***wsTRANSFER: {payload}')
+            await _wsTransferOptions['transfer'](payload, _wsTransferOptions)
+    
+        print(f'************************************************************************* \n')
+        print(f' \n*************************************************************************')
+        print('******inUSER: WAIT')
         
 #############################################
 async def inUserEvent(post):
@@ -63,6 +116,9 @@ async def inUserEvent(post):
     keyCode = keyMaps.usbNum2keyCode(usbNum)
     if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
 
+    await translateInput(keyCode, zone)
+    return
+    
     print(f' \n***TRANSLATE: {keyCode}')
     hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
     if(hassioSequence == None): return
@@ -98,11 +154,46 @@ async def inUserEvent(post):
             await _btTransferOptions['transfer'](payload, _btTransferOptions)
         else:
             print(f' \n***wsTRANSFER: {payload}')
-            await _btTransferOptions['transfer'](payload, _wsTransferOptions)
+            await _wsTransferOptions['transfer'](payload, _wsTransferOptions)
     
         print(f'************************************************************************* \n')
         print(f' \n*************************************************************************')
         print('******inUSER: WAIT')
+ 
+#############################################
+async def wssInputEvent(post):
+#############################################
+    print(f' \n***inUSER: {post}')
+    global _ioQueue, _sessionId
+    
+    keyCode = post.get('keyCode', None)
+    zone = post.get('zone', 'home')
+    if(keyCode == None): print(f'Abort inPosts, invalid keyCode: {keyCode}'); return
+    
+    await translateInput(keyCode, zone)
+    return
+
+    hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
+    if(hassioSequence == None): print(f'Abort inUserEvent, invalid keyCode: "{keyCode}"'); return
+    
+    for task in hassioSequence:
+        key = list(task.keys())[0]
+        data = task[key]
+        command = key.split('/')
+        if(command[0] == 'sleep'): time.sleep(int(data)); continue
+        
+        _sessionId += 1
+        
+        payload = {
+            "id": _sessionId, 
+            "type": "call_service",	
+            "domain": command[0],
+            "service": command[1],
+            "service_data": data
+        }
+
+        print(f' \n***wsTRANSFER: {payload}')
+        await _wsTransferOptions['transfer'](payload, _wsTransferOptions)
        
 ##########################
 async def btControlEvent(post, options):
@@ -153,6 +244,15 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
             time.sleep(1)
         except:
             print('Abort httpServer: ', sys.exc_info()[0])
+            traceback.print_exc()
+
+        # Start wsServer Module
+        try:
+            _wssInputOptions['userEvent'] = wssInputEvent
+            threading.Thread(target=wsioServer.start, args=(_wssInputOptions,)).start()
+            time.sleep(1)
+        except:
+            print('Abort wsServer: ', sys.exc_info()[0])
             traceback.print_exc()
 
         # Enable ConnectSignal
