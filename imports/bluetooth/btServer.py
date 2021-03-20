@@ -32,8 +32,18 @@ async def transfer(post, options):
     
     repeat = key.get('hidRepeat', 0)    
     wait = key.get('hidWait', .75)
+    reportNum = key.get('hidReport', 1)
+
+    if(reportNum < 1 or reportNum > 2): print(f'Abort transfer: Invalid reportNum: {reportNum}'); return
+
+    if(reportNum == 2):
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 2, key['hidCode'], 0 ]))
+        await asyncio.sleep(.75)
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 2, 0, 0 ]))
+        return
+        
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
-    
+           
     for x in range(repeat): 
         #print(x)
         await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
@@ -41,8 +51,7 @@ async def transfer(post, options):
   
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
             
-#############################            print(" \n==============================================================")
-################
+#############################################
 async def connect(server, loop, options):
 #############################################
     while True:

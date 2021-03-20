@@ -55,10 +55,10 @@ def loadProfile(deviceName='smartRemotes Keypad'):
     
     btDevice.registerProfile(profileUUID, profileOptions)
     
+    btDevice.setPowered(True)
     btDevice.setAlias(deviceName)
     btDevice.setDiscoverable(True)
-    btDevice.setDiscoverableTime(300)
-    btDevice.setPowered(True)
+    btDevice.setDiscoverableTime(900)
     
     print(f'Device Name: "{btDevice.getAlias()}"')
     print(f'isDiscoverable: {btDevice.getDiscoverable()}')

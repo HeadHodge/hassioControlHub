@@ -19,8 +19,8 @@ async def connect(request):
     print(f' \n***wssCONNECTED on port: {_options["port"]}')
 
     async for userPost in ws:
-        #print(f'wsServer received userPost: {userPost}')
-        await _options['userEvent'](json.loads(userPost[1])); continue
+        print(f'wsServer received userPost: {userPost}')
+        await _options['userEvent'](json.loads(userPost[1]))
 
     print(' \n***wssCLOSED')
     return ws

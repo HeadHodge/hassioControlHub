@@ -95,23 +95,25 @@ tasks = {
 	"Silence": [
 		{"media_player/volume_mute": {"entity_id": "media_player.living_room", "is_volume_muted": True}}
 	],
+		
+	"Forward": [
+		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent --longpress 90"}}
+		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Forward"]}}
+		#{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 235, "hidMod": 0, "hidRepeat": 1}}}
+		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 0xB3, "hidReport": 2, "hidMod": 0, "hidRepeat": 1}}}
+	],
 	
 	"Backward": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent --longpress 89"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Backward"]}}
-		{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 234, "hidMod": 0, "hidRepeat": 1}}}
+		#{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 234, "hidMod": 0, "hidRepeat": 1}}}
+		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 0xB4, "hidReport": 2, "hidMod": 0, "hidRepeat": 1}}}
 	],
-	
+
 	"PlayToggle": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent 85"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["PlayToggle"]}}
 		{"script/publish_post": {"post": {"keyCode": "PlayToggle", "hidCode": 232, "hidMod": 0}}}
-	],
-	
-	"Forward": [
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent --longpress 90"}}
-		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Forward"]}}
-		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 235, "hidMod": 0, "hidRepeat": 1}}}
 	],
 	
 	"Open": [
