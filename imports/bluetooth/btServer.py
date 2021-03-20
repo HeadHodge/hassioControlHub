@@ -28,28 +28,43 @@ async def transfer(post, options):
     if(options.get('connection', None) == None): print('Abort transfer, no active connecton available'); return
     if(key.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
     if(key.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
-    if(key.get('hidMod', None) == None): print('Abort transfer, "hidMod" missing'); return
     
     repeat = key.get('hidRepeat', 0)    
-    wait = key.get('hidWait', .75)
+    hold = key.get('hidWait', 0)
     reportNum = key.get('hidReport', 1)
+    keyMod = key.get('hidMod', 0)
 
     if(reportNum < 1 or reportNum > 2): print(f'Abort transfer: Invalid reportNum: {reportNum}'); return
 
+    #Send Report #2
     if(reportNum == 2):
-        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 2, key['hidCode'], 0 ]))
-        await asyncio.sleep(.75)
-        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 2, 0, 0 ]))
+        """
+        for keyCode in range(254):
+            keyBytes = keyCode.to_bytes(2, byteorder='little')
+            print(keyBytes)
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
+            await asyncio.sleep(2)           
         return
+        """
         
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
+        keyBytes = key['hidCode'].to_bytes(2, byteorder='little')
+        print([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ])
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
+        await asyncio.sleep(hold)
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
+        return
+                
+    #Send Report #1
+    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyMod, 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
            
-    for x in range(repeat): 
-        #print(x)
-        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
-        await asyncio.sleep(wait)
+    #for x in range(repeat): 
+    #    #print(x)
+    #    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyMod, 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
+    
+    await asyncio.sleep(hold)
   
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
+    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]))
             
 #############################################
 async def connect(server, loop, options):

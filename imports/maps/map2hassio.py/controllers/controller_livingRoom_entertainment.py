@@ -4,6 +4,7 @@
 print('Load controller_livingRoom_entertainment')
 
 eventNum = 5;
+longPress = .75
 
 adbEvents = {
 	"Home"		: f'sendevent /dev/input/event{eventNum} 4 4 786979 && sendevent /dev/input/event{eventNum} 1 172 1 && sendevent /dev/input/event{eventNum} 0 0 0 && sendevent /dev/input/event{eventNum} 4 4 786979 && sendevent /dev/input/event{eventNum} 1 172 0 && sendevent /dev/input/event{eventNum} 0 0 0',
@@ -99,15 +100,15 @@ tasks = {
 	"Forward": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent --longpress 90"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Forward"]}}
-		#{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 235, "hidMod": 0, "hidRepeat": 1}}}
-		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 0xB3, "hidReport": 2, "hidMod": 0, "hidRepeat": 1}}}
+		#{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 235, "hidMod": 0, "hidWait": longPress}}}
+		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 0xB3, "hidReport": 2, "hidWait": longPress, "hidRepeat": 1}}}
 	],
 	
 	"Backward": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "input keyevent --longpress 89"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Backward"]}}
-		#{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 234, "hidMod": 0, "hidRepeat": 1}}}
-		{"script/publish_post": {"post": {"keyCode": "Forward", "hidCode": 0xB4, "hidReport": 2, "hidMod": 0, "hidRepeat": 1}}}
+		#{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 234, "hidMod": 0, "hidWait": longPress}}}
+		{"script/publish_post": {"post": {"keyCode": "Backward", "hidCode": 0xB4, "hidReport": 2, "hidWait": longPress, "hidRepeat": 1}}}
 	],
 
 	"PlayToggle": [
