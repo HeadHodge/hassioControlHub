@@ -22,6 +22,8 @@ import btDevice
 ##########################
 async def transfer(post, options):
 ##########################
+    global myCode
+    
     loop = asyncio.get_event_loop()
     key = post['service_data']['post']
     
@@ -38,18 +40,8 @@ async def transfer(post, options):
 
     #Send Report #2
     if(reportNum == 2):
-        """
-        for keyCode in range(254):
-            keyBytes = keyCode.to_bytes(2, byteorder='little')
-            print(keyBytes)
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
-            await asyncio.sleep(2)           
-        return
-        """
-        
         keyBytes = key['hidCode'].to_bytes(2, byteorder='little')
-        print([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ])
+        print(bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
         await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
         await asyncio.sleep(hold)
         await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
