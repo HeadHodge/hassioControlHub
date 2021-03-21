@@ -4,7 +4,7 @@
 print('Load controller_livingRoom_entertainment')
 
 eventNum = 5;
-longPress = .75
+longPress = .5
 
 adbEvents = {
 	"Home"		: f'sendevent /dev/input/event{eventNum} 4 4 786979 && sendevent /dev/input/event{eventNum} 1 172 1 && sendevent /dev/input/event{eventNum} 0 0 0 && sendevent /dev/input/event{eventNum} 4 4 786979 && sendevent /dev/input/event{eventNum} 1 172 0 && sendevent /dev/input/event{eventNum} 0 0 0',
@@ -131,7 +131,7 @@ tasks = {
 	
 	"Open": [
 		#{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 102, "hidMod": 0}}}
+		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 0x223, "hidReport": 2}}}
 	],
 	
 	"OnToggle": [

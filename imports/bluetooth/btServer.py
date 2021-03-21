@@ -41,21 +41,15 @@ async def transfer(post, options):
     #Send Report #2
     if(reportNum == 2):
         keyBytes = key['hidCode'].to_bytes(2, byteorder='little')
-        print(bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
+        #print(bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
         await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
         await asyncio.sleep(hold)
         await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
         return
                 
     #Send Report #1
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyMod, 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
-           
-    #for x in range(repeat): 
-    #    #print(x)
-    #    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyMod, 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
-    
-    await asyncio.sleep(hold)
-  
+    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyMod, 0, key['hidCode'], 0, 0, 0, 0, 0 ]))    
+    await asyncio.sleep(hold)  
     await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]))
             
 #############################################
