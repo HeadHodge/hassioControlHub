@@ -27,13 +27,15 @@ tasks = {
 	"Home": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "HOME"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Home"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 40, "hidMod": 12}}}
+		#{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 40, "hidMod": 12}}}
+		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 0x223, "hidReport": 2}}}
 	],
 	
 	"Menu": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "MENU"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Menu"]}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 101, "hidMod": 0}}}
+		#{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 101, "hidMod": 0}}}
+		{"script/publish_post": {"post": {"keyCode": "Menu", "hidCode": 0x40, "hidReport": 2}}}
 	],
 		
 	"Back": [
@@ -134,12 +136,9 @@ tasks = {
 	
 	"OnToggle": [
 		#{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}	
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 102, "hidMod": 0}}}
+		#{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 102, "hidMod": 0}}}
+		{"script/publish_post": {"post": {"keyCode": "OnToggle", "hidCode": 0x30, "hidReport": 2}}}
 	],
-    
-	"Space": [
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 40, "hidMod": 12}}}
-	]
 };
 
 ###########################################
