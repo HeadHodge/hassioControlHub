@@ -28,7 +28,7 @@ def loadServiceRecord():
     """
     try:
         currentDirectory  = os.path.dirname(os.path.realpath(__file__))
-        filePath = os.path.join(currentDirectory, 'sdpRecord.xml')
+        filePath = os.path.join(currentDirectory, 'serviceRecord.xml')
         print(f'load serviceRecord: {filePath}')
         fh = open(filePath, 'r')
         return fh.read()
