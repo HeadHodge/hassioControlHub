@@ -36,7 +36,12 @@ def setFocus(keyCode, zone):
     
     if(keyCode == 'Menu'):
         _zones[zone].isTaskSet = True
-        print(f'select task for {zone}');return
+        print(f'select task for {zone}')
+        return
+    
+    if(keyCode == 'Ok'):
+        print(f'reload selected for {zone}')
+        return 'RELOAD'
 
     def Home()        : return _zones[zone].controllers.get('Home', None)
     def Louder()      : return _zones[zone].controllers.get('Louder', None)

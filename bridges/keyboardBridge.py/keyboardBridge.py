@@ -5,7 +5,7 @@ print('Load usb2bt')
 
 from multiprocessing import Process
 from dbus.mainloop.glib import DBusGMainLoop
-import os, sys, time, json, asyncio, traceback, queue, threading
+import os, sys, time, json, asyncio, traceback, queue, threading, importlib
 if len(sys.argv) < 3: 
     print('Terminate usb2hassio, missing required zone name and/or event list arguments')
     print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
@@ -67,14 +67,21 @@ async def translateInput(keyCode, zone):
     global _transferNum
 
     hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
+    
     if(hassioSequence == None): return
+    
+    if(hassioSequence == 'RELOAD'): 
+        print('reload')
+        importlib.reload(keyMaps)
+        importlib.reload(map2hassio)
+        return
     
     for task in hassioSequence:
         key = list(task.keys())[0]
         data = task[key]
         command = key.split('/')
         
-        if(command[0] == 'sleep'): print(f' \n***SLEEP: {data} seconds'); await asyncio.sleep(data); continue
+        if(command[0] == 'sleep'): print(f' \n***SLEEP: {data} seconds'); time.sleep(data); continue
             
         _transferNum += 1
         
@@ -127,13 +134,15 @@ async def wssInputEvent(post):
 ##########################
 async def btControlEvent(post, options):
 ##########################
-    print(f' \n*************************************************************************')
+    return
     print(f' \n***btCONTROL: RECEIVED POST: {post}')
     print(f' \n***btCONTROL: WAIT')
+    print(f'************************************************************************* \n')
     
 ##########################
 async def btTransferEvent(post, options):
 ##########################
+    print(list(bytes(post)), len(post))
     print(f' \n*************************************************************************')
     print(f' \n***btOUT: RECEIVED POST: {post}')
     print(f' \n***btOUT: WAIT')
