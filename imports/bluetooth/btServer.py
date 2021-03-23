@@ -34,23 +34,33 @@ async def transfer(post, options):
     repeat = key.get('hidRepeat', 0)    
     hold = key.get('hidWait', 0)
     reportNum = key.get('hidReport', 1)
-    keyMod = key.get('hidMod', 0)
+    hidCode = key.get('hidCode', 0)
+    hidMod = key.get('hidMod', 0)
 
-    if(reportNum < 1 or reportNum > 2): print(f'Abort transfer: Invalid reportNum: {reportNum}'); return
-
-    #Send Report #2
-    if(reportNum == 2):
-        keyBytes = key['hidCode'].to_bytes(2, byteorder='little')
+    if(reportNum == 1):
+        #Send Report #1
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, 0, hidCode, 0, 0, 0, 0, 0 ]))
+        await asyncio.sleep(hold)  
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]))
+        return        
+    elif(reportNum == 2):    
+        #Send Report #2
+        keyBytes = hidCode.to_bytes(2, byteorder='little')
         #print(bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
         await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
         await asyncio.sleep(hold)
         await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
         return
-                
-    #Send Report #1
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyMod, 0, key['hidCode'], 0, 0, 0, 0, 0 ]))    
-    await asyncio.sleep(hold)  
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]))
+    elif(reportNum == 3):    
+        #Send Report #3
+        print('SEND Report 3')
+        #Send Report #3
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, hidCode ]))
+        await asyncio.sleep(hold)  
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
+        return        
+    else:
+        print(f'Abort transfer, Invalid reportNum: {reportNum}')
             
 #############################################
 async def connect(server, loop, options):
