@@ -13,6 +13,11 @@
 			</sequence>
 		</sequence>
 	</attribute>
+	<attribute id="0x0005">					<!-- BrowseGroupList -->
+		<sequence>
+			<uuid value="0x1002" />			<!-- PublicBrowseRoot -->
+		</sequence>
+	</attribute>
 	<attribute id="0x0206">					<!-- HIDDescriptorList -->
 		<sequence>
 			<sequence>
