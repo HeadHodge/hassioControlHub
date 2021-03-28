@@ -443,8 +443,9 @@ class TestService(Service):
     def __init__(self, bus, index):
         Service.__init__(self, bus, index, self.TEST_SVC_UUID, True)
         self.add_characteristic(ProtocolModeCharacteristic(bus, 0, self))
-        self.add_characteristic(ReportCharacteristic(bus, 1, self))
-        self.add_characteristic(ReportMapCharacteristic(bus, 2, self))
+        self.add_characteristic(HIDInformationCharacteristic(bus, 1, self))
+        self.add_characteristic(ReportCharacteristic(bus, 2, self))
+        self.add_characteristic(ReportMapCharacteristic(bus, 3, self))
 
 #name="Protocol Mode" sourceId="org.bluetooth.characteristic.protocol_mode" uuid="2A4E"
 class ProtocolModeCharacteristic(Characteristic):
@@ -474,6 +475,52 @@ class ProtocolModeCharacteristic(Characteristic):
     def WriteValue(self, value, options):
         print(f'Write ProtocolMode {value}')
         self.value = value
+
+#id="hid_information" name="HID Information" sourceId="org.bluetooth.characteristic.hid_information" uuid="2A4A"
+class HIDInformationCharacteristic(Characteristic):
+    """
+    Fake Battery Level characteristic. The battery level is drained by 2 points
+    every 5 seconds.
+
+    """
+    BATTERY_LVL_UUID = '2A4A'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.BATTERY_LVL_UUID,
+                ['read'],
+                service)
+                
+        self.value = dbus.Array(bytearray.fromhex('01110002'), signature=dbus.Signature('ay'))
+        print(f'***HIDInformation value***: {self.value}')
+
+    def ReadValue(self, options):
+        print(f'Read HIDInformation: {self.value}')
+        return self.value
+
+
+class ReportMapCharacteristic(Characteristic):
+    """
+    Fake Battery Level characteristic. The battery level is drained by 2 points
+    every 5 seconds.
+
+    """
+    BATTERY_LVL_UUID = '2A4B'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.BATTERY_LVL_UUID,
+                ['read'],
+                service)
+                
+        self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'), signature=dbus.Signature('ay'))
+        print(f'***ReportMap value***: {self.value}')
+
+    def ReadValue(self, options):
+        print(f'Read ReportMap: {self.value}')
+        return self.value
 
 
 #id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
