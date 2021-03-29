@@ -53,7 +53,7 @@ class Application(dbus.service.Object):
         self.add_service(HIDService(bus, 0))
         self.add_service(DeviceInfoService(bus, 1))
         self.add_service(BatteryService(bus, 2))
-        self.add_service(TestService(bus, 3))
+        #self.add_service(TestService(bus, 3))
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -414,7 +414,6 @@ class ProtocolModeCharacteristic(Characteristic):
                 service)
         
         #self.value = dbus.Array([1], signature=dbus.Signature('y'))
-        #self.value = dbus.Array([1], signature=dbus.Signature('y'))
         self.value = dbus.Array(bytearray.fromhex('01'), signature=dbus.Signature('y'))
         print(f'***ProtocolMode value***: {self.value}')
 
@@ -478,7 +477,8 @@ class ReportMapCharacteristic(Characteristic):
                 ['read'],
                 service)
                 
-        self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'), signature=dbus.Signature('y'))
+        #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'), signature=dbus.Signature('y'))
+        self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'), signature=dbus.Signature('y'))
         print(f'***ReportMap value***: {self.value}')
 
     def ReadValue(self, options):
@@ -498,8 +498,12 @@ class ReportCharacteristic(Characteristic):
                 ['read', 'notify'],
                 service)
                 
+        #self.add_descriptor(ClientConfigurationDescriptor(bus, 0, self))
+        self.add_descriptor(ReportReferenceDescriptor(bus, 1, self))
+        
         #[ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        self.value = dbus.Array(bytearray.fromhex('00000000000000000000'), signature=dbus.Signature('y'))
+        #self.value = dbus.Array(bytearray.fromhex('00000000000000000000'), signature=dbus.Signature('y'))
+        self.value = dbus.Array(bytearray.fromhex('0000000000000000'), signature=dbus.Signature('y'))
         print(f'***Report value***: {self.value}')
                 
         self.notifying = False
@@ -548,7 +552,53 @@ class ReportCharacteristic(Characteristic):
             return
 
         self.notifying = False
+        
+#name="Client Characteristic Configuration" sourceId="org.bluetooth.descriptor.gatt.client_characteristic_configuration" uuid="2902"
+class ClientConfigurationDescriptor(Descriptor):
 
+    DESCRIPTOR_UUID = '2902'
+
+    def __init__(self, bus, index, characteristic):
+        Descriptor.__init__(
+                self, bus, index,
+                self.DESCRIPTOR_UUID,
+                ['read', 'write'],
+                characteristic)
+                
+        self.value = dbus.Array(bytearray.fromhex('0100'), signature=dbus.Signature('y'))
+        print(f'***ClientConfiguration***: {self.value}')
+
+    def ReadValue(self, options):
+        print(f'Read ClientConfiguration: {self.value}')
+        return self.value
+
+    def WriteValue(self, value, options):
+        print(f'Write ClientConfiguration {self.value}')
+        self.value = value
+
+#type="org.bluetooth.descriptor.report_reference" uuid="2908"
+class ReportReferenceDescriptor(Descriptor):
+
+    DESCRIPTOR_UUID = '2908'
+
+    def __init__(self, bus, index, characteristic):
+        Descriptor.__init__(
+                self, bus, index,
+                self.DESCRIPTOR_UUID,
+                ['read'],
+                characteristic)
+                
+        self.value = dbus.Array(bytearray.fromhex('0001'), signature=dbus.Signature('y'))
+        print(f'***ReportReference***: {self.value}')
+
+    def ReadValue(self, options):
+        print(f'Read ReportReference: {self.value}')
+        return self.value
+
+ 
+#############################
+# my sandbox
+#############################
 class TestService(Service):
     """
     Dummy test service that provides characteristics and descriptors that
