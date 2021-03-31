@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-import dbus
-import dbus.exceptions
+import time
+import dbus, dbus.exceptions
 import dbus.mainloop.glib
 import dbus.service
 
@@ -16,6 +16,7 @@ import sys
 from random import randint
 
 mainloop = None
+hidService = None
 
 BLUEZ_SERVICE_NAME = 'org.bluez'
 GATT_MANAGER_IFACE = 'org.bluez.GattManager1'
@@ -47,9 +48,11 @@ class Application(dbus.service.Object):
     org.bluez.GattApplication1 interface implementation
     """
     def __init__(self, bus):
+ 
         self.path = '/'
         self.services = []
         dbus.service.Object.__init__(self, bus, self.path)
+        
         self.add_service(HIDService(bus, 0))
         self.add_service(DeviceInfoService(bus, 1))
         self.add_service(BatteryService(bus, 2))
@@ -305,6 +308,8 @@ class BatteryLevelCharacteristic(Characteristic):
         return [dbus.Byte(self.battery_lvl)]
 
     def StartNotify(self):
+        print('Start Battery Notify')
+        
         if self.notifying:
             print('Already notifying, nothing to do')
             return
@@ -313,6 +318,8 @@ class BatteryLevelCharacteristic(Characteristic):
         self.notify_battery_level()
 
     def StopNotify(self):
+        print('Stop Battery Notify')
+        
         if not self.notifying:
             print('Not notifying, nothing to do')
             return
@@ -390,30 +397,49 @@ class VersionCharacteristic(Characteristic):
 
 #name="Human Interface Device" sourceId="org.bluetooth.service.human_interface_device" type="primary" uuid="1812"
 class HIDService(Service):
-
     SERVICE_UUID = '1812'
-
+   
     def __init__(self, bus, index):
         Service.__init__(self, bus, index, self.SERVICE_UUID, True)
-        self.add_characteristic(ProtocolModeCharacteristic(bus, 0, self))
-        self.add_characteristic(HIDInfoCharacteristic(bus, 1, self))
-        self.add_characteristic(ControlPointCharacteristic(bus, 2, self))
-        self.add_characteristic(ReportCharacteristic(bus, 3, self))
-        self.add_characteristic(ReportMapCharacteristic(bus, 4, self))
-
+        
+        self.protocolMode = ProtocolModeCharacteristic(bus, 0, self)
+        self.hidInfo = HIDInfoCharacteristic(bus, 1, self)
+        self.controlPoint = ControlPointCharacteristic(bus, 2, self)
+        self.report = ReportCharacteristic(bus, 3, self)
+        self.reportMap = ReportMapCharacteristic(bus, 4, self)
+        
+        self.add_characteristic(self.protocolMode)
+        self.add_characteristic(self.hidInfo)
+        self.add_characteristic(self.controlPoint)
+        self.add_characteristic(self.report)
+        self.add_characteristic(self.reportMap)
+        
 #name="Protocol Mode" sourceId="org.bluetooth.characteristic.protocol_mode" uuid="2A4E"
 class ProtocolModeCharacteristic(Characteristic):
 
     CHARACTERISTIC_UUID = '2A4E'
 
     def __init__(self, bus, index, service):
+        
         Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
                 ["read", "write-without-response"],
                 service)
+                
+        '''        
+        <Field name="Protocol Mode Value">
+        <Requirement>Mandatory</Requirement>
+        <Format>uint8</Format>
+        <Enumerations>
+        <Enumeration key="0" value="Boot Protocol Mode"/>
+        <Enumeration key="1" value="Report Protocol Mode"/>
+        <ReservedForFutureUse start="2" end="255"/>
+        </Enumerations>
+        '''
         
         #self.value = dbus.Array([1], signature=dbus.Signature('y'))
+        self.parent = service
         self.value = dbus.Array(bytearray.fromhex('01'), signature=dbus.Signature('y'))
         print(f'***ProtocolMode value***: {self.value}')
 
@@ -424,6 +450,61 @@ class ProtocolModeCharacteristic(Characteristic):
     def WriteValue(self, value, options):
         print(f'Write ProtocolMode {value}')
         self.value = value
+
+
+#id="hid_information" name="HID Information" sourceId="org.bluetooth.characteristic.hid_information" uuid="2A4A"
+class HIDInfoCharacteristic(Characteristic):
+
+    CHARACTERISTIC_UUID = '2A4A'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.CHARACTERISTIC_UUID,
+                ['read'],
+                service)
+
+        '''
+        <Field name="bcdHID">
+            <InformativeText>16-bit unsigned integer representing version number of base USB HID Specification implemented by HID Device</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>uint16</Format>
+        </Field>
+        
+        <Field name="bCountryCode">
+            <InformativeText>Identifies which country the hardware is localized for. Most hardware is not localized and thus this value would be zero (0).</InformativeText>
+            <Requirement>Mandatory</Requirement>
+            <Format>8bit</Format>
+        </Field>
+        
+        <Field name="Flags">
+            <Requirement>Mandatory</Requirement>
+            <Format>8bit</Format>
+            <BitField>
+                <Bit index="0" size="1" name="RemoteWake">
+                <Enumerations>
+                    <Enumeration key="0" value="The device is not designed to be capable of providing wake-up signal to a HID host"/>
+                    <Enumeration key="1" value="The device is designed to be capable of providing wake-up signal to a HID host"/>
+                </Enumerations>
+                </Bit>
+            
+                <Bit index="1" size="1" name="NormallyConnectable">
+                <Enumerations>
+                    <Enumeration key="0" value="The device is not normally connectable"/>
+                    <Enumeration key="1" value="The device is normally connectable"/>
+                </Enumerations>
+                </Bit>
+            
+                <ReservedForFutureUse index="2" size="6"/>
+            </BitField>
+        </Field>
+        '''                
+        self.value = dbus.Array(bytearray.fromhex('01110002'), signature=dbus.Signature('y'))
+        print(f'***HIDInformation value***: {self.value}')
+
+    def ReadValue(self, options):
+        print(f'Read HIDInformation: {self.value}')
+        return self.value
 
 #sourceId="org.bluetooth.characteristic.hid_control_point" uuid="2A4C"
 class ControlPointCharacteristic(Characteristic):
@@ -445,26 +526,6 @@ class ControlPointCharacteristic(Characteristic):
         self.value = value
 
 
-#id="hid_information" name="HID Information" sourceId="org.bluetooth.characteristic.hid_information" uuid="2A4A"
-class HIDInfoCharacteristic(Characteristic):
-
-    CHARACTERISTIC_UUID = '2A4A'
-
-    def __init__(self, bus, index, service):
-        Characteristic.__init__(
-                self, bus, index,
-                self.CHARACTERISTIC_UUID,
-                ['read'],
-                service)
-                
-        self.value = dbus.Array(bytearray.fromhex('01110002'), signature=dbus.Signature('y'))
-        print(f'***HIDInformation value***: {self.value}')
-
-    def ReadValue(self, options):
-        print(f'Read HIDInformation: {self.value}')
-        return self.value
-
-
 #sourceId="org.bluetooth.characteristic.report_map" uuid="2A4B"
 class ReportMapCharacteristic(Characteristic):
 
@@ -476,7 +537,13 @@ class ReportMapCharacteristic(Characteristic):
                 self.CHARACTERISTIC_UUID,
                 ['read'],
                 service)
-                
+        '''
+        <Field name="Report Map Value">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Repeated>true</Repeated>
+        </Field>
+        '''
         #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'), signature=dbus.Signature('y'))
         self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'), signature=dbus.Signature('y'))
         print(f'***ReportMap value***: {self.value}')
@@ -498,6 +565,14 @@ class ReportCharacteristic(Characteristic):
                 ['read', 'notify'],
                 service)
                 
+        '''
+        <Field name="Report Value">
+        <Requirement>Mandatory</Requirement>
+        <Format>uint8</Format>
+        <Repeated>true</Repeated>
+        </Field>
+        '''
+        
         #self.add_descriptor(ClientConfigurationDescriptor(bus, 0, self))
         self.add_descriptor(ReportReferenceDescriptor(bus, 1, self))
         
@@ -508,26 +583,19 @@ class ReportCharacteristic(Characteristic):
                 
         self.notifying = False
         #self.battery_lvl = 100
-        #GObject.timeout_add(5000, self.drain_battery)
+        
 
-    def notify_battery_level(self):
-        if not self.notifying:
-            return
-        self.PropertiesChanged(
-                GATT_CHRC_IFACE,
-                { 'Value': self.value }, [])
-
-    def drain_battery(self):
-        if not self.notifying:
-            return True
-        if self.battery_lvl > 0:
-            self.battery_lvl -= 2
-            if self.battery_lvl < 0:
-                self.battery_lvl = 0
-        print('Report Changed: ' + repr(self.value))
-        self.notify_battery_level()
-        return True
-
+    def send(self, value='Hey'):
+        if(self.notifying == False): print('Abort send'); return
+        
+        print(f'***send {value}***');
+        self.payload = dbus.Array(bytearray.fromhex('0000480000000000'))       
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': self.payload }, [])
+        print(f'***sent***')
+        
+        time.sleep(10)
+        self.send()
+        
     def ReadValue(self, options):
         print(f'Read Report: {self.value}')
         return self.value
@@ -537,45 +605,15 @@ class ReportCharacteristic(Characteristic):
         self.value = value
 
     def StartNotify(self):
-        print(f'Start Notify')
-        if self.notifying:
-            print('Already notifying, nothing to do')
-            return
-
+        print(f'Start Report Notify')
+        GObject.timeout_add(15000, self.send)
         self.notifying = True
-        self.notify_battery_level()
 
     def StopNotify(self):
-        print(f'Stop Notify')
-        if not self.notifying:
-            print('Not notifying, nothing to do')
-            return
-
+        print(f'Stop Report Notify')
         self.notifying = False
+
         
-#name="Client Characteristic Configuration" sourceId="org.bluetooth.descriptor.gatt.client_characteristic_configuration" uuid="2902"
-class ClientConfigurationDescriptor(Descriptor):
-
-    DESCRIPTOR_UUID = '2902'
-
-    def __init__(self, bus, index, characteristic):
-        Descriptor.__init__(
-                self, bus, index,
-                self.DESCRIPTOR_UUID,
-                ['read', 'write'],
-                characteristic)
-                
-        self.value = dbus.Array(bytearray.fromhex('0100'), signature=dbus.Signature('y'))
-        print(f'***ClientConfiguration***: {self.value}')
-
-    def ReadValue(self, options):
-        print(f'Read ClientConfiguration: {self.value}')
-        return self.value
-
-    def WriteValue(self, value, options):
-        print(f'Write ClientConfiguration {self.value}')
-        self.value = value
-
 #type="org.bluetooth.descriptor.report_reference" uuid="2908"
 class ReportReferenceDescriptor(Descriptor):
 
@@ -588,6 +626,29 @@ class ReportReferenceDescriptor(Descriptor):
                 ['read'],
                 characteristic)
                 
+        '''
+        <Field name="Report ID">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Minimum>0</Minimum>
+            <Maximum>255</Maximum>
+        </Field>
+        
+        <Field name="Report Type">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Minimum>1</Minimum>
+            <Maximum>3</Maximum>
+            <Enumerations>
+                <Enumeration value="Input Report" key="1"/>
+                <Enumeration value="Output report" key="2"/>
+                <Enumeration value="Feature Report" key="3"/>
+                <ReservedForFutureUse start="4" end="255"/>
+                <ReservedForFutureUse1 start1="0" end1="0"/>
+            </Enumerations>
+        </Field>
+        '''
+
         self.value = dbus.Array(bytearray.fromhex('0001'), signature=dbus.Signature('y'))
         print(f'***ReportReference***: {self.value}')
 
