@@ -56,7 +56,7 @@ class Application(dbus.service.Object):
         self.add_service(HIDService(bus, 0))
         self.add_service(DeviceInfoService(bus, 1))
         self.add_service(BatteryService(bus, 2))
-        #self.add_service(TestService(bus, 3))
+        #self.add_service(SandboxService(bus, 3))
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -180,9 +180,7 @@ class Characteristic(dbus.service.Object):
 
         return self.get_properties()[GATT_CHRC_IFACE]
 
-    @dbus.service.method(GATT_CHRC_IFACE,
-                        in_signature='a{sv}',
-                        out_signature='ay')
+    @dbus.service.method(GATT_CHRC_IFACE, in_signature='a{sv}', out_signature='ay')
     def ReadValue(self, options):
         print('Default ReadValue called, returning error')
         raise NotSupportedException()
@@ -202,9 +200,12 @@ class Characteristic(dbus.service.Object):
         print('Default StopNotify called, returning error')
         raise NotSupportedException()
 
-    @dbus.service.signal(DBUS_PROP_IFACE,
-                         signature='sa{sv}as')
+    @dbus.service.signal(DBUS_PROP_IFACE, signature='sa{sv}as')
     def PropertiesChanged(self, interface, changed, invalidated):
+        pass
+        
+    @dbus.service.signal(DBUS_PROP_IFACE, signature='ay')
+    def ReportValueChanged(self, reportValue):
         pass
 
 
@@ -526,94 +527,6 @@ class ControlPointCharacteristic(Characteristic):
         self.value = value
 
 
-#sourceId="org.bluetooth.characteristic.report_map" uuid="2A4B"
-class ReportMapCharacteristic(Characteristic):
-
-    CHARACTERISTIC_UUID = '2A4B'
-
-    def __init__(self, bus, index, service):
-        Characteristic.__init__(
-                self, bus, index,
-                self.CHARACTERISTIC_UUID,
-                ['read'],
-                service)
-        '''
-        <Field name="Report Map Value">
-            <Requirement>Mandatory</Requirement>
-            <Format>uint8</Format>
-            <Repeated>true</Repeated>
-        </Field>
-        '''
-        #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'), signature=dbus.Signature('y'))
-        self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'), signature=dbus.Signature('y'))
-        print(f'***ReportMap value***: {self.value}')
-
-    def ReadValue(self, options):
-        print(f'Read ReportMap: {self.value}')
-        return self.value
-
-
-#id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
-class ReportCharacteristic(Characteristic):
-
-    CHARACTERISTIC_UUID = '2A4D'
-
-    def __init__(self, bus, index, service):
-        Characteristic.__init__(
-                self, bus, index,
-                self.CHARACTERISTIC_UUID,
-                ['read', 'notify'],
-                service)
-                
-        '''
-        <Field name="Report Value">
-        <Requirement>Mandatory</Requirement>
-        <Format>uint8</Format>
-        <Repeated>true</Repeated>
-        </Field>
-        '''
-        
-        #self.add_descriptor(ClientConfigurationDescriptor(bus, 0, self))
-        self.add_descriptor(ReportReferenceDescriptor(bus, 1, self))
-        
-        #[ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]
-        #self.value = dbus.Array(bytearray.fromhex('00000000000000000000'), signature=dbus.Signature('y'))
-        self.value = dbus.Array(bytearray.fromhex('0000000000000000'), signature=dbus.Signature('y'))
-        print(f'***Report value***: {self.value}')
-                
-        self.notifying = False
-        #self.battery_lvl = 100
-        
-
-    def send(self, value='Hey'):
-        if(self.notifying == False): print('Abort send'); return
-        
-        print(f'***send {value}***');
-        self.payload = dbus.Array(bytearray.fromhex('0000480000000000'))       
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': self.payload }, [])
-        print(f'***sent***')
-        
-        time.sleep(10)
-        self.send()
-        
-    def ReadValue(self, options):
-        print(f'Read Report: {self.value}')
-        return self.value
-
-    def WriteValue(self, value, options):
-        print(f'Write Report {self.value}')
-        self.value = value
-
-    def StartNotify(self):
-        print(f'Start Report Notify')
-        GObject.timeout_add(15000, self.send)
-        self.notifying = True
-
-    def StopNotify(self):
-        print(f'Stop Report Notify')
-        self.notifying = False
-
-        
 #type="org.bluetooth.descriptor.report_reference" uuid="2908"
 class ReportReferenceDescriptor(Descriptor):
 
@@ -649,64 +562,179 @@ class ReportReferenceDescriptor(Descriptor):
         </Field>
         '''
 
-        self.value = dbus.Array(bytearray.fromhex('0001'), signature=dbus.Signature('y'))
+        self.value = dbus.Array(bytearray.fromhex('0101'), signature=dbus.Signature('y'))
         print(f'***ReportReference***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read ReportReference: {self.value}')
         return self.value
 
- 
-#############################
-# my sandbox
-#############################
-class TestService(Service):
-    """
-    Dummy test service that provides characteristics and descriptors that
-    exercise various API functionality.
-    """
 
-    SERVICE_UUID = '12345678-1234-5678-1234-56789abcdef0'
+#sourceId="org.bluetooth.characteristic.report_map" uuid="2A4B"
+class ReportMapCharacteristic(Characteristic):
 
-    def __init__(self, bus, index):
-        Service.__init__(self, bus, index, self.SERVICE_UUID, True)
-        self.add_characteristic(TestCharacteristic(bus, 0, self))
-
-
-class TestCharacteristic(Characteristic):
-    """
-    Dummy test characteristic. Allows writing arbitrary bytes to its value, and
-    contains "extended properties", as well as a test descriptor.
-    """
-
-    CHARACTERISTIC_UUID = '12345678-1234-5678-1234-56789abcdef1'
+    CHARACTERISTIC_UUID = '2A4B'
 
     def __init__(self, bus, index, service):
         Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
-                ['read', 'write'],
+                ['read'],
                 service)
-                
-        self.add_descriptor(TestDescriptor(bus, 0, self))
-        #self.value = []
-        self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'), signature=dbus.Signature('y'))
+        '''
+        <Field name="Report Map Value">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Repeated>true</Repeated>
+        </Field>
+        '''
+        #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'))
+        self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0'))
+        print(f'***ReportMap value***: {self.value}')
 
     def ReadValue(self, options):
-        print('TestCharacteristic Read: ' + repr(self.value))
+        print(f'Read ReportMap: {self.value}')
+        return self.value
+
+
+#id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
+class ReportCharacteristic(Characteristic):
+
+    CHARACTERISTIC_UUID = '2A4D'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.CHARACTERISTIC_UUID,
+                ['secure-read', 'notify'],
+                service)
+                
+        '''
+        <Field name="Report Value">
+        <Requirement>Mandatory</Requirement>
+        <Format>uint8</Format>
+        <Repeated>true</Repeated>
+        </Field>
+        '''
+        
+        #self.add_descriptor(ClientConfigurationDescriptor(bus, 0, self))
+        self.add_descriptor(ReportReferenceDescriptor(bus, 1, self))
+        
+        self.notifying = False
+        self.toggle = True
+        self.value = dbus.Array(bytearray.fromhex('0000480000000000'))
+        self.none = dbus.Array(bytearray.fromhex('0000000000000000'))
+        print(f'***Report value***: {self.value}, none: {self.none}')
+        
+    def send(self):
+
+        if(self.toggle == None):
+            print(f'***send: {self.none}***');
+            #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.none}, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, {}, [])
+            self.toggle = True
+        else:
+            print(f'***send {self.value}***');
+            #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.value}, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, {}, [])
+            self.toggle = None
+
+        print(f'***sent***')
+        return True
+                
+    def ReadValue(self, options):
+        print(f'Read Report: {self.value}')
         return self.value
 
     def WriteValue(self, value, options):
-        print('TestCharacteristic Write: ' + repr(value))
+        print(f'Write Report {self.value}')
         self.value = value
 
+    def StartNotify(self):
+        print(f'Start Report Notify')
+        self.notifying = True
+        GObject.timeout_add(10000, self.send)
 
-class TestDescriptor(Descriptor):
+    def StopNotify(self):
+        print(f'Stop Report Notify')
+        self.notifying = False
+
+ 
+#############################
+# my sandbox
+#############################
+class SandboxService(Service):
+    """
+    Dummy test service that provides characteristics and descriptors that
+    exercise various API functionality.
+    """
+
+    SERVICE_UUID = '12345100-1234-5678-1234-56789abcdef1'
+
+    def __init__(self, bus, index):
+        Service.__init__(self, bus, index, self.SERVICE_UUID, True)
+        self.add_characteristic(SandboxCharacteristic(bus, 0, self))
+
+
+class SandboxCharacteristic(Characteristic):
+    """
+    Dummy test characteristic. Allows writing arbitrary bytes to its value, and
+    contains "extended properties", as well as a test descriptor.
+    """
+
+    CHARACTERISTIC_UUID = '12345110-1234-5678-1234-56789abcdef1'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.CHARACTERISTIC_UUID,
+                ['read', 'write', 'notify'],
+                service)
+                
+        self.add_descriptor(SandboxDescriptor(bus, 0, self))
+        #self.value = []
+        self.value = dbus.Array(bytearray.fromhex('0000480000000000'))
+        print(f'***SandboxCharacteristic***: {self.value}')
+        
+    def send(self, value='Hey'):
+        if(self.notifying == False): print('Abort send'); return True
+        
+        print(f'***send {value}***');
+        self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.value}, [])
+        time.sleep(.1)
+        self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': dbus.Array(bytearray.fromhex('0000000000000000'))}, [])
+
+        #self.payload = dbus.Array(bytearray.fromhex('0000480000000000'))     
+        #self.ReportValueChanged(self.payload)
+        #self.payload = dbus.Array(bytearray.fromhex('0000000000000000'))      
+        #self.ReportValueChanged(self.payload)
+        print(f'***sent***')
+        return True
+ 
+    def ReadValue(self, options):
+        print('SandboxCharacteristic Read: ' + repr(self.value))
+        return self.value
+
+    def WriteValue(self, value, options):
+        print('SandboxCharacteristic Write: ' + repr(value))
+        self.value = value
+
+    def StartNotify(self):
+        print(f'Start Sandbox Notify')
+        self.notifying = True
+        GObject.timeout_add(10000, self.send)
+
+    def StopNotify(self):
+        print(f'Stop Sandbox Notify')
+        self.notifying = False
+
+
+class SandboxDescriptor(Descriptor):
     """
     Dummy test descriptor. Returns a static value.
     """
 
-    DESCRIPTOR_UUID = '12345678-1234-5678-1234-56789abcdef2'
+    DESCRIPTOR_UUID = '12345111-1234-5678-1234-56789abcdef1'
 
     def __init__(self, bus, index, characteristic):
         Descriptor.__init__(
@@ -715,17 +743,16 @@ class TestDescriptor(Descriptor):
                 ['read', 'write'],
                 characteristic)
                 
-        self.value = dbus.Array('Test'.encode(), signature=dbus.Signature('y'))
-        print(f'***TestDescriptor***: {self.value}')
+        self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
+        print(f'***SandboxDescriptor***: {self.value}')
 
 
     def ReadValue(self, options):
-        print('TestDescriptor Read')
-        
+        print('SandboxDescriptor Read')
         return self.value
 
     def WriteValue(self, value, options):
-        print(f'TestDescriptor Write: {value}')
+        print(f'SandboxDescriptor Write: {value}')
         self.value = value
 
 def register_app_cb():
