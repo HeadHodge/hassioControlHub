@@ -547,7 +547,8 @@ class ReportMapCharacteristic(Characteristic):
         #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'))
         #self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
         #self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
-        self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508150025650507190029658100c0'))
+        #self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508150025650507190029658100c0'))
+        self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508150025650507190029658100c0050C0901A101850275109501150126ff0719012Aff078100C0'))
         print(f'***ReportMap value***: {self.value}')
 
     def ReadValue(self, options):
@@ -590,14 +591,14 @@ class ReportCharacteristic(Characteristic):
             print(f'***send: {self.none}***');
             #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.none}, [])
             #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x48),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
             self.toggle = True
         else:
             print(f'***send {self.value}***');
-            #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.value}, [])
-            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': self.value }, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
+            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0xe9)] }, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00)] }, [])
             self.toggle = None
 
         print(f'***sent***')
@@ -656,7 +657,7 @@ class ReportReferenceDescriptor(Descriptor):
         </Field>
         '''
 
-        self.value = dbus.Array(bytearray.fromhex('0101'), signature=dbus.Signature('y'))
+        self.value = dbus.Array(bytearray.fromhex('0201'), signature=dbus.Signature('y'))
         print(f'***ReportReference***: {self.value}')
 
     def ReadValue(self, options):
