@@ -281,19 +281,18 @@ class BatteryLevelCharacteristic(Characteristic):
                 ['read', 'notify'],
                 service)
         self.notifying = False
+        self.notifyCnt = 0
         self.battery_lvl = 100
-        self.timer = GObject.timeout_add(30000, self.drain_battery)
+        #self.timer = GObject.timeout_add(60000, self.drain_battery)
 
     def notify_battery_level(self):
-        if not self.notifying:
-            return
-        self.PropertiesChanged(
-                GATT_CHRC_IFACE,
-                { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
-
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
+        self.notifyCnt += 1
+        
     def drain_battery(self):
-        if not self.notifying:
-            return True
+        if not self.notifying: return True
+        if(self.notifyCnt > 2): return False
+        
         if self.battery_lvl > 0:
             self.battery_lvl -= 2
             if self.battery_lvl < 5:
@@ -303,7 +302,7 @@ class BatteryLevelCharacteristic(Characteristic):
         print('Battery Level drained: ' + repr(self.battery_lvl))
         self.notify_battery_level()
         return True
-
+ 
     def ReadValue(self, options):
         print('Battery Level read: ' + repr(self.battery_lvl))
         return [dbus.Byte(self.battery_lvl)]
@@ -316,7 +315,7 @@ class BatteryLevelCharacteristic(Characteristic):
             return
 
         self.notifying = True
-        self.notify_battery_level()
+        self.timer = GObject.timeout_add(60000, self.drain_battery)
 
     def StopNotify(self):
         print('Stop Battery Notify')
@@ -562,7 +561,7 @@ class ReportReferenceDescriptor(Descriptor):
         </Field>
         '''
 
-        self.value = dbus.Array(bytearray.fromhex('0101'), signature=dbus.Signature('y'))
+        self.value = dbus.Array(bytearray.fromhex('0001'), signature=dbus.Signature('y'))
         print(f'***ReportReference***: {self.value}')
 
     def ReadValue(self, options):
@@ -589,7 +588,7 @@ class ReportMapCharacteristic(Characteristic):
         </Field>
         '''
         #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'))
-        self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0'))
+        self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
         print(f'***ReportMap value***: {self.value}')
 
     def ReadValue(self, options):
@@ -622,7 +621,7 @@ class ReportCharacteristic(Characteristic):
         
         self.notifying = False
         self.toggle = True
-        self.value = dbus.Array(bytearray.fromhex('0000480000000000'))
+        self.value = dbus.Array(bytearray.fromhex('0000100000000000'))
         self.none = dbus.Array(bytearray.fromhex('0000000000000000'))
         print(f'***Report value***: {self.value}, none: {self.none}')
         
@@ -631,12 +630,15 @@ class ReportCharacteristic(Characteristic):
         if(self.toggle == None):
             print(f'***send: {self.none}***');
             #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.none}, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, {}, [])
+            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x48),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
             self.toggle = True
         else:
             print(f'***send {self.value}***');
             #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.value}, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, {}, [])
+            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': self.value }, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x10),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
             self.toggle = None
 
         print(f'***sent***')
