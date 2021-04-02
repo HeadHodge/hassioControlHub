@@ -526,49 +526,6 @@ class ControlPointCharacteristic(Characteristic):
         self.value = value
 
 
-#type="org.bluetooth.descriptor.report_reference" uuid="2908"
-class ReportReferenceDescriptor(Descriptor):
-
-    DESCRIPTOR_UUID = '2908'
-
-    def __init__(self, bus, index, characteristic):
-        Descriptor.__init__(
-                self, bus, index,
-                self.DESCRIPTOR_UUID,
-                ['read'],
-                characteristic)
-                
-        '''
-        <Field name="Report ID">
-            <Requirement>Mandatory</Requirement>
-            <Format>uint8</Format>
-            <Minimum>0</Minimum>
-            <Maximum>255</Maximum>
-        </Field>
-        
-        <Field name="Report Type">
-            <Requirement>Mandatory</Requirement>
-            <Format>uint8</Format>
-            <Minimum>1</Minimum>
-            <Maximum>3</Maximum>
-            <Enumerations>
-                <Enumeration value="Input Report" key="1"/>
-                <Enumeration value="Output report" key="2"/>
-                <Enumeration value="Feature Report" key="3"/>
-                <ReservedForFutureUse start="4" end="255"/>
-                <ReservedForFutureUse1 start1="0" end1="0"/>
-            </Enumerations>
-        </Field>
-        '''
-
-        self.value = dbus.Array(bytearray.fromhex('0001'), signature=dbus.Signature('y'))
-        print(f'***ReportReference***: {self.value}')
-
-    def ReadValue(self, options):
-        print(f'Read ReportReference: {self.value}')
-        return self.value
-
-
 #sourceId="org.bluetooth.characteristic.report_map" uuid="2A4B"
 class ReportMapCharacteristic(Characteristic):
 
@@ -588,7 +545,9 @@ class ReportMapCharacteristic(Characteristic):
         </Field>
         '''
         #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'))
-        self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
+        #self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
+        #self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
+        self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508150025650507190029658100c0'))
         print(f'***ReportMap value***: {self.value}')
 
     def ReadValue(self, options):
@@ -637,8 +596,8 @@ class ReportCharacteristic(Characteristic):
             print(f'***send {self.value}***');
             #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.value}, [])
             #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': self.value }, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x10),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
-            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
+            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
             self.toggle = None
 
         print(f'***sent***')
@@ -660,6 +619,49 @@ class ReportCharacteristic(Characteristic):
     def StopNotify(self):
         print(f'Stop Report Notify')
         self.notifying = False
+
+
+#type="org.bluetooth.descriptor.report_reference" uuid="2908"
+class ReportReferenceDescriptor(Descriptor):
+
+    DESCRIPTOR_UUID = '2908'
+
+    def __init__(self, bus, index, characteristic):
+        Descriptor.__init__(
+                self, bus, index,
+                self.DESCRIPTOR_UUID,
+                ['read'],
+                characteristic)
+                
+        '''
+        <Field name="Report ID">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Minimum>0</Minimum>
+            <Maximum>255</Maximum>
+        </Field>
+        
+        <Field name="Report Type">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Minimum>1</Minimum>
+            <Maximum>3</Maximum>
+            <Enumerations>
+                <Enumeration value="Input Report" key="1"/>
+                <Enumeration value="Output report" key="2"/>
+                <Enumeration value="Feature Report" key="3"/>
+                <ReservedForFutureUse start="4" end="255"/>
+                <ReservedForFutureUse1 start1="0" end1="0"/>
+            </Enumerations>
+        </Field>
+        '''
+
+        self.value = dbus.Array(bytearray.fromhex('0101'), signature=dbus.Signature('y'))
+        print(f'***ReportReference***: {self.value}')
+
+    def ReadValue(self, options):
+        print(f'Read ReportReference: {self.value}')
+        return self.value
 
  
 #############################
