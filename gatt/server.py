@@ -1,19 +1,26 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LGPL-2.1-or-later
 
-import time
+####################################################################################################################
+#
+#                                    *****smartRemotes created by HeadHodge*****
+#
+#   HeadHodge/smartRemotes is licensed under the MIT License
+#
+#   A short and simple permissive license with conditions only requiring preservation of copyright and license notices.
+#   Licensed works, modifications, and larger works may be distributed under different terms and without source code.
+#
+####################################################################################################################
+
 import dbus, dbus.exceptions
 import dbus.mainloop.glib
 import dbus.service
 
-import array
 try:
   from gi.repository import GObject
 except ImportError:
   import gobject as GObject
 import sys
-
-from random import randint
 
 mainloop = None
 hidService = None
@@ -254,6 +261,7 @@ class Descriptor(dbus.service.Object):
         print('Default WriteValue called, returning error')
         raise NotSupportedException()
 
+#sourceId="org.bluetooth.service.battery_service" type="primary" uuid="180F"
 class BatteryService(Service):
     """
     Fake Battery service that emulates a draining battery.
@@ -265,7 +273,7 @@ class BatteryService(Service):
         Service.__init__(self, bus, index, self.SERVICE_UUID, True)
         self.add_characteristic(BatteryLevelCharacteristic(bus, 0, self))
 
-
+#name="Battery Level" sourceId="org.bluetooth.characteristic.battery_level" uuid="2A19"
 class BatteryLevelCharacteristic(Characteristic):
     """
     Fake Battery Level characteristic. The battery level is drained by 2 points
@@ -291,7 +299,7 @@ class BatteryLevelCharacteristic(Characteristic):
         
     def drain_battery(self):
         if not self.notifying: return True
-        if(self.notifyCnt > 2): return False
+        if(self.notifyCnt > 2): return False #Update battery level 3 times then stop
         
         if self.battery_lvl > 0:
             self.battery_lvl -= 2
@@ -405,14 +413,16 @@ class HIDService(Service):
         self.protocolMode = ProtocolModeCharacteristic(bus, 0, self)
         self.hidInfo = HIDInfoCharacteristic(bus, 1, self)
         self.controlPoint = ControlPointCharacteristic(bus, 2, self)
-        self.report = ReportCharacteristic(bus, 3, self)
-        self.reportMap = ReportMapCharacteristic(bus, 4, self)
+        self.reportMap = ReportMapCharacteristic(bus, 3, self)
+        self.report1 = Report1Characteristic(bus, 4, self)
+        self.report2 = Report2Characteristic(bus, 5, self)
         
         self.add_characteristic(self.protocolMode)
         self.add_characteristic(self.hidInfo)
         self.add_characteristic(self.controlPoint)
-        self.add_characteristic(self.report)
         self.add_characteristic(self.reportMap)
+        self.add_characteristic(self.report1)
+        self.add_characteristic(self.report2)
         
 #name="Protocol Mode" sourceId="org.bluetooth.characteristic.protocol_mode" uuid="2A4E"
 class ProtocolModeCharacteristic(Characteristic):
@@ -498,7 +508,8 @@ class HIDInfoCharacteristic(Characteristic):
                 <ReservedForFutureUse index="2" size="6"/>
             </BitField>
         </Field>
-        '''                
+        '''
+        
         self.value = dbus.Array(bytearray.fromhex('01110002'), signature=dbus.Signature('y'))
         print(f'***HIDInformation value***: {self.value}')
 
@@ -543,11 +554,52 @@ class ReportMapCharacteristic(Characteristic):
             <Format>uint8</Format>
             <Repeated>true</Repeated>
         </Field>
+        
+        HID Report Descriptors https://www.usb.org/sites/default/files/documents/hid1_11.pdf
+        HID Report Parser https://eleccelerator.com/usbdescreqparser/
         '''
-        #self.value = dbus.Array(bytearray.fromhex('05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050C0901A101850275109501150126ff0719012Aff078100C005010906a101850375019508050719e029e715002501810295017508150026ff000507190029ff8100c0'))
-        #self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
-        #self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
-        #self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508150025650507190029658100c0'))
+        
+        ##############################################################################################
+        # This Report Descriptor defines 2 Input Reports
+        # ReportMap designed by HeadHodge
+        #
+        # <Report Layouts>
+        #   <Report>
+        #       <ReportId>1</ReportId>
+        #       <Description>HID Keyboard Input</Description>
+        #       <Example>KeyCode capital 'M' = [dbus.Byte(0x02), dbus.Byte(0x10)]</Example>
+        #       <Field>
+        #           <Name>Keyboard Modifier</Name>
+        #           <Size>uint8</Size>
+        #           <Format>
+        #               <Bit0>Left CTRL Key Pressed</Bit0>
+        #               <Bit1>Left SHIFT Key Pressed</Bit1>
+        #               <Bit2>Left ALT Key Pressed</Bit2>
+        #               <Bit3>Left CMD(Window) Key Pressed</Bit3>
+        #               <Bit4>Right CTRL Key Pressed</Bit4>
+        #               <Bit5>Right SHIFT Key Pressed</Bit5>
+        #               <Bit6>Right ALT Key Pressed</Bit6>
+        #               <Bit7>Right CMD(Window) Key Pressed</Bit7>
+        #           </Format>
+        #       </Field>
+        #       <Field>
+        #           <Name>Keyboard Input KeyCode</Name>
+        #           <Size>uint8</Size>
+        #       </Field>
+        #   </Report>
+        #   <Report>
+        #       <ReportId>2</ReportId>
+        #       <Description>HID Consumer Input</Description>
+        #       <Example>KeyCode 'VolumeUp' = [dbus.Byte(0xe9), dbus.Byte(0x00)]</Example>
+        #       <Field>
+        #           <Name>Consumer Input KeyCode</Name>
+        #           <Size>uint16</Size>
+        #       </Field>
+        #   </Report>
+        # </Report Layouts>
+        ##############################################################################################
+  
+        #USB HID Report Descriptor
         self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508150025650507190029658100c0050C0901A101850275109501150126ff0719012Aff078100C0'))
         print(f'***ReportMap value***: {self.value}')
 
@@ -557,7 +609,7 @@ class ReportMapCharacteristic(Characteristic):
 
 
 #id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
-class ReportCharacteristic(Characteristic):
+class Report1Characteristic(Characteristic):
 
     CHARACTERISTIC_UUID = '2A4D'
 
@@ -574,33 +626,21 @@ class ReportCharacteristic(Characteristic):
         <Format>uint8</Format>
         <Repeated>true</Repeated>
         </Field>
+        
+        Use standard key codes: https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
         '''
         
-        #self.add_descriptor(ClientConfigurationDescriptor(bus, 0, self))
-        self.add_descriptor(ReportReferenceDescriptor(bus, 1, self))
+        self.add_descriptor(Report1ReferenceDescriptor(bus, 1, self))
         
-        self.notifying = False
-        self.toggle = True
-        self.value = dbus.Array(bytearray.fromhex('0000100000000000'))
-        self.none = dbus.Array(bytearray.fromhex('0000000000000000'))
-        print(f'***Report value***: {self.value}, none: {self.none}')
+        self.value = [dbus.Byte(0x00),dbus.Byte(0x00)]
+        print(f'***Report value***: {self.value}')
         
     def send(self):
 
-        if(self.toggle == None):
-            print(f'***send: {self.none}***');
-            #self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.none}, [])
-            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x48),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
-            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
-            self.toggle = True
-        else:
-            print(f'***send {self.value}***');
-            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
-            #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0xe9)] }, [])
-            self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00)] }, [])
-            self.toggle = None
-
+        #send keyCode: 'M'
+        print(f'***send keyCode: "M"***');
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
         print(f'***sent***')
         return True
                 
@@ -613,17 +653,15 @@ class ReportCharacteristic(Characteristic):
         self.value = value
 
     def StartNotify(self):
-        print(f'Start Report Notify')
-        self.notifying = True
+        print(f'Start Start Report Keyboard Input')
         GObject.timeout_add(10000, self.send)
 
     def StopNotify(self):
-        print(f'Stop Report Notify')
-        self.notifying = False
+        print(f'Stop Report Keyboard Input')
 
 
 #type="org.bluetooth.descriptor.report_reference" uuid="2908"
-class ReportReferenceDescriptor(Descriptor):
+class Report1ReferenceDescriptor(Descriptor):
 
     DESCRIPTOR_UUID = '2908'
 
@@ -656,7 +694,104 @@ class ReportReferenceDescriptor(Descriptor):
             </Enumerations>
         </Field>
         '''
+       
+        # This report uses ReportId 1 as defined in the ReportMap characteristic
+        self.value = dbus.Array(bytearray.fromhex('0101'), signature=dbus.Signature('y'))
+        print(f'***ReportReference***: {self.value}')
 
+    def ReadValue(self, options):
+        print(f'Read ReportReference: {self.value}')
+        return self.value
+
+
+#id="report" name="Report" sourceId="org.bluetooth.characteristic.report" uuid="2A4D"        
+class Report2Characteristic(Characteristic):
+
+    CHARACTERISTIC_UUID = '2A4D'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(
+                self, bus, index,
+                self.CHARACTERISTIC_UUID,
+                ['secure-read', 'notify'],
+                service)
+                
+        '''
+        <Field name="Report Value">
+        <Requirement>Mandatory</Requirement>
+        <Format>uint8</Format>
+        <Repeated>true</Repeated>
+        </Field>
+        
+        Use standard key codes: https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
+        '''
+        
+        self.add_descriptor(Report2ReferenceDescriptor(bus, 1, self))
+        
+        self.value = [dbus.Byte(0x00),dbus.Byte(0x00)]
+        print(f'***Report value***: {self.value}')
+        
+    def send(self):
+
+        #send keyCode: 'VolumeUp'
+        print(f'***send keyCode: "VolumeUp"***');
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0xe9), dbus.Byte(0x00)] }, [])
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00), dbus.Byte(0x00)] }, [])
+        print(f'***sent***')
+        return True
+                
+    def ReadValue(self, options):
+        print(f'Read Report: {self.value}')
+        return self.value
+
+    def WriteValue(self, value, options):
+        print(f'Write Report {self.value}')
+        self.value = value
+
+    def StartNotify(self):
+        print(f'Start Report Consumer Input')
+        GObject.timeout_add(15000, self.send)
+
+    def StopNotify(self):
+        print(f'Stop Start Report Consumer Input')
+ 
+
+#type="org.bluetooth.descriptor.report_reference" uuid="2908"
+class Report2ReferenceDescriptor(Descriptor):
+
+    DESCRIPTOR_UUID = '2908'
+
+    def __init__(self, bus, index, characteristic):
+        Descriptor.__init__(
+                self, bus, index,
+                self.DESCRIPTOR_UUID,
+                ['read'],
+                characteristic)
+                
+        '''
+        <Field name="Report ID">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Minimum>0</Minimum>
+            <Maximum>255</Maximum>
+        </Field>
+        
+        <Field name="Report Type">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint8</Format>
+            <Minimum>1</Minimum>
+            <Maximum>3</Maximum>
+            <Enumerations>
+                <Enumeration value="Input Report" key="1"/>
+                <Enumeration value="Output report" key="2"/>
+                <Enumeration value="Feature Report" key="3"/>
+                <ReservedForFutureUse start="4" end="255"/>
+                <ReservedForFutureUse1 start1="0" end1="0"/>
+            </Enumerations>
+        </Field>
+        '''
+        
+        # This report uses ReportId 2 as defined in the ReportMap characteristic
         self.value = dbus.Array(bytearray.fromhex('0201'), signature=dbus.Signature('y'))
         print(f'***ReportReference***: {self.value}')
 
@@ -664,102 +799,9 @@ class ReportReferenceDescriptor(Descriptor):
         print(f'Read ReportReference: {self.value}')
         return self.value
 
- 
-#############################
-# my sandbox
-#############################
-class SandboxService(Service):
-    """
-    Dummy test service that provides characteristics and descriptors that
-    exercise various API functionality.
-    """
-
-    SERVICE_UUID = '12345100-1234-5678-1234-56789abcdef1'
-
-    def __init__(self, bus, index):
-        Service.__init__(self, bus, index, self.SERVICE_UUID, True)
-        self.add_characteristic(SandboxCharacteristic(bus, 0, self))
-
-
-class SandboxCharacteristic(Characteristic):
-    """
-    Dummy test characteristic. Allows writing arbitrary bytes to its value, and
-    contains "extended properties", as well as a test descriptor.
-    """
-
-    CHARACTERISTIC_UUID = '12345110-1234-5678-1234-56789abcdef1'
-
-    def __init__(self, bus, index, service):
-        Characteristic.__init__(
-                self, bus, index,
-                self.CHARACTERISTIC_UUID,
-                ['read', 'write', 'notify'],
-                service)
-                
-        self.add_descriptor(SandboxDescriptor(bus, 0, self))
-        #self.value = []
-        self.value = dbus.Array(bytearray.fromhex('0000480000000000'))
-        print(f'***SandboxCharacteristic***: {self.value}')
-        
-    def send(self, value='Hey'):
-        if(self.notifying == False): print('Abort send'); return True
-        
-        print(f'***send {value}***');
-        self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': self.value}, [])
-        time.sleep(.1)
-        self.PropertiesChanged(GATT_CHRC_IFACE, {'Value': dbus.Array(bytearray.fromhex('0000000000000000'))}, [])
-
-        #self.payload = dbus.Array(bytearray.fromhex('0000480000000000'))     
-        #self.ReportValueChanged(self.payload)
-        #self.payload = dbus.Array(bytearray.fromhex('0000000000000000'))      
-        #self.ReportValueChanged(self.payload)
-        print(f'***sent***')
-        return True
- 
-    def ReadValue(self, options):
-        print('SandboxCharacteristic Read: ' + repr(self.value))
-        return self.value
-
-    def WriteValue(self, value, options):
-        print('SandboxCharacteristic Write: ' + repr(value))
-        self.value = value
-
-    def StartNotify(self):
-        print(f'Start Sandbox Notify')
-        self.notifying = True
-        GObject.timeout_add(10000, self.send)
-
-    def StopNotify(self):
-        print(f'Stop Sandbox Notify')
-        self.notifying = False
-
-
-class SandboxDescriptor(Descriptor):
-    """
-    Dummy test descriptor. Returns a static value.
-    """
-
-    DESCRIPTOR_UUID = '12345111-1234-5678-1234-56789abcdef1'
-
-    def __init__(self, bus, index, characteristic):
-        Descriptor.__init__(
-                self, bus, index,
-                self.DESCRIPTOR_UUID,
-                ['read', 'write'],
-                characteristic)
-                
-        self.value = dbus.Array(bytearray.fromhex('05010906a101050719e029e71500250175019508810295017508810195067508150025650507190029658100c0'))
-        print(f'***SandboxDescriptor***: {self.value}')
-
-
-    def ReadValue(self, options):
-        print('SandboxDescriptor Read')
-        return self.value
-
-    def WriteValue(self, value, options):
-        print(f'SandboxDescriptor Write: {value}')
-        self.value = value
-
+######################################################
+# MAIN
+######################################################
 def register_app_cb():
     print('GATT application registered')
 
