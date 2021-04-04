@@ -10,16 +10,14 @@
 #   Licensed works, modifications, and larger works may be distributed under different terms and without source code.
 #
 ####################################################################################################################
+print("Load gattServer")
 
+from gi.repository import GLib
+from dbus.mainloop.glib import DBusGMainLoop
+import os, sys, time, traceback, json
 import dbus, dbus.exceptions
-import dbus.mainloop.glib
+#import dbus.mainloop.glib
 import dbus.service
-
-try:
-  from gi.repository import GObject
-except ImportError:
-  import gobject as GObject
-import sys
 
 mainloop = None
 hidService = None
@@ -59,9 +57,13 @@ class Application(dbus.service.Object):
         self.services = []
         dbus.service.Object.__init__(self, bus, self.path)
         
-        self.add_service(HIDService(bus, 0))
-        self.add_service(DeviceInfoService(bus, 1))
-        self.add_service(BatteryService(bus, 2))
+        self.hidService = HIDService(bus, 0)
+        self.deviceService = DeviceInfoService(bus, 1)
+        self.batteryService = BatteryService(bus, 2)
+        
+        self.add_service(self.hidService)
+        self.add_service(self.deviceService)
+        self.add_service(self.batteryService)
 
     def get_path(self):
         return dbus.ObjectPath(self.path)
@@ -72,7 +74,7 @@ class Application(dbus.service.Object):
     @dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
     def GetManagedObjects(self):
         response = {}
-        print('GetManagedObjects')
+        #print('GetManagedObjects')
 
         for service in self.services:
             response[service.get_path()] = service.get_properties()
@@ -208,10 +210,6 @@ class Characteristic(dbus.service.Object):
     @dbus.service.signal(DBUS_PROP_IFACE, signature='sa{sv}as')
     def PropertiesChanged(self, interface, changed, invalidated):
         pass
-        
-    @dbus.service.signal(DBUS_PROP_IFACE, signature='ay')
-    def ReportValueChanged(self, reportValue):
-        pass
 
 
 class Descriptor(dbus.service.Object):
@@ -289,7 +287,6 @@ class BatteryLevelCharacteristic(Characteristic):
         self.notifying = False
         self.notifyCnt = 0
         self.battery_lvl = 100
-        #self.timer = GObject.timeout_add(60000, self.drain_battery)
 
     def notify_battery_level(self):
         self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(self.battery_lvl)] }, [])
@@ -297,7 +294,6 @@ class BatteryLevelCharacteristic(Characteristic):
         
     def drain_battery(self):
         if not self.notifying: return True
-        if(self.notifyCnt > 2): return False #Update battery level 3 times then stop
         
         if self.battery_lvl > 0:
             self.battery_lvl -= 2
@@ -307,14 +303,14 @@ class BatteryLevelCharacteristic(Characteristic):
                 
         print('Battery Level drained: ' + repr(self.battery_lvl))
         self.notify_battery_level()
-        return True
- 
+        return False #Stop after 1st Notify 
+        
     def ReadValue(self, options):
         print('Battery Level read: ' + repr(self.battery_lvl))
         return [dbus.Byte(self.battery_lvl)]
 
     def StartNotify(self):
-        print('Start Battery Notify')
+        print(' \n***Start Battery Notify')
         
         if self.notifying:
             print('Already notifying, nothing to do')
@@ -357,7 +353,7 @@ class VendorCharacteristic(Characteristic):
                 service)
         
         self.value = dbus.Array('HodgeCode'.encode(), signature=dbus.Signature('y'))
-        print(f'***VendorCharacteristic value***: {self.value}')
+        #print(f'***VendorCharacteristic value***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read VendorCharacteristic: {self.value}')
@@ -376,7 +372,7 @@ class ProductCharacteristic(Characteristic):
                 service)
         
         self.value = dbus.Array('smartRemotes'.encode(), signature=dbus.Signature('y'))
-        print(f'***ProductCharacteristic value***: {self.value}')
+        #print(f'***ProductCharacteristic value***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read ProductCharacteristic: {self.value}')
@@ -395,7 +391,7 @@ class VersionCharacteristic(Characteristic):
                 service)
         
         self.value = dbus.Array('version 1.0.0'.encode(), signature=dbus.Signature('y'))
-        print(f'***VersionCharacteristic value***: {self.value}')
+        #print(f'***VersionCharacteristic value***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read VersionCharacteristic: {self.value}')
@@ -449,7 +445,7 @@ class ProtocolModeCharacteristic(Characteristic):
         #self.value = dbus.Array([1], signature=dbus.Signature('y'))
         self.parent = service
         self.value = dbus.Array(bytearray.fromhex('01'), signature=dbus.Signature('y'))
-        print(f'***ProtocolMode value***: {self.value}')
+        #print(f'***ProtocolMode value***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read ProtocolMode: {self.value}')
@@ -509,7 +505,7 @@ class HIDInfoCharacteristic(Characteristic):
         '''
         
         self.value = dbus.Array(bytearray.fromhex('01110002'), signature=dbus.Signature('y'))
-        print(f'***HIDInformation value***: {self.value}')
+        #print(f'***HIDInformation value***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read HIDInformation: {self.value}')
@@ -528,7 +524,7 @@ class ControlPointCharacteristic(Characteristic):
                 service)
         
         self.value = dbus.Array(bytearray.fromhex('00'), signature=dbus.Signature('y'))
-        print(f'***ControlPoint value***: {self.value}')
+        #print(f'***ControlPoint value***: {self.value}')
 
     def WriteValue(self, value, options):
         print(f'Write ControlPoint {value}')
@@ -546,6 +542,7 @@ class ReportMapCharacteristic(Characteristic):
                 self.CHARACTERISTIC_UUID,
                 ['read'],
                 service)
+                
         '''
         <Field name="Report Map Value">
             <Requirement>Mandatory</Requirement>
@@ -599,10 +596,12 @@ class ReportMapCharacteristic(Characteristic):
   
         #USB HID Report Descriptor
         self.value = dbus.Array(bytearray.fromhex('05010906a1018501050719e029e71500250175019508810295017508150025650507190029658100c0050C0901A101850275109501150126ff0719012Aff078100C0'))
-        print(f'***ReportMap value***: {self.value}')
+        self.isMapLoaded = False
+        #print(f'***ReportMap value***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read ReportMap: {self.value}')
+        self.isMapLoaded = True
         return self.value
 
 
@@ -615,7 +614,7 @@ class Report1Characteristic(Characteristic):
         Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
-                ['secure-read', 'notify'],
+                ['read', 'notify'],
                 service)
                 
         '''
@@ -630,32 +629,34 @@ class Report1Characteristic(Characteristic):
         
         self.add_descriptor(Report1ReferenceDescriptor(bus, 1, self))
         
+        self.isConnected = False
         self.value = [dbus.Byte(0x00),dbus.Byte(0x00)]
-        print(f'***Report value***: {self.value}')
+        #print(f'***Report value***: {self.value}')
+       
+    def sendKey(self, keyBytes, keyHold, isMapLoaded):
+        #send keyCode
+        print(f' \n***Send report1 keyCode: {[hex(x) for x in keyBytes]}, keyHold: {keyHold}***');
+        if(self.isConnected == False): print('Abort Report1: Not connected to client'); return
+        #self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(keyBytes[0]),dbus.Byte(keyBytes[1])] }, [])
+        GLib.timeout_add(keyHold, self.sendNull)
         
-    def send(self):
-
-        #send keyCode: 'M'
-        print(f'***send keyCode: "M"***');
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x02),dbus.Byte(0x10)] }, [])
+    def sendNull(self):
         self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
-        print(f'***sent***')
-        return True
+        return False
                 
     def ReadValue(self, options):
         print(f'Read Report: {self.value}')
         return self.value
 
-    def WriteValue(self, value, options):
-        print(f'Write Report {self.value}')
-        self.value = value
-
     def StartNotify(self):
-        print(f'Start Start Report Keyboard Input')
-        GObject.timeout_add(10000, self.send)
+        print(f' \n***CONNECTED: Report1 Client')
+        self.isConnected = True
+        #GLib.timeout_add(10000, self.send)
 
     def StopNotify(self):
-        print(f'Stop Report Keyboard Input')
+        print(f' \n***DISCONNECTED: Report1 Client')
+        self.isConnected = False
 
 
 #type="org.bluetooth.descriptor.report_reference" uuid="2908"
@@ -695,7 +696,7 @@ class Report1ReferenceDescriptor(Descriptor):
        
         # This report uses ReportId 1 as defined in the ReportMap characteristic
         self.value = dbus.Array(bytearray.fromhex('0101'), signature=dbus.Signature('y'))
-        print(f'***ReportReference***: {self.value}')
+        #print(f'***ReportReference***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read ReportReference: {self.value}')
@@ -711,7 +712,7 @@ class Report2Characteristic(Characteristic):
         Characteristic.__init__(
                 self, bus, index,
                 self.CHARACTERISTIC_UUID,
-                ['secure-read', 'notify'],
+                ['read', 'notify'],
                 service)
                 
         '''
@@ -726,32 +727,33 @@ class Report2Characteristic(Characteristic):
         
         self.add_descriptor(Report2ReferenceDescriptor(bus, 1, self))
         
+        self.isConnected = False
         self.value = [dbus.Byte(0x00),dbus.Byte(0x00)]
-        print(f'***Report value***: {self.value}')
+        #print(f'***Report value***: {self.value}')
+              
+    def sendKey(self, keyBytes, keyHold, isMapLoaded):
+        #send keyCode
+        print(f' \n***Send report2 keyCode: {[hex(x) for x in keyBytes]}, keyHold: {keyHold}***');
+        if(self.isConnected == False): print('Abort Report2: Not connected to client'); return
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(keyBytes[0]),dbus.Byte(keyBytes[1])] }, [])
+        GLib.timeout_add(keyHold, self.sendNull)
         
-    def send(self):
-
-        #send keyCode: 'VolumeUp'
-        print(f'***send keyCode: "VolumeUp"***');
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0xe9), dbus.Byte(0x00)] }, [])
-        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00), dbus.Byte(0x00)] }, [])
-        print(f'***sent***')
-        return True
+    def sendNull(self):
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': [dbus.Byte(0x00),dbus.Byte(0x00)] }, [])
+        return False
                 
     def ReadValue(self, options):
         print(f'Read Report: {self.value}')
         return self.value
 
-    def WriteValue(self, value, options):
-        print(f'Write Report {self.value}')
-        self.value = value
-
     def StartNotify(self):
-        print(f'Start Report Consumer Input')
-        GObject.timeout_add(15000, self.send)
+        print(f' \n***CONNECTED: Report2 Client')
+        self.isConnected = True
+        #GLib.timeout_add(15000, self.send)
 
     def StopNotify(self):
-        print(f'Stop Start Report Consumer Input')
+        print(f' \n***DISCONNECTED: Report2 Client')
+        self.isConnected = False
  
 
 #type="org.bluetooth.descriptor.report_reference" uuid="2908"
@@ -791,62 +793,96 @@ class Report2ReferenceDescriptor(Descriptor):
         
         # This report uses ReportId 2 as defined in the ReportMap characteristic
         self.value = dbus.Array(bytearray.fromhex('0201'), signature=dbus.Signature('y'))
-        print(f'***ReportReference***: {self.value}')
+        #print(f'***ReportReference***: {self.value}')
 
     def ReadValue(self, options):
         print(f'Read ReportReference: {self.value}')
         return self.value
 
-######################################################
-# MAIN
-######################################################
+####################################
+async def transfer(post, options):
+####################################
+    
+    try:
+        #loop = asyncio.get_event_loop()
+        key = post['service_data']['post']
+        if(key.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
+        if(key.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
+    
+        reportNum = key.get('hidReport', 1)
+        hidCode = key.get('hidCode', 0)
+        hidMod = key.get('hidMod', 0)
+        hold = key.get('hidWait', 0) * 1000
+        repeat = key.get('hidRepeat', 0)    
+
+        if(reportNum == 1):
+            #Transfer Keyboard Input
+            keyBytes = [hidMod, hidCode]
+            options['report1'].sendKey(keyBytes, hold, options['app'].hidService.reportMap.isMapLoaded)
+            return        
+        elif(reportNum == 2):    
+            #Transfer Consumer Input
+            keyBytes = hidCode.to_bytes(2, byteorder='little')
+            options['report2'].sendKey(keyBytes, hold, options['app'].hidService.reportMap.isMapLoaded)
+            return
+        else:
+            print(f'Abort transfer, Invalid reportNum: {reportNum}')
+    except:
+        print('Abort transfer: ', sys.exc_info()[0])
+        traceback.print_exc()
+
+####################################
 def register_app_cb():
+####################################
     print('GATT application registered')
 
 
+####################################
 def register_app_error_cb(error):
+####################################
     print('Failed to register application: ' + str(error))
     mainloop.quit()
 
 
+####################################
 def find_adapter(bus):
-    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'),
-                               DBUS_OM_IFACE)
+####################################
+    remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
     objects = remote_om.GetManagedObjects()
 
-    for o, props in objects.items():
-        if GATT_MANAGER_IFACE in props.keys():
-            return o
+    for adapter, props in objects.items():
+        if GATT_MANAGER_IFACE in props.keys(): return adapter
 
     return None
 
-def main():
+####################################
+def start(options={}):
+####################################
+    print("Start gattServer")
     global mainloop
-
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
+    
+    DBusGMainLoop(set_as_default=True)
     bus = dbus.SystemBus()
-
     adapter = find_adapter(bus)
+
     if not adapter:
         print('GattManager1 interface not found')
         return
 
-    service_manager = dbus.Interface(
-            bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-            GATT_MANAGER_IFACE)
-
-    app = Application(bus)
-
-    mainloop = GObject.MainLoop()
+    service_manager = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter), GATT_MANAGER_IFACE)
+    options['app'] = Application(bus)
+    options['report1'] = options['app'].hidService.report1
+    options['report2'] = options['app'].hidService.report2
+    options['transfer'] = transfer
 
     print('Registering GATT application...')
+    service_manager.RegisterApplication(options['app'].get_path(), {}, reply_handler=register_app_cb, error_handler=register_app_error_cb)
 
-    service_manager.RegisterApplication(app.get_path(), {},
-                                    reply_handler=register_app_cb,
-                                    error_handler=register_app_error_cb)
-
+    mainloop = GLib.MainLoop()
     mainloop.run()
 
+##########################
+#        MAIN
+##########################
 if __name__ == '__main__':
-    main()
+    start()
