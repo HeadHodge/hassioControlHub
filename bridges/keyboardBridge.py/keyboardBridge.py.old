@@ -24,7 +24,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/maps/map2hassio.py')
 sys.path.append(path)
 
-import usbServer, gattServer, httpServer, wsioServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
+import usbServer, btServer, httpServer, wsioServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
 
 _transferNum = 0
 
@@ -197,7 +197,7 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
         # Enable ConnectSignal
         try:
             threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
-            #threading.Thread(target=btProfile.start).start()
+            threading.Thread(target=btProfile.start).start()
             time.sleep(1)
         except:
             print('Abort enableConnectSignal: ', sys.exc_info()[0])
@@ -205,17 +205,13 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
 
         # Start bt output module
         try:            
-            #_btControlOptions['userEvent'] = btControlEvent
-            #_btControlOptions['channel'] = options["controlPort"]
-            #threading.Thread(target=btServer.start, args=(_btControlOptions,)).start()
+            _btControlOptions['userEvent'] = btControlEvent
+            _btControlOptions['channel'] = options["controlPort"]
+            threading.Thread(target=btServer.start, args=(_btControlOptions,)).start()
 
-            #_btTransferOptions['userEvent'] = btTransferEvent
-            #_btTransferOptions['channel'] = options["interruptPort"]
-            #threading.Thread(target=btServer.start, args=(_btTransferOptions,)).start()
-            
             _btTransferOptions['userEvent'] = btTransferEvent
             _btTransferOptions['channel'] = options["interruptPort"]
-            threading.Thread(target=gattServer.start, args=(_btTransferOptions,)).start()
+            threading.Thread(target=btServer.start, args=(_btTransferOptions,)).start()
 
             time.sleep(1)
         except:

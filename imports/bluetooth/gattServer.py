@@ -504,7 +504,7 @@ class HIDInfoCharacteristic(Characteristic):
         </Field>
         '''
         
-        self.value = dbus.Array(bytearray.fromhex('01110002'), signature=dbus.Signature('y'))
+        self.value = dbus.Array(bytearray.fromhex('01110003'), signature=dbus.Signature('y'))
         #print(f'***HIDInformation value***: {self.value}')
 
     def ReadValue(self, options):

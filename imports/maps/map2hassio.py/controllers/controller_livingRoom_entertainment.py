@@ -41,8 +41,8 @@ tasks = {
 	"Back": [
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": "BACK"}}
 		#{"androidtv/adb_command": {"entity_id": "media_player.firetv_livingroom", "command": adbEvents["Back"]}}
-		{"script/publish_post": {"post": {"keyCode": "Back", "hidCode": 41, "hidMod": 0, "hidReport": 3}}}
-		#{"script/publish_post": {"post": {"keyCode": "Back", "hidCode": 0x46, "hidReport": 2}}}
+		#{"script/publish_post": {"post": {"keyCode": "Back", "hidCode": 41, "hidMod": 0, "hidReport": 3}}}
+		{"script/publish_post": {"post": {"keyCode": "Back", "hidCode": 0x46, "hidReport": 2}}}
 	],
 	
 	"Up": [
