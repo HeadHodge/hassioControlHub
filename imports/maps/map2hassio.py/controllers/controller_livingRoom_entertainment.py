@@ -130,14 +130,14 @@ tasks = {
 	],
 	
 	"Open": [
-		#{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}
-		{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 0x223, "hidReport": 2}}}
+		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}
+		#{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 0x223, "hidReport": 2}}}
 	],
 	
 	"OnToggle": [
-		#{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}	
+		{"remote/send_command": {"entity_id": "remote.broadlink_ir_hub_downstairs_remote", "device": "Insignia FireTV", "command": "On/Off"}}	
 		#{"script/publish_post": {"post": {"keyCode": "Home", "hidCode": 102, "hidMod": 0}}}
-		{"script/publish_post": {"post": {"keyCode": "OnToggle", "hidCode": 0x30, "hidReport": 2}}}
+		#{"script/publish_post": {"post": {"keyCode": "OnToggle", "hidCode": 0x30, "hidReport": 2}}}
 	],
 };
 
