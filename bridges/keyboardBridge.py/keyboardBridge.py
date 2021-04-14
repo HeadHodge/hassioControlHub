@@ -5,7 +5,7 @@ print('Load usb2bt')
 
 from multiprocessing import Process
 from dbus.mainloop.glib import DBusGMainLoop
-import os, sys, time, json, asyncio, traceback, queue, threading
+import os, sys, time, json, asyncio, traceback, queue, threading, importlib
 if len(sys.argv) < 3: 
     print('Terminate usb2hassio, missing required zone name and/or event list arguments')
     print('Example: python3 usb2hassio.py masterBedroom 3,4,5,6')
@@ -24,7 +24,7 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), '../../imports/maps/map2hassio.py')
 sys.path.append(path)
 
-import usbServer, btServer, httpServer, wsioServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
+import usbServer, gattServer, httpServer, wsioServer, wsClient, btDevice, btProfile, keyMaps, map2hassio
 
 _transferNum = 0
 
@@ -55,6 +55,7 @@ _wsTransferOptions = {
     "port": "8123",
     "path": "/api/websocket",
     "firstPost": "User",
+    "ack": True,
     "userEvent": None,
     "agentEvent": None
    }
@@ -66,22 +67,21 @@ async def translateInput(keyCode, zone):
     global _transferNum
 
     hassioSequence = map2hassio.keyCode2hassio(keyCode, zone)
+    
     if(hassioSequence == None): return
+    
+    if(hassioSequence == 'RELOAD'): 
+        print('reload')
+        importlib.reload(keyMaps)
+        importlib.reload(map2hassio)
+        return
     
     for task in hassioSequence:
         key = list(task.keys())[0]
         data = task[key]
         command = key.split('/')
         
-        if(command[0] == 'sleep'):
-            payload = {
-                "id": 0, 
-                "type": "sleep",	
-                "service_data": data
-            }
-            
-            _ioQueue.put(payload)
-            continue
+        if(command[0] == 'sleep'): print(f' \n***SLEEP: {data} seconds'); time.sleep(data); continue
             
         _transferNum += 1
         
@@ -99,6 +99,7 @@ async def translateInput(keyCode, zone):
             await _btTransferOptions['transfer'](payload, _btTransferOptions)
         else:
             print(f' \n***wsTRANSFER: {payload}')
+            _wsTransferOptions['ack'] = False
             await _wsTransferOptions['transfer'](payload, _wsTransferOptions)
     
         print(f'************************************************************************* \n')
@@ -133,13 +134,15 @@ async def wssInputEvent(post):
 ##########################
 async def btControlEvent(post, options):
 ##########################
-    print(f' \n*************************************************************************')
+    return
     print(f' \n***btCONTROL: RECEIVED POST: {post}')
     print(f' \n***btCONTROL: WAIT')
+    print(f'************************************************************************* \n')
     
 ##########################
 async def btTransferEvent(post, options):
 ##########################
+    print(list(bytes(post)), len(post))
     print(f' \n*************************************************************************')
     print(f' \n***btOUT: RECEIVED POST: {post}')
     print(f' \n***btOUT: WAIT')
@@ -148,7 +151,8 @@ async def btTransferEvent(post, options):
 async def wsTransferEvent(post, options):
 #############################################
     print(f' \n***wsOUT: {post}')
-
+    options['ack'] = True
+    
     content = json.loads(post)
     if(content['type'] == "auth_required"):
         payload = {
@@ -161,11 +165,6 @@ async def wsTransferEvent(post, options):
         await options['transfer'](payload, options)
         print(f' \n***********************************************************************')
         print(f'***wsOUT: WAIT')
-   
-#############################################
-def onConnectSignal(interface, changed, path):
-#############################################
-    print(f'****CONNECTION ALERT****, interface: {interface}, connected: {changed["Connected"]}')
    
 #############################################
 def start(options={"controlPort": 17, "interruptPort": 19}):
@@ -190,24 +189,20 @@ def start(options={"controlPort": 17, "interruptPort": 19}):
             print('Abort wsServer: ', sys.exc_info()[0])
             traceback.print_exc()
 
-        # Enable ConnectSignal
-        try:
-            threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
-            threading.Thread(target=btProfile.start).start()
-            time.sleep(1)
-        except:
-            print('Abort enableConnectSignal: ', sys.exc_info()[0])
-            traceback.print_exc()
 
         # Start bt output module
         try:            
-            _btControlOptions['userEvent'] = btControlEvent
-            _btControlOptions['channel'] = options["controlPort"]
-            threading.Thread(target=btServer.start, args=(_btControlOptions,)).start()
+            #_btControlOptions['userEvent'] = btControlEvent
+            #_btControlOptions['channel'] = options["controlPort"]
+            #threading.Thread(target=btServer.start, args=(_btControlOptions,)).start()
 
+            #_btTransferOptions['userEvent'] = btTransferEvent
+            #_btTransferOptions['channel'] = options["interruptPort"]
+            #threading.Thread(target=btServer.start, args=(_btTransferOptions,)).start()
+            
             _btTransferOptions['userEvent'] = btTransferEvent
             _btTransferOptions['channel'] = options["interruptPort"]
-            threading.Thread(target=btServer.start, args=(_btTransferOptions,)).start()
+            threading.Thread(target=gattServer.start, args=(_btTransferOptions,)).start()
 
             time.sleep(1)
         except:

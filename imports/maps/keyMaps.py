@@ -58,7 +58,7 @@ _keyCode = {
     "Up" 			: {"name": "dpad up",            "hidCode":82,  "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},
     "Set" 			: {"name": "set options",        "hidCode":88,  "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},
     "Menu" 			: {"name": "options menu",       "hidCode":101, "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},
-    "OnToggle" 		: {"name": "power toggle",       "hidCode":102, "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},
+    "OnToggle" 		: {"name": "power toggle",       "hidCode":248, "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},
     "SoundToggle" 	: {"name": "volume mute",        "hidCode":127, "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},
     "Louder" 		: {"name": "volume up",          "hidCode":128, "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},
     "Softer" 		: {"name": "volume down",        "hidCode":129, "hidMod": 0, "keyDuration": _keyDuration, "zone": _zone},

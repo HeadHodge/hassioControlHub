@@ -22,46 +22,73 @@ import btDevice
 ##########################
 async def transfer(post, options):
 ##########################
-    loop = asyncio.get_event_loop()
-    key = post['service_data']['post']
+    global myCode
     
-    if(options.get('connection', None) == None): print('Abort transfer, no active connecton available'); return
-    if(key.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
-    if(key.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
-    if(key.get('hidMod', None) == None): print('Abort transfer, "hidMod" missing'); return
+    try:
+        loop = asyncio.get_event_loop()
+        key = post['service_data']['post']
     
-    repeat = key.get('hidRepeat', 0)    
-    wait = key.get('hidWait', .75)
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
+        if(options.get('isConnected', None) == None): print('Abort transfer, no active connecton available'); return
+        if(key.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
+        if(key.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
     
-    for x in range(repeat): 
-        #print(x)
-        await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, key['hidMod'], 0, key['hidCode'], 0, 0, 0, 0, 0 ]))
-        await asyncio.sleep(wait)
-  
-    await loop.sock_sendall(options['connection'], bytes([ 0xA1, 1, 0, 0, 0, 0, 0, 0, 0, 0 ]))
-            
+        repeat = key.get('hidRepeat', 0)    
+        hold = key.get('hidWait', 0)
+        reportNum = key.get('hidReport', 1)
+        hidCode = key.get('hidCode', 0)
+        hidMod = key.get('hidMod', 0)
+
+        if(reportNum == 1):
+            #Send Report #1
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, 0, hidCode, 0, 0, 0, 0, 0 ]))
+            await asyncio.sleep(hold)  
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]))
+            return        
+        elif(reportNum == 2):    
+            #Send Report #2
+            keyBytes = hidCode.to_bytes(2, byteorder='little')
+            #print(bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
+            await asyncio.sleep(hold)
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
+            return
+        elif(reportNum == 3):    
+            #Send Report #3
+            print('SEND Report 3')
+            #Send Report #3
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, hidCode ]))
+            await asyncio.sleep(hold)  
+            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
+            return        
+        else:
+            print(f'Abort transfer, Invalid reportNum: {reportNum}')
+    except:
+        print('Abort transfer: ', sys.exc_info()[0])
+        traceback.print_exc()
+             
 #############################################
 async def connect(server, loop, options):
 #############################################
     while True:
         try:
-            print("***WAIT for a connection")
-            connection,  address = await loop.sock_accept(server)
+            print(" \n==============================================================")
+            print("***CONNECT")
+            connection, device = await loop.sock_accept(server)
+            options['server'] = server
             options['connection'] = connection
-            print(f' \n***CONNECTED at address: {address}\n')
+            options['isConnected'] = True
+            print(f' \n***CONNECTED to device: {device}\n')
             
             while True:
                 print(f'***WAIT btPOST')
                 post = await loop.sock_recv(connection, 2048)
+                if(len(post) == 0): raise Exception("****DISCONNECTED****")
                 if(options.get('userEvent', None) != None): await options['userEvent'](post, options); continue
                 print(f' \n***RECEIVED POST: {post}')
-                
         except:
-            print('***ABORT Connection: ', sys.exc_info()[0])
-            traceback.print_exc()
-            print(' \n \n')
-        
+            print(' \n***ABORT CONNECTION: ', sys.exc_info()[1])
+            options['isConnected'] = None
+            
 ####################################################################################################
 def start(options={}): # Note: standard hid channels > "controlPort": 17, "interruptPort": 19
 ####################################################################################################

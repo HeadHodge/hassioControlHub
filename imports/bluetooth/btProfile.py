@@ -28,7 +28,7 @@ def loadServiceRecord():
     """
     try:
         currentDirectory  = os.path.dirname(os.path.realpath(__file__))
-        filePath = os.path.join(currentDirectory, 'sdpRecord.xml')
+        filePath = os.path.join(currentDirectory, 'serviceRecord.xml')
         print(f'load serviceRecord: {filePath}')
         fh = open(filePath, 'r')
         return fh.read()
@@ -55,10 +55,10 @@ def loadProfile(deviceName='smartRemotes Keypad'):
     
     btDevice.registerProfile(profileUUID, profileOptions)
     
+    btDevice.setPowered(True)
     btDevice.setAlias(deviceName)
     btDevice.setDiscoverable(True)
-    btDevice.setDiscoverableTime(300)
-    btDevice.setPowered(True)
+    btDevice.setDiscoverableTime(900)
     
     print(f'Device Name: "{btDevice.getAlias()}"')
     print(f'isDiscoverable: {btDevice.getDiscoverable()}')
