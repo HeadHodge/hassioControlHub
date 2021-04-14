@@ -57,8 +57,9 @@ class Application(dbus.service.Object):
         dbus.service.Object.__init__(self, bus, self.path)
         
         self.hidService = HIDService(bus, 0)
-        self.deviceService = DeviceInfoService(bus, 1)
-        self.batteryService = BatteryService(bus, 2)
+        self.genericAttributeService = GenericAttributeService(bus, 1)
+        self.deviceService = DeviceInfoService(bus, 2)
+        self.batteryService = BatteryService(bus, 3)
         
         self.add_service(self.hidService)
         self.add_service(self.deviceService)
@@ -326,6 +327,61 @@ class BatteryLevelCharacteristic(Characteristic):
             return
 
         self.notifying = False
+
+
+#name="Generic Attribute" last-modified="2012-12-04" type="org.bluetooth.service.generic_attribute" uuid="1801"
+class GenericAttributeService(Service):
+
+    SERVICE_UUID = '1801'
+
+    def __init__(self, bus, index):
+        Service.__init__(self, bus, index, self.SERVICE_UUID, True)
+        self.add_characteristic(ServiceChangedCharacteristic(bus, 0, self))
+
+
+#name="Service Changed" type="org.bluetooth.characteristic.gatt.service_changed" last-modified="2013-05-29" uuid="2A05"       
+class ServiceChangedCharacteristic(Characteristic):
+
+    CHARACTERISTIC_UUID = '2A05'
+
+    def __init__(self, bus, index, service):
+        Characteristic.__init__(self, bus, index, self.CHARACTERISTIC_UUID, ['notify'], service)
+                
+        '''
+        <Value>
+        <Field name="Start of Affected Attribute Handle Range">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint16</Format>
+            <Minimum>1</Minimum>
+            <Maximum>65535</Maximum>
+        </Field>
+        <Field name="End of Affected Attribute Handle Range">
+            <Requirement>Mandatory</Requirement>
+            <Format>uint16</Format>
+            <Minimum>1</Minimum>
+            <Maximum>65535</Maximum>
+        </Field>
+        </Value>
+        
+        example(handle 1-65535): [dbus.Byte(0x01),dbus.Byte(0x00),dbus.Byte(0xFF),dbus.Byte(0xFF)]
+        '''
+        
+        self.isConnected = False
+        self.handles = [dbus.Byte(0x01),dbus.Byte(0x00),dbus.Byte(0xFF),dbus.Byte(0xFF)]
+       
+    def notifyServiceChanged(self):
+        #send keyCode
+        print(f' \n***notifyServiceChanged: {[hex(x) for x in keyBytes]}, keyHold: {keyHold}***');
+        self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': self.handles }, [])
+
+    def StartNotify(self):
+        print(f' \n***CONNECTED: ServiceChanged Characteristic')
+        self.isConnected = True
+        #GLib.timeout_add(10000, self.send)
+
+    def StopNotify(self):
+        print(f' \n***DISCONNECTED: ServiceChanged Characteristic')
+        self.isConnected = False
 
 
 #sourceId="org.bluetooth.service.device_information" type="primary" uuid="180A"
@@ -907,6 +963,7 @@ def start(options={}):
         # Enable ConnectSignal
         #threading.Thread(target=btDevice.enableConnectSignal, args=(onConnectSignal,)).start()
         btDevice.enableConnectSignal(onConnectSignal)
+        print(f'Connected: {btDevice.isConnected()}')
         #onConnectSignal('org.bluez.Device1', {'Connected': btDevice.isConnected()})
         
         # Start btOutput event loop

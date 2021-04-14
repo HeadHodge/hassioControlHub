@@ -81,13 +81,15 @@ def getAddress():
 def isConnected():
 #############################################
     """Return the device connection state."""
+    if(_options['deviceProperties']['interface'] == None): return 0
     return _options['deviceProperties']['interface'].Get(_options['deviceProperties']['device'], 'Connected')
     
 #############################################
 def enableConnectSignal(callBack):
 #############################################
     print(f'enableConnectSignal')
-
+    if(_options['devicePath'] == None): print('Abort enableConnectSignal, no device connected'); return
+    
     _options['systemBus'].add_signal_receiver(callBack, signal_name = 'PropertiesChanged', path = _options['devicePath'])
         
     # Start btOutput event loop
@@ -116,17 +118,18 @@ def start():
 
     #get 1st paired device name
     devicePath = None
+    interface['deviceProperties'] = None
     for child in ElementTree.fromstring(interface['dbusIntrospect'].Introspect()):
         if child.tag != 'node': continue
         deviceName = child.attrib['name']
         devicePath = '/org/bluez/hci0/' + deviceName
+        interface['deviceProperties'] = dbus.Interface(systemBus.get_object('org.bluez', devicePath), 'org.freedesktop.DBus.Properties')
         #print('devicePath', devicePath)
         break
 
     #get bluez interfaces
     interface['bluezManager'] = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez'), 'org.bluez.ProfileManager1')
     interface['hciProperties'] = dbus.Interface(systemBus.get_object('org.bluez', '/org/bluez/hci0'), 'org.freedesktop.DBus.Properties')
-    interface['deviceProperties'] = dbus.Interface(systemBus.get_object('org.bluez', devicePath), 'org.freedesktop.DBus.Properties')
     
     _options['systemBus'] = systemBus
     
