@@ -8,13 +8,13 @@ import asyncio, traceback
 _options = None
 
 #######################################
-async def onInput(connection, post):
+async def onInput(connection, note):
 #######################################
-    print('received post: ', post)
+    print('received note: ', note)
     try:    
-        reply = await _options['onEvent']('post', post)
-        print('reply: ', reply)
-        if(reply == None): return
+        #reply = await _options['onEvent']('note', note)
+        #print('reply: ', reply)
+        #if(reply == None): return
     
         await connection.send('{"format": "reply", "reply": "Got It"}')
     except:

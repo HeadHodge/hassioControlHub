@@ -3,32 +3,35 @@
 #############################################
 print('Load usbServer')
 
-import sys, time, json, threading, traceback, asyncio
 from evdev import InputDevice, categorize, ecodes
+import sys, time, json, threading, traceback, asyncio
+import noteTool
+
+_parent = sys.modules["__main__"]
         
 ############################
-def captureInput(channel, options):
+def captureInput(channel):
 ############################
     #print(f'captureInput on channel: {channel}')
     
+    zone = _parent._zone
     lastCode = 0
     lastTime = time.time()
     device = InputDevice(f'/dev/input/event{channel}')
     device.grab()
     postTime = 0
         
-    print(f'grabbed: {device} in zone: {options["zone"]}')
-
+    print(f'grabbed: {device} in zone: {zone}')
+    '''
     keyData = {
         "scanTime" : 0,
         "scanCode" : 0,
         "keyCode"  : 0,
         "channel"  : channel,
         "device"   : device.name,
-        "zone"     : options['zone'],
-        "userEvent": options['userEvent']
+        "zone"     : zone
     }
-        
+    '''    
     startTime = 0
     startCode = 0
             
@@ -39,20 +42,22 @@ def captureInput(channel, options):
             keyEvent = categorize(event)
             if(keyEvent.scancode == startCode and currentTime - startTime < .50): continue
             
-            print(keyEvent)
             startCode = keyEvent.scancode
             startTime = currentTime
             
-            payload = {
+            #print(keyEvent)
+            
+            note = _parent.noteTool.publishNote('usbServer', 'captured usbInput', {
                 "keyCode" : keyEvent.keycode,
                 "scanCode": keyEvent.scancode,
                 "channel" : channel,
                 "device"  : device.name,
-                "zone"    : options['zone'],
-                "time"    : time.time()
-            }
-                        
-            asyncio.run(options['userEvent'](payload))
+                "zone"    : zone,
+                "time"    : int(time.time() * 1000)
+            })
+            
+            asyncio.run(_parent.receivedNote(note))
+            #_parent.receivedNote(note)
         except:
             print(f'Abort captureInput: {sys.exc_info()[0]}')
             traceback.print_exc()
@@ -60,17 +65,17 @@ def captureInput(channel, options):
 ###################
 # start
 ###################
-def start(options={"zone":"masterBedroom", "channels": [3,4,5,6]}):
+def start():
     print('Start usbServer')
 
     try:
-        if(options.get('userEvent', None) == None): print('Abort usbServer, no "userEvent" method provided in options'); return
-        #if(options.get('queue', None) == None): print('Abort usbServer, no "queue" object provided in options'); return
-        if(options.get('zone', None) == None): print('Abort usbServer, no "zone" value provided in options'); return
-        #_options = options
-       
-        for channel in options['channels']:
-            threading.Thread(target=captureInput, args=(channel, options)).start()
+        print(' \n***Grab USB Devices:')
+        
+        for channel in _parent._channels:
+            threading.Thread(target=captureInput, args=(channel,)).start()
+        
+        time.sleep(1)
+        print(' \n========================================================')
 
     except:
         print('Abort usbServer', sys.exc_info()[0])
