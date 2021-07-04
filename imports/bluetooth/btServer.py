@@ -24,48 +24,44 @@ async def transfer(post, options):
 ##########################
     global myCode
     
-    try:
-        loop = asyncio.get_event_loop()
-        key = post['service_data']['post']
+    loop = asyncio.get_event_loop()
+    key = post['service_data']['post']
     
-        if(options.get('isConnected', None) == None): print('Abort transfer, no active connecton available'); return
-        if(key.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
-        if(key.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
+    if(options.get('connection', None) == None): print('Abort transfer, no active connecton available'); return
+    if(key.get('keyCode', None) == None): print('Abort transfer, "keyCode" missing'); return
+    if(key.get('hidCode', None) == None): print('Abort transfer, "hidCode" missing'); return
     
-        repeat = key.get('hidRepeat', 0)    
-        hold = key.get('hidWait', 0)
-        reportNum = key.get('hidReport', 1)
-        hidCode = key.get('hidCode', 0)
-        hidMod = key.get('hidMod', 0)
+    repeat = key.get('hidRepeat', 0)    
+    hold = key.get('hidWait', 0)
+    reportNum = key.get('hidReport', 1)
+    hidCode = key.get('hidCode', 0)
+    hidMod = key.get('hidMod', 0)
 
-        if(reportNum == 1):
-            #Send Report #1
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, 0, hidCode, 0, 0, 0, 0, 0 ]))
-            await asyncio.sleep(hold)  
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]))
-            return        
-        elif(reportNum == 2):    
-            #Send Report #2
-            keyBytes = hidCode.to_bytes(2, byteorder='little')
-            #print(bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
-            await asyncio.sleep(hold)
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
-            return
-        elif(reportNum == 3):    
-            #Send Report #3
-            print('SEND Report 3')
-            #Send Report #3
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, hidCode ]))
-            await asyncio.sleep(hold)  
-            await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
-            return        
-        else:
-            print(f'Abort transfer, Invalid reportNum: {reportNum}')
-    except:
-        print('Abort transfer: ', sys.exc_info()[0])
-        traceback.print_exc()
-             
+    if(reportNum == 1):
+        #Send Report #1
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, 0, hidCode, 0, 0, 0, 0, 0 ]))
+        await asyncio.sleep(hold)  
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0, 0, 0, 0, 0, 0, 0 ]))
+        return        
+    elif(reportNum == 2):    
+        #Send Report #2
+        keyBytes = hidCode.to_bytes(2, byteorder='little')
+        #print(bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, keyBytes[0], keyBytes[1] ]))
+        await asyncio.sleep(hold)
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
+        return
+    elif(reportNum == 3):    
+        #Send Report #3
+        print('SEND Report 3')
+        #Send Report #3
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, hidMod, hidCode ]))
+        await asyncio.sleep(hold)  
+        await loop.sock_sendall(options['connection'], bytes([ 0xA1, reportNum, 0, 0 ]))
+        return        
+    else:
+        print(f'Abort transfer, Invalid reportNum: {reportNum}')
+            
 #############################################
 async def connect(server, loop, options):
 #############################################
@@ -74,9 +70,7 @@ async def connect(server, loop, options):
             print(" \n==============================================================")
             print("***CONNECT")
             connection, device = await loop.sock_accept(server)
-            options['server'] = server
             options['connection'] = connection
-            options['isConnected'] = True
             print(f' \n***CONNECTED to device: {device}\n')
             
             while True:
@@ -87,7 +81,7 @@ async def connect(server, loop, options):
                 print(f' \n***RECEIVED POST: {post}')
         except:
             print(' \n***ABORT CONNECTION: ', sys.exc_info()[1])
-            options['isConnected'] = None
+            #connection.close()
             
 ####################################################################################################
 def start(options={}): # Note: standard hid channels > "controlPort": 17, "interruptPort": 19

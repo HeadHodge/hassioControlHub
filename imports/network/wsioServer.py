@@ -4,38 +4,26 @@
 print('Load wsServer')
 
 import sys, time, json, traceback, asyncio
-import noteTool
 from aiohttp import web
 
-_parent = sys.modules["__main__"]
 _options = {}
 
 #############################################
-async def deliverNote(note, connection):
-#############################################
-    #print('receivedNote')
-    await connection.send_str(noteTool.object2serial(note))
-
-#############################################
-async def receiveNotes(request):
+async def connect(request):
 #############################################
     global _options
+    if(_options.get('userEvent', None) == None): print('Abort connect, userEvent method missing in options'); return
 
-    connection = web.WebSocketResponse()
-    #connection.deliverNote = deliverNote
-    await connection.prepare(request)
-    print(f' \n***CONNECTED: wsServer on port: {_options["port"]}')
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
+    print(f' \n***wssCONNECTED on port: {_options["port"]}')
 
-    async for message in connection:
-        try:        
-            note = noteTool.serial2object(message.data)
-            await _parent.receivedNote(note, connection)
-        except:
-            print('Abort receiveNote', sys.exc_info()[0])
-            traceback.print_exc()
+    async for userPost in ws:
+        print(f'wsServer received userPost: {userPost}')
+        await _options['userEvent'](json.loads(userPost[1]))
 
-    print(' \n***CLOSED: wsServer')
-    #return connection
+    print(' \n***wssCLOSED')
+    return ws
     
 #############################################
 def start(options={"port": 8080}):
@@ -44,17 +32,11 @@ def start(options={"port": 8080}):
     global _options
     
     _options = options
-    
     asyncio.set_event_loop(asyncio.new_event_loop())
-    while True:
-        try:        
-            app = web.Application()
-            app.add_routes([web.get('/', receiveNotes)])
-            web.run_app(app, port=options['port'], handle_signals=False)
-        except:
-            print('Abort start wsServer', sys.exc_info()[0])
-            traceback.print_exc()
-   
+    app = web.Application()
+    app.add_routes([web.get('/', connect)])
+    web.run_app(app, port=options['port'], handle_signals=False)
+    
 #######################################
 #              MAIN
 #######################################
